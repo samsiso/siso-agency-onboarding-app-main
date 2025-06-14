@@ -4,35 +4,21 @@ import {
   ArrowRight, Users, DollarSign, Shield, Zap, Calculator, CheckCircle, 
   Search, Code, Phone, Mail, ChevronDown, ChevronUp, Star, Award,
   Building, ShoppingCart, Heart, GraduationCap, Stethoscope, Utensils,
-  Menu, X
+  Menu, X, ExternalLink, Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GradientHeading } from '@/components/ui/gradient-heading';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import PartnershipStats from '@/components/partnership/PartnershipStats';
 import CommissionCalculator from '@/components/partnership/CommissionCalculator';
-import { usePartnerApplication } from '@/hooks/usePartnerApplication';
-import { toast } from 'sonner';
 
 const PartnershipPage = memo(() => {
   const navigate = useNavigate();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState('hero');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { submitApplication, isSubmitting } = usePartnerApplication();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    experience: '',
-    network: '',
-    expectedVolume: ''
-  });
 
   // Scroll progress tracking
   const { scrollYProgress } = useScroll();
@@ -43,73 +29,37 @@ const PartnershipPage = memo(() => {
   });
 
   const handleApplyNow = () => {
-    // Scroll to application form instead of navigating away
-    const element = document.getElementById('application');
+    // Redirect directly to auth with partner context instead of scrolling to form
+    navigate('/auth', { 
+      state: { 
+        userType: 'partner',
+        returnTo: '/dashboard',
+        source: 'partnership-landing-apply-now'
+      }
+    });
+  };
+
+  const handleLearnMore = () => {
+    const element = document.getElementById('benefits');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
-      setActiveSection('application');
+      setActiveSection('benefits');
     }
   };
 
-  const handleSubmitApplication = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      // Transform form data to match API expectations
-      const applicationData = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        company: '', // Optional field, set to empty string
-        networkDescription: formData.network,
-        expectedReferrals: parseInt(formData.expectedVolume) || 1,
-        experienceLevel: 'Intermediate' as const // Default value, could be made dynamic
-      };
 
-      const success = await submitApplication(applicationData);
-      
-      if (success) {
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          experience: '',
-          network: '',
-          expectedVolume: ''
-        });
-
-        // Show success message and redirect after delay
-        toast.success('Application submitted successfully! We will contact you within 24 hours.');
-        
-        // Optional: Navigate to a confirmation page or dashboard after delay
-        setTimeout(() => {
-          navigate('/auth', { 
-            state: { 
-              userType: 'partner',
-              returnTo: '/partner-dashboard',
-              source: 'partnership-application-success'
-            }
-          });
-        }, 3000);
-      }
-    } catch (error) {
-      console.error('Error submitting application:', error);
-      toast.error('Failed to submit application. Please try again.');
-    }
-  };
 
   // Navigation sections
   const navigationSections = [
     { id: 'hero', label: 'Get Started' },
     { id: 'stats', label: 'Program Stats' },
+    { id: 'portfolio', label: 'Our Work' },
     { id: 'benefits', label: 'Benefits' },
     { id: 'process', label: 'How It Works' },
     { id: 'calculator', label: 'Calculator' },
     { id: 'clients', label: 'Client Types' },
     { id: 'testimonials', label: 'Success Stories' },
-    { id: 'faq', label: 'FAQ' },
-    { id: 'application', label: 'Apply Now' }
+    { id: 'faq', label: 'FAQ' }
   ];
 
   const scrollToSection = (sectionId: string) => {
@@ -322,14 +272,23 @@ const PartnershipPage = memo(() => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                       onClick={() => scrollToSection(section.id)}
-                      className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 
-                        min-h-[48px] flex items-center
+                      whileHover={{ scale: 1.02, x: 5 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={`w-full text-left px-6 py-4 rounded-xl font-semibold transition-all duration-300 
+                        min-h-[56px] flex items-center border border-transparent relative overflow-hidden group
                         ${activeSection === section.id 
-                          ? 'bg-orange-500 text-white' 
-                          : 'text-gray-300 hover:text-orange-400 hover:bg-gray-800/50'
+                          ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-orange-400/30 shadow-lg' 
+                          : 'text-gray-300 hover:text-orange-300 hover:bg-gray-800/70 hover:border-gray-600/50'
                         }`}
                     >
-                      {section.label}
+                      <span className="relative z-10">{section.label}</span>
+                      {activeSection === section.id && (
+                        <motion.div
+                          className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-orange-300/20"
+                          layoutId="activeMobileTab"
+                          transition={{ type: "spring", duration: 0.5 }}
+                        />
+                      )}
                     </motion.button>
                   ))}
                 </div>
@@ -343,7 +302,7 @@ const PartnershipPage = memo(() => {
                 >
                   <Button 
                     onClick={() => {
-                      scrollToSection('application');
+                      handleApplyNow();
                       setIsMobileMenuOpen(false);
                     }}
                     className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 
@@ -358,22 +317,24 @@ const PartnershipPage = memo(() => {
         )}
       </AnimatePresence>
 
-      {/* Desktop Sticky Navigation */}
+      {/* Desktop Sticky Navigation - ENHANCED & RESPONSIVE */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 bg-gray-900/95 backdrop-blur-md 
-          border border-gray-700/50 rounded-full px-4 py-2 shadow-2xl hidden lg:block"
+          border border-gray-700/50 rounded-full shadow-2xl hidden lg:block
+          max-w-[90vw] 2xl:max-w-[1200px] xl:max-w-[1000px] lg:max-w-[800px]"
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-1 px-4 py-3 overflow-x-auto scrollbar-hide">
           {navigationSections.map((section) => (
             <button
               key={section.id}
               onClick={() => scrollToSection(section.id)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 whitespace-nowrap
+              className={`px-3 py-2 rounded-full text-xs xl:text-sm font-semibold transition-all duration-300 
+                whitespace-nowrap min-w-fit shrink-0 border border-transparent
                 ${activeSection === section.id 
-                  ? 'bg-orange-500 text-white' 
-                  : 'text-gray-400 hover:text-orange-400 hover:bg-gray-800/50'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg border-orange-400/50 scale-105' 
+                  : 'text-gray-300 hover:text-orange-400 hover:bg-gray-800/70 hover:border-gray-600/50 hover:scale-105'
                 }`}
             >
               {section.label}
@@ -382,7 +343,7 @@ const PartnershipPage = memo(() => {
         </div>
       </motion.nav>
 
-      {/* CSS for gradient animation */}
+      {/* CSS for gradient animation and enhanced styles */}
       <style>{`
         @keyframes gradientShift {
           0% { background-position: 0% 50%; }
@@ -394,6 +355,13 @@ const PartnershipPage = memo(() => {
         }
         .transform-gpu {
           transform: translateZ(0);
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
 
@@ -441,79 +409,169 @@ const PartnershipPage = memo(() => {
               transition={{ duration: 1, ease: "easeOut" }}
               className="text-center space-y-12"
             >
-              {/* CLEAN PROFESSIONAL BADGE */}
+              {/* ENHANCED ELITE BADGE */}
               <motion.div 
-                className="inline-flex items-center gap-3 px-6 py-3 bg-gray-800/80 border border-orange-500/30 
-                  rounded-full backdrop-blur-sm"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-gray-800/90 to-gray-900/90 
+                  border border-orange-500/50 rounded-full backdrop-blur-sm shadow-2xl
+                  hover:from-gray-700/90 hover:to-gray-800/90 hover:border-orange-400/70 
+                  transition-all duration-500 group"
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                whileHover={{ scale: 1.05, y: -2 }}
               >
-                <div className="w-2 h-2 bg-green-400 rounded-full" />
-                <span className="text-orange-400 font-semibold">Elite Partnership Program</span>
+                <motion.div 
+                  className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full shadow-lg"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-300 
+                  font-bold text-lg tracking-wide group-hover:from-orange-300 group-hover:to-orange-200 
+                  transition-all duration-300">
+                  Elite Partnership Program
+                </span>
+                <motion.div
+                  className="w-1 h-1 bg-orange-400 rounded-full opacity-50"
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                />
               </motion.div>
 
-              {/* CLEAN HERO TYPOGRAPHY */}
+              {/* ENHANCED HERO TYPOGRAPHY */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-center max-w-5xl mx-auto"
+                transition={{ duration: 0.8, delay: 0.3 }}
+                className="text-center max-w-6xl mx-auto"
               >
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-tight">
-                  Earn <span className="text-orange-500">£500</span> Per Deal
-                </h1>
+                <motion.h1 
+                  className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black text-white 
+                    mb-8 leading-none tracking-tight"
+                  initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+                >
+                  Earn{" "}
+                  <motion.span 
+                    className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600
+                      drop-shadow-2xl relative inline-block"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    £500
+                    <motion.div
+                      className="absolute -inset-1 bg-gradient-to-r from-orange-500/20 to-orange-600/20 
+                        rounded-lg blur-lg -z-10"
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                        opacity: [0.3, 0.6, 0.3]
+                      }}
+                      transition={{ 
+                        duration: 3, 
+                        repeat: Infinity, 
+                        ease: "easeInOut" 
+                      }}
+                    />
+                  </motion.span>
+                  {" "}Per Deal
+                </motion.h1>
                 
-                <p className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed px-4">
-                  Partner with SISO and earn 20% commission on every web solution referral
-                </p>
+                <motion.p 
+                  className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-gray-300 mb-10 
+                    leading-relaxed px-4 font-light tracking-wide"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.7 }}
+                >
+                  Partner with{" "}
+                  <span className="text-orange-400 font-semibold">SISO</span>{" "}
+                  and earn{" "}
+                  <span className="text-green-400 font-semibold">20% commission</span>{" "}
+                  on every web solution referral
+                </motion.p>
               </motion.div>
 
-              {/* CLEAN VALUE HIGHLIGHTS */}
+              {/* ENHANCED VALUE HIGHLIGHTS */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="flex flex-wrap justify-center items-center gap-4 mb-8"
+                transition={{ duration: 0.6, delay: 0.8 }}
+                className="flex flex-wrap justify-center items-center gap-6 mb-12"
               >
-                <div className="px-4 py-2 bg-orange-500/20 border border-orange-500/30 rounded-full">
-                  <span className="text-orange-400 font-semibold">20% Commission</span>
-                </div>
-                <span className="text-gray-400">•</span>
-                <div className="px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
-                  <span className="text-green-400 font-semibold">Zero Risk</span>
-                </div>
-                <span className="text-gray-400">•</span>
-                <div className="px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full">
-                  <span className="text-blue-400 font-semibold">48hr Delivery</span>
-                </div>
+                {[
+                  { text: "20% Commission", color: "orange", gradient: "from-orange-500 to-orange-600" },
+                  { text: "Zero Risk", color: "green", gradient: "from-green-500 to-emerald-600" },
+                  { text: "48hr Delivery", color: "blue", gradient: "from-blue-500 to-cyan-600" }
+                ].map((item, index) => (
+                  <motion.div
+                    key={item.text}
+                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.9 + index * 0.1 }}
+                    whileHover={{ scale: 1.1, y: -5 }}
+                    className={`px-6 py-3 bg-gradient-to-r ${item.gradient}/20 border border-${item.color}-500/40 
+                      rounded-full backdrop-blur-sm shadow-lg hover:shadow-2xl hover:border-${item.color}-400/60
+                      transition-all duration-300 group cursor-pointer`}
+                  >
+                    <span className={`text-${item.color}-400 font-bold text-lg group-hover:text-${item.color}-300 
+                      transition-colors duration-300`}>
+                      {item.text}
+                    </span>
+                  </motion.div>
+                ))}
               </motion.div>
 
-              {/* CLEAN CTA BUTTONS */}
+              {/* ENHANCED CTA BUTTONS */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center"
+                transition={{ duration: 0.6, delay: 1.2 }}
+                className="flex flex-col sm:flex-row gap-6 justify-center"
               >
-                <Button 
-                  onClick={handleApplyNow}
-                  size="lg"
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 text-lg font-semibold 
-                    rounded-lg transition-colors duration-200 min-h-[44px] min-w-[140px] touch-manipulation"
+                <motion.div
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  Apply Now
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
+                  <Button 
+                    onClick={handleApplyNow}
+                    size="lg"
+                    className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 
+                      text-white px-10 py-5 text-xl font-bold rounded-xl transition-all duration-300 
+                      min-h-[56px] min-w-[180px] touch-manipulation shadow-2xl hover:shadow-orange-500/25
+                      border border-orange-400/20 relative overflow-hidden group"
+                  >
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-orange-300/20 
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    />
+                    <span className="relative z-10 flex items-center">
+                      Apply Now
+                      <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform duration-300" />
+                    </span>
+                  </Button>
+                </motion.div>
                 
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800 px-8 py-4 text-lg font-semibold 
-                    rounded-lg transition-colors duration-200 min-h-[44px] min-w-[140px] touch-manipulation"
+                <motion.div
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  Learn More
-                </Button>
+                  <Button 
+                    onClick={handleLearnMore}
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-gray-600 text-gray-300 hover:bg-gray-800/80 hover:border-gray-500 
+                      px-10 py-5 text-xl font-bold rounded-xl transition-all duration-300 
+                      min-h-[56px] min-w-[180px] touch-manipulation backdrop-blur-sm
+                      hover:text-white hover:shadow-2xl hover:shadow-gray-500/10 group"
+                  >
+                    <span className="flex items-center">
+                      Learn More
+                      <ChevronDown className="w-6 h-6 ml-3 group-hover:translate-y-1 transition-transform duration-300" />
+                    </span>
+                  </Button>
+                </motion.div>
               </motion.div>
 
               {/* ENHANCED TRUST INDICATORS */}
@@ -575,6 +633,258 @@ const PartnershipPage = memo(() => {
 
         {/* Partnership Statistics */}
         <PartnershipStats />
+
+        {/* Portfolio Section - Our Work */}
+        <section id="portfolio" className="py-16 px-4 bg-gradient-to-b from-gray-900/50 to-gray-800/30">
+          <div className="container mx-auto max-w-7xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
+                Our <span className="text-orange-500">Portfolio</span>
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                See the quality of work your referrals will receive. These are real projects we've built for clients.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Event Management Majorca */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="group relative"
+              >
+                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700 hover:border-orange-500/50 transition-all duration-300 overflow-hidden h-full">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-red-500/0 group-hover:from-orange-500/10 group-hover:to-red-500/5 transition-all duration-300" />
+                  
+                  <CardContent className="p-6 relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="px-3 py-1 bg-green-500/30 text-green-200 text-sm rounded-full">Live</div>
+                      <div className="text-orange-500 font-bold">€2,500-€5,000</div>
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-3">Event Management Majorca</h3>
+                    <p className="text-gray-400 mb-4">Complete event management platform with booking, payments, and client communication for luxury events in Majorca.</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded">React</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">Stripe</span>
+                      <span className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded">Calendar</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-green-400 font-semibold">Commission: €500-€1,000</div>
+                      <Button variant="outline" size="sm" className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        View Live
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Restaurant Template */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="group relative"
+              >
+                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700 hover:border-orange-500/50 transition-all duration-300 overflow-hidden h-full">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-red-500/0 group-hover:from-orange-500/10 group-hover:to-red-500/5 transition-all duration-300" />
+                  
+                  <CardContent className="p-6 relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="px-3 py-1 bg-blue-500/30 text-blue-200 text-sm rounded-full">Demo</div>
+                      <div className="text-orange-500 font-bold">£1,500-£3,500</div>
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-3">Restaurant Management System</h3>
+                    <p className="text-gray-400 mb-4">Online ordering, table reservations, menu management, and customer reviews system for restaurants.</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded">React</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">Orders</span>
+                      <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded">Reviews</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-green-400 font-semibold">Commission: £300-£700</div>
+                      <Button variant="outline" size="sm" className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10">
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Demo
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Barber Template */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="group relative"
+              >
+                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700 hover:border-orange-500/50 transition-all duration-300 overflow-hidden h-full">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-red-500/0 group-hover:from-orange-500/10 group-hover:to-red-500/5 transition-all duration-300" />
+                  
+                  <CardContent className="p-6 relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="px-3 py-1 bg-blue-500/30 text-blue-200 text-sm rounded-full">Demo</div>
+                      <div className="text-orange-500 font-bold">£800-£2,000</div>
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-3">Barber Shop Booking System</h3>
+                    <p className="text-gray-400 mb-4">Appointment booking, service showcase, staff management, and customer profiles for barbershops.</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded">Booking</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">Calendar</span>
+                      <span className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded">Staff</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-green-400 font-semibold">Commission: £160-£400</div>
+                      <Button variant="outline" size="sm" className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10">
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Demo
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Crypto App */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="group relative"
+              >
+                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700 hover:border-orange-500/50 transition-all duration-300 overflow-hidden h-full">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-red-500/0 group-hover:from-orange-500/10 group-hover:to-red-500/5 transition-all duration-300" />
+                  
+                  <CardContent className="p-6 relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="px-3 py-1 bg-purple-500/30 text-purple-200 text-sm rounded-full">Custom</div>
+                      <div className="text-orange-500 font-bold">£5,000-£15,000</div>
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-3">Crypto Trading Platform</h3>
+                    <p className="text-gray-400 mb-4">Full-featured crypto trading app with portfolio tracking, real-time prices, and secure wallet integration.</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded">Trading</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">Wallet</span>
+                      <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded">Analytics</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-green-400 font-semibold">Commission: £1,000-£3,000</div>
+                      <Button variant="outline" size="sm" className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10">
+                        <Code className="w-4 h-4 mr-2" />
+                        Custom Build
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Property Management */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="group relative"
+              >
+                <Card className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border-gray-700 hover:border-orange-500/50 transition-all duration-300 overflow-hidden h-full">
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-red-500/0 group-hover:from-orange-500/10 group-hover:to-red-500/5 transition-all duration-300" />
+                  
+                  <CardContent className="p-6 relative z-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="px-3 py-1 bg-green-500/30 text-green-200 text-sm rounded-full">Live</div>
+                      <div className="text-orange-500 font-bold">£3,000-£8,000</div>
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-3">Property Management System</h3>
+                    <p className="text-gray-400 mb-4">Complete property management with tenant portals, maintenance requests, and financial reporting.</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <span className="px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded">Tenants</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">Finance</span>
+                      <span className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded">Reports</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-green-400 font-semibold">Commission: £600-£1,600</div>
+                      <Button variant="outline" size="sm" className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        View Live
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* More Templates Coming Soon */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="group relative"
+              >
+                <Card className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 border-gray-700/50 hover:border-orange-500/30 transition-all duration-300 overflow-hidden h-full border-dashed">
+                  <CardContent className="p-6 relative z-10 flex flex-col items-center justify-center text-center min-h-[300px]">
+                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 to-orange-600/20 rounded-full flex items-center justify-center mb-4">
+                      <Star className="w-8 h-8 text-orange-500" />
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-3">More Templates</h3>
+                    <p className="text-gray-400 mb-4">Healthcare, Education, E-commerce, and more industry-specific templates coming soon.</p>
+                    
+                    <div className="px-3 py-1 bg-orange-500/30 text-orange-200 text-sm rounded-full">
+                      Coming Soon
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+
+            {/* Portfolio CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.7 }}
+              className="text-center mt-12"
+            >
+              <p className="text-lg text-gray-300 mb-6">
+                This is the quality of work your referrals will receive. Ready to start earning?
+              </p>
+              <Button 
+                onClick={handleApplyNow}
+                size="lg"
+                className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-8 py-4 text-lg"
+              >
+                Apply Now
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </motion.div>
+          </div>
+        </section>
 
         {/* Enhanced Value Proposition Section */}
         <section id="benefits" className="relative min-h-[80vh] flex items-center px-4 overflow-hidden">
@@ -903,114 +1213,6 @@ const PartnershipPage = memo(() => {
                 </motion.div>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* Application Form Section */}
-        <section id="application" className="py-16 px-4">
-          <div className="container mx-auto max-w-4xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-12"
-            >
-              <GradientHeading variant="secondary" className="text-3xl md:text-4xl font-bold mb-4">
-                Apply to Become a Partner
-              </GradientHeading>
-              <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-                Ready to start earning? Fill out our application form and we'll be in touch within 24 hours.
-              </p>
-            </motion.div>
-
-            <Card className="bg-gray-800/50 border-gray-700">
-              <CardContent className="p-8">
-                <form onSubmit={handleSubmitApplication} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="text-white">Full Name</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="bg-gray-700 border-gray-600 text-white min-h-[48px] text-base"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="text-white">Email Address</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        className="bg-gray-700 border-gray-600 text-white min-h-[48px] text-base"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-white">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="bg-gray-700 border-gray-600 text-white min-h-[48px] text-base"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="experience" className="text-white">Professional Background</Label>
-                    <Textarea
-                      id="experience"
-                      value={formData.experience}
-                      onChange={(e) => setFormData({...formData, experience: e.target.value})}
-                      className="bg-gray-700 border-gray-600 text-white min-h-[120px] text-base"
-                      rows={3}
-                      placeholder="Tell us about your professional background and sales experience..."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="network" className="text-white">Your Network</Label>
-                    <Textarea
-                      id="network"
-                      value={formData.network}
-                      onChange={(e) => setFormData({...formData, network: e.target.value})}
-                      className="bg-gray-700 border-gray-600 text-white min-h-[120px] text-base"
-                      rows={3}
-                      placeholder="Describe your network and the types of businesses you have connections with..."
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="expectedVolume" className="text-white">Expected Monthly Referrals</Label>
-                    <Input
-                      id="expectedVolume"
-                      value={formData.expectedVolume}
-                      onChange={(e) => setFormData({...formData, expectedVolume: e.target.value})}
-                      className="bg-gray-700 border-gray-600 text-white min-h-[48px] text-base"
-                      placeholder="e.g., 2-3 businesses per month"
-                      required
-                    />
-                  </div>
-
-                  <Button 
-                    type="submit"
-                    size="lg"
-                    disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed min-h-[56px] touch-manipulation"
-                  >
-                    {isSubmitting ? 'Submitting...' : 'Submit Application'}
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
           </div>
         </section>
 

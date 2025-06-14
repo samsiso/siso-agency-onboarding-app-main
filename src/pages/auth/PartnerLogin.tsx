@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const PartnerLogin = () => {
   const navigate = useNavigate();
@@ -25,17 +26,50 @@ const PartnerLogin = () => {
     setIsLoading(true);
 
     try {
-      // TODO: Implement Supabase authentication
-      // For now, simulate login
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('PartnerLogin - Attempting sign in with:', formData.email);
       
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      if (error) {
+        console.error('PartnerLogin - Sign in error:', error);
+        throw error;
+      }
+      
+      console.log('PartnerLogin - Sign in successful:', data.user?.id);
       toast.success('Login successful! Welcome back.');
       
+      // Check if user has partner profile
+      if (data.user) {
+        const { data: profile, error: profileError } = await supabase
+          .from('partner_profiles')
+          .select('*')
+          .eq('user_id', data.user.id)
+          .single();
+          
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('PartnerLogin - Profile check error:', profileError);
+        }
+        
+        console.log('PartnerLogin - Partner profile found:', !!profile);
+      }
+      
       // Redirect to dashboard or return URL
-      const returnTo = location.state?.returnTo || '/dashboard';
-      navigate(returnTo);
-    } catch (error) {
-      toast.error('Login failed. Please check your credentials.');
+      const returnTo = location.state?.from || location.state?.returnTo || '/dashboard';
+      navigate(returnTo, { replace: true });
+    } catch (error: any) {
+      console.error('PartnerLogin - Auth error:', error);
+      
+      // Handle specific error messages
+      if (error.message?.includes('Email not confirmed')) {
+        toast.error('Please verify your email address before signing in.');
+      } else if (error.message?.includes('Invalid login')) {
+        toast.error('Invalid email or password. Please check your credentials.');
+      } else {
+        toast.error('Login failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

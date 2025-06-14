@@ -24,7 +24,10 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ComingSoonSection } from '@/components/dashboard/ComingSoonSection';
 import { PartnerLeaderboard } from '@/components/dashboard/PartnerLeaderboard';
+import { PartnerOnboarding } from '@/components/dashboard/PartnerOnboarding';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface DashboardStats {
   totalEarnings: number;
@@ -47,6 +50,8 @@ interface RecentActivity {
 }
 
 const PartnerDashboard = () => {
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
     totalEarnings: 2450,
     monthlyEarnings: 1500,
@@ -56,6 +61,99 @@ const PartnerDashboard = () => {
     currentTier: 'Silver Partner',
     nextTierProgress: 65
   });
+
+  // Check if partner has completed onboarding
+  useEffect(() => {
+    const checkOnboardingStatus = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Check if partner profile exists and is complete
+        const { data: profile } = await supabase
+          .from('partner_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profile && profile.full_name && profile.network_description) {
+          setIsOnboardingComplete(true);
+        } else {
+          setIsOnboardingComplete(false);
+        }
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+        setIsOnboardingComplete(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, []);
+
+  const handleOnboardingComplete = async (data: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Save or update partner profile
+      const { error } = await supabase
+        .from('partner_profiles')
+        .upsert({
+          user_id: user.id,
+          email: user.email,
+          full_name: data.fullName,
+          phone: data.phone,
+          company: data.company,
+          professional_background: data.professionalBackground,
+          network_description: data.networkDescription,
+          expected_monthly_referrals: data.expectedMonthlyReferrals,
+          status: 'pending',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) {
+        console.error('Error saving partner profile:', error);
+        toast.error('Failed to save partner profile');
+        return;
+      }
+
+      setIsOnboardingComplete(true);
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      toast.error('Failed to complete onboarding');
+    }
+  };
+
+  const handleOnboardingSkip = () => {
+    setIsOnboardingComplete(true);
+    toast.info('You can complete your profile later from settings');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
+
+  // Show onboarding if not complete
+  if (isOnboardingComplete === false) {
+    return (
+      <div className="p-6">
+        <PartnerOnboarding 
+          onComplete={handleOnboardingComplete}
+          onSkip={handleOnboardingSkip}
+        />
+      </div>
+    );
+  }
 
   const [recentActivity] = useState<RecentActivity[]>([
     {

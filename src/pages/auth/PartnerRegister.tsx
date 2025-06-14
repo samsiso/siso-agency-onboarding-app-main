@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
+  import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const PartnerRegister = () => {
   const navigate = useNavigate();
@@ -44,23 +45,86 @@ const PartnerRegister = () => {
       return;
     }
 
+    if (formData.password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // TODO: Implement Supabase registration
-      // For now, simulate registration
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('PartnerRegister - Attempting registration for:', formData.email);
+      
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name,
+            user_role: 'partner',
+            phone: formData.phone,
+            company: formData.company || null,
+          },
+        },
+      });
+      
+      if (authError) {
+        console.error('PartnerRegister - Auth signup error:', authError);
+        throw authError;
+      }
+      
+      console.log('PartnerRegister - Auth user created:', authData.user?.id);
+      
+      // Create partner application if user was created
+      if (authData.user) {
+        const { error: applicationError } = await supabase
+          .from('partner_applications')
+          .insert({
+            user_id: authData.user.id,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            company: formData.company || null,
+            experience_level: formData.experienceLevel,
+            network_description: formData.networkDescription,
+            expected_referrals: parseInt(formData.expectedReferrals) || 1,
+            status: 'pending',
+            source: 'partner-registration',
+            application_data: {
+              agreeToMarketing: formData.agreeToMarketing,
+              registrationDate: new Date().toISOString(),
+            },
+          });
+          
+        if (applicationError) {
+          console.error('PartnerRegister - Application creation error:', applicationError);
+          // Don't throw here, auth user was created successfully
+        } else {
+          console.log('PartnerRegister - Partner application created successfully');
+        }
+      }
       
       toast.success('Registration successful! Please check your email to verify your account.');
       
       // Redirect to login with success message
       navigate('/auth/login', { 
         state: { 
-          message: 'Registration successful! Please sign in with your new account.' 
+          message: 'Registration successful! Please sign in with your new account.',
+          email: formData.email
         }
       });
-    } catch (error) {
-      toast.error('Registration failed. Please try again.');
+    } catch (error: any) {
+      console.error('PartnerRegister - Registration error:', error);
+      
+      // Handle specific error messages
+      if (error.message?.includes('already registered')) {
+        toast.error('An account with this email already exists. Please sign in instead.');
+      } else if (error.message?.includes('Password')) {
+        toast.error('Password requirements not met. Please use a stronger password.');
+      } else {
+        toast.error('Registration failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
