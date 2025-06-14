@@ -1,202 +1,202 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
-import { PartnerAuthForm } from '../../components/auth/PartnerAuthForm';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 
-export function PartnerLogin() {
+const PartnerLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
+    rememberMe: false
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-    
     setIsLoading(true);
-    
+
     try {
-      // TODO: Implement actual authentication logic
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+      // TODO: Implement Supabase authentication
+      // For now, simulate login
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Store remember me preference if needed
-      if (rememberMe) {
-        localStorage.setItem('partner_remember_me', 'true');
-      }
+      toast.success('Login successful! Welcome back.');
       
-      // Redirect to dashboard
-      navigate('/dashboard');
+      // Redirect to dashboard or return URL
+      const returnTo = location.state?.returnTo || '/dashboard';
+      navigate(returnTo);
     } catch (error) {
-      setErrors({ general: 'Login failed. Please check your credentials.' });
+      toast.error('Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
-        {/* Logo/Header */}
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-orange-600 rounded-full flex items-center justify-center mb-6">
-            <span className="text-white font-bold text-xl">S</span>
-          </div>
-          <h2 className="text-3xl font-bold text-white">Welcome Back</h2>
-          <p className="mt-2 text-gray-400">Sign in to your partner account</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center px-4">
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md relative z-10"
+      >
+        {/* Header */}
+        <div className="text-center mb-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-3 px-6 py-3 bg-gray-800/80 border border-orange-500/30 
+              rounded-full backdrop-blur-sm mb-6"
+          >
+            <Shield className="w-5 h-5 text-orange-500" />
+            <span className="text-orange-400 font-semibold">Partner Portal</span>
+          </motion.div>
+          
+          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+          <p className="text-gray-400">Sign in to your partner dashboard</p>
         </div>
 
         {/* Login Form */}
-        <PartnerAuthForm
-          type="login"
-          onSubmit={handleSubmit}
-          isLoading={isLoading}
-          errors={errors}
-        >
-          <div className="space-y-6">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-800 border ${
-                    errors.email ? 'border-red-500' : 'border-gray-700'
-                  } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors`}
-                  placeholder="Enter your email"
-                />
+        <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-white text-center">Partner Login</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Field */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white">Email Address</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    className="bg-gray-700 border-gray-600 text-white pl-10 focus:border-orange-500"
+                    placeholder="partner@example.com"
+                    required
+                  />
+                </div>
               </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email}</p>
-              )}
-            </div>
 
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  className={`w-full pl-10 pr-12 py-3 bg-gray-800 border ${
-                    errors.password ? 'border-red-500' : 'border-gray-700'
-                  } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors`}
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300"
+              {/* Password Field */}
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-white">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    className="bg-gray-700 border-gray-600 text-white pl-10 pr-10 focus:border-orange-500"
+                    placeholder="Enter your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-500"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember Me & Forgot Password */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="rememberMe"
+                    checked={formData.rememberMe}
+                    onCheckedChange={(checked) => setFormData({...formData, rememberMe: checked as boolean})}
+                    className="border-gray-600 data-[state=checked]:bg-orange-500"
+                  />
+                  <Label htmlFor="rememberMe" className="text-sm text-gray-300">Remember me</Label>
+                </div>
+                <Link 
+                  to="/auth/reset-password" 
+                  className="text-sm text-orange-500 hover:text-orange-400 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
+                  Forgot password?
+                </Link>
               </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-400">{errors.password}</p>
-              )}
-            </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-600 rounded bg-gray-800"
-                />
-                <span className="ml-2 text-sm text-gray-300">Remember me</span>
-              </label>
-              <Link
-                to="/auth/reset-password"
-                className="text-sm text-orange-500 hover:text-orange-400 transition-colors"
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 text-lg font-semibold 
+                  disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Forgot password?
-              </Link>
-            </div>
-
-            {/* General Error */}
-            {errors.general && (
-              <div className="p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
-                <p className="text-sm text-red-400">{errors.general}</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  Sign in
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </button>
-          </div>
-        </PartnerAuthForm>
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Signing in...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    Sign In
+                    <ArrowRight className="w-5 h-5" />
+                  </div>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
         {/* Register Link */}
-        <div className="text-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center mt-6"
+        >
           <p className="text-gray-400">
             Don't have an account?{' '}
-            <Link
-              to="/auth/register"
-              className="text-orange-500 hover:text-orange-400 font-medium transition-colors"
+            <Link 
+              to="/auth/register" 
+              className="text-orange-500 hover:text-orange-400 font-semibold transition-colors"
             >
               Apply to become a partner
             </Link>
           </p>
-        </div>
-      </div>
+        </motion.div>
+
+        {/* Back to Landing */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-center mt-4"
+        >
+          <Link 
+            to="/partnership" 
+            className="text-sm text-gray-500 hover:text-gray-400 transition-colors"
+          >
+            ← Back to Partnership Program
+          </Link>
+        </motion.div>
+      </motion.div>
     </div>
   );
-} 
+};
+
+export default PartnerLogin; 

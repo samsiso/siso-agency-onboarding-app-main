@@ -1,9 +1,10 @@
 import { memo, useState, useEffect } from 'react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import { 
   ArrowRight, Users, DollarSign, Shield, Zap, Calculator, CheckCircle, 
   Search, Code, Phone, Mail, ChevronDown, ChevronUp, Star, Award,
-  Building, ShoppingCart, Heart, GraduationCap, Stethoscope, Utensils
+  Building, ShoppingCart, Heart, GraduationCap, Stethoscope, Utensils,
+  Menu, X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GradientHeading } from '@/components/ui/gradient-heading';
@@ -22,6 +23,7 @@ const PartnershipPage = memo(() => {
   const navigate = useNavigate();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState('hero');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { submitApplication, isSubmitting } = usePartnerApplication();
   const [formData, setFormData] = useState({
     name: '',
@@ -55,13 +57,13 @@ const PartnershipPage = memo(() => {
     try {
       // Transform form data to match API expectations
       const applicationData = {
-        full_name: formData.name,
+        name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        experience: formData.experience,
-        network_description: formData.network,
-        expected_monthly_volume: formData.expectedVolume,
-        status: 'pending' as const
+        company: '', // Optional field, set to empty string
+        networkDescription: formData.network,
+        expectedReferrals: parseInt(formData.expectedVolume) || 1,
+        experienceLevel: 'Intermediate' as const // Default value, could be made dynamic
       };
 
       const success = await submitApplication(applicationData);
@@ -115,6 +117,7 @@ const PartnershipPage = memo(() => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
       setActiveSection(sectionId);
+      setIsMobileMenuOpen(false); // Close mobile menu after navigation
     }
   };
 
@@ -273,7 +276,89 @@ const PartnershipPage = memo(() => {
         style={{ scaleX }}
       />
 
-      {/* Sticky Navigation */}
+      {/* Mobile Menu Button */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="lg:hidden fixed top-4 right-4 z-50 bg-gray-800/95 backdrop-blur-md border border-gray-700/50 
+          p-3 rounded-full shadow-2xl hover:bg-gray-700/95 transition-all duration-200 min-h-[48px] min-w-[48px]"
+      >
+        {isMobileMenuOpen ? (
+          <X className="w-6 h-6 text-white" />
+        ) : (
+          <Menu className="w-6 h-6 text-white" />
+        )}
+      </motion.button>
+
+      {/* Mobile Navigation Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="lg:hidden fixed inset-0 bg-black/50 z-40"
+            />
+            
+            {/* Mobile Menu */}
+            <motion.nav
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="lg:hidden fixed right-0 top-0 h-full w-80 bg-gray-900/95 backdrop-blur-md 
+                border-l border-gray-700/50 z-45 overflow-y-auto"
+            >
+              <div className="p-6 pt-20">
+                <div className="space-y-2">
+                  {navigationSections.map((section, index) => (
+                    <motion.button
+                      key={section.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      onClick={() => scrollToSection(section.id)}
+                      className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-all duration-200 
+                        min-h-[48px] flex items-center
+                        ${activeSection === section.id 
+                          ? 'bg-orange-500 text-white' 
+                          : 'text-gray-300 hover:text-orange-400 hover:bg-gray-800/50'
+                        }`}
+                    >
+                      {section.label}
+                    </motion.button>
+                  ))}
+                </div>
+                
+                {/* Mobile CTA */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-8 pt-6 border-t border-gray-700/50"
+                >
+                  <Button 
+                    onClick={() => {
+                      scrollToSection('application');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 
+                      hover:to-orange-700 text-white min-h-[48px]"
+                  >
+                    Apply Now
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.nav>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop Sticky Navigation */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -849,7 +934,7 @@ const PartnershipPage = memo(() => {
                         id="name"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="bg-gray-700 border-gray-600 text-white"
+                        className="bg-gray-700 border-gray-600 text-white min-h-[48px] text-base"
                         required
                       />
                     </div>
@@ -860,7 +945,7 @@ const PartnershipPage = memo(() => {
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        className="bg-gray-700 border-gray-600 text-white"
+                        className="bg-gray-700 border-gray-600 text-white min-h-[48px] text-base"
                         required
                       />
                     </div>
@@ -872,7 +957,7 @@ const PartnershipPage = memo(() => {
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="bg-gray-700 border-gray-600 text-white"
+                      className="bg-gray-700 border-gray-600 text-white min-h-[48px] text-base"
                       required
                     />
                   </div>
@@ -883,7 +968,7 @@ const PartnershipPage = memo(() => {
                       id="experience"
                       value={formData.experience}
                       onChange={(e) => setFormData({...formData, experience: e.target.value})}
-                      className="bg-gray-700 border-gray-600 text-white"
+                      className="bg-gray-700 border-gray-600 text-white min-h-[120px] text-base"
                       rows={3}
                       placeholder="Tell us about your professional background and sales experience..."
                     />
@@ -895,7 +980,7 @@ const PartnershipPage = memo(() => {
                       id="network"
                       value={formData.network}
                       onChange={(e) => setFormData({...formData, network: e.target.value})}
-                      className="bg-gray-700 border-gray-600 text-white"
+                      className="bg-gray-700 border-gray-600 text-white min-h-[120px] text-base"
                       rows={3}
                       placeholder="Describe your network and the types of businesses you have connections with..."
                       required
@@ -917,9 +1002,10 @@ const PartnershipPage = memo(() => {
                   <Button 
                     type="submit"
                     size="lg"
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 text-lg"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit Application
+                    {isSubmitting ? 'Submitting...' : 'Submit Application'}
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </form>

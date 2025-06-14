@@ -136,7 +136,10 @@ const CommissionCalculator = memo(() => {
                     max={2490}
                     min={249}
                     step={50}
-                    className="w-full"
+                    className="w-full [&>*]:h-6 [&>*]:w-6 [&_[role=slider]]:h-6 [&_[role=slider]]:w-6 
+                      [&_[role=slider]]:border-2 [&_[role=slider]]:border-orange-500 
+                      [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-lg
+                      [&_.slider-track]:h-2 [&_.slider-range]:bg-orange-500"
                   />
                   <div className="flex justify-between text-sm text-gray-400">
                     <span>£249 (Minimum)</span>
@@ -156,7 +159,10 @@ const CommissionCalculator = memo(() => {
                     max={10}
                     min={1}
                     step={1}
-                    className="w-full"
+                    className="w-full [&>*]:h-6 [&>*]:w-6 [&_[role=slider]]:h-6 [&_[role=slider]]:w-6 
+                      [&_[role=slider]]:border-2 [&_[role=slider]]:border-green-500 
+                      [&_[role=slider]]:bg-white [&_[role=slider]]:shadow-lg
+                      [&_.slider-track]:h-2 [&_.slider-range]:bg-green-500"
                   />
                   <div className="flex justify-between text-sm text-gray-400">
                     <span>1 deal</span>

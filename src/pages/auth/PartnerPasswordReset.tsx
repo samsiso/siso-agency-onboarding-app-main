@@ -1,175 +1,239 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
-import { PartnerAuthForm } from '../../components/auth/PartnerAuthForm';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, ArrowRight, Shield, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
 
-export function PartnerPasswordReset() {
-  const [email, setEmail] = useState('');
+const PartnerPasswordReset = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [isEmailSent, setIsEmailSent] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const [emailSent, setEmailSent] = useState(false);
+  const [email, setEmail] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-    
     setIsLoading(true);
-    
+
     try {
-      // TODO: Implement actual password reset logic
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
+      // TODO: Implement Supabase password reset
+      // For now, simulate email sending
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      setIsEmailSent(true);
+      setEmailSent(true);
+      toast.success('Password reset email sent! Check your inbox.');
     } catch (error) {
-      setErrors({ general: 'Failed to send reset email. Please try again.' });
+      toast.error('Failed to send reset email. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (value: string) => {
-    setEmail(value);
-    // Clear error when user starts typing
-    if (errors.email) {
-      setErrors(prev => ({ ...prev, email: '' }));
-    }
+  const handleBackToLogin = () => {
+    navigate('/auth/login');
   };
 
-  if (isEmailSent) {
+  if (emailSent) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="max-w-md w-full space-y-8 text-center">
-          {/* Success Icon */}
-          <div className="mx-auto h-16 w-16 bg-green-600 rounded-full flex items-center justify-center mb-6">
-            <CheckCircle className="h-8 w-8 text-white" />
-          </div>
-          
-          <div className="bg-gray-800 rounded-xl shadow-2xl p-8 border border-gray-700">
-            <h2 className="text-2xl font-bold text-white mb-4">Check Your Email</h2>
-            <p className="text-gray-300 mb-6">
-              We've sent a password reset link to <strong className="text-orange-500">{email}</strong>
-            </p>
-            <p className="text-gray-400 text-sm mb-8">
-              If you don't see the email, check your spam folder or try again.
-            </p>
-            
-            <div className="space-y-4">
-              <Link
-                to="/auth/login"
-                className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Login
-              </Link>
-              
-              <button
-                onClick={() => {
-                  setIsEmailSent(false);
-                  setEmail('');
-                  setErrors({});
-                }}
-                className="w-full py-3 px-4 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-              >
-                Try Different Email
-              </button>
-            </div>
-          </div>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center px-4">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl" />
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-md relative z-10"
+        >
+          {/* Success Header */}
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-3 px-6 py-3 bg-green-500/20 border border-green-500/30 
+                rounded-full backdrop-blur-sm mb-6"
+            >
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              <span className="text-green-400 font-semibold">Email Sent</span>
+            </motion.div>
+            
+            <h1 className="text-3xl font-bold text-white mb-2">Check Your Email</h1>
+            <p className="text-gray-400">We've sent password reset instructions to</p>
+            <p className="text-orange-400 font-semibold">{email}</p>
+          </div>
+
+          {/* Success Card */}
+          <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Mail className="w-8 h-8 text-green-500" />
+                </div>
+                
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-white">Reset Link Sent</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    Click the link in your email to reset your password. The link will expire in 24 hours.
+                  </p>
+                </div>
+
+                <div className="pt-4 space-y-3">
+                  <Button
+                    onClick={handleBackToLogin}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Login
+                  </Button>
+                  
+                  <p className="text-xs text-gray-500">
+                    Didn't receive the email? Check your spam folder or{' '}
+                    <button 
+                      onClick={() => setEmailSent(false)}
+                      className="text-orange-500 hover:text-orange-400 underline"
+                    >
+                      try again
+                    </button>
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
-        {/* Logo/Header */}
-        <div className="text-center">
-          <div className="mx-auto h-16 w-16 bg-orange-600 rounded-full flex items-center justify-center mb-6">
-            <span className="text-white font-bold text-xl">S</span>
-          </div>
-          <h2 className="text-3xl font-bold text-white">Reset Password</h2>
-          <p className="mt-2 text-gray-400">Enter your email to receive a reset link</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center px-4">
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md relative z-10"
+      >
+        {/* Header */}
+        <div className="text-center mb-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-3 px-6 py-3 bg-gray-800/80 border border-orange-500/30 
+              rounded-full backdrop-blur-sm mb-6"
+          >
+            <Shield className="w-5 h-5 text-orange-500" />
+            <span className="text-orange-400 font-semibold">Password Reset</span>
+          </motion.div>
+          
+          <h1 className="text-3xl font-bold text-white mb-2">Reset Your Password</h1>
+          <p className="text-gray-400">Enter your email address and we'll send you a reset link</p>
         </div>
 
         {/* Reset Form */}
-        <PartnerAuthForm
-          type="reset"
-          onSubmit={handleSubmit}
-          isLoading={isLoading}
-          errors={errors}
+        <Card className="bg-gray-800/50 border-gray-700 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-white text-center">Password Recovery</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Field */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-white">Email Address</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-gray-700 border-gray-600 text-white pl-10 focus:border-orange-500"
+                    placeholder="Enter your email address"
+                    required
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  We'll send a password reset link to this email address
+                </p>
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 text-lg font-semibold 
+                  disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Sending Reset Link...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    Send Reset Link
+                    <ArrowRight className="w-5 h-5" />
+                  </div>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        {/* Navigation Links */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center mt-6 space-y-4"
         >
-          <div className="space-y-6">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => handleInputChange(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-800 border ${
-                    errors.email ? 'border-red-500' : 'border-gray-700'
-                  } rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-colors`}
-                  placeholder="Enter your email"
-                />
-              </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-400">{errors.email}</p>
-              )}
-            </div>
-
-            {/* General Error */}
-            {errors.general && (
-              <div className="p-3 bg-red-900/20 border border-red-500/30 rounded-lg">
-                <p className="text-sm text-red-400">{errors.general}</p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex items-center justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          <div className="flex items-center justify-center gap-4">
+            <Link 
+              to="/auth/login" 
+              className="text-orange-500 hover:text-orange-400 font-semibold transition-colors flex items-center gap-2"
             >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Sending Reset Link...
-                </>
-              ) : (
-                'Send Reset Link'
-              )}
-            </button>
-
-            {/* Back to Login */}
-            <Link
-              to="/auth/login"
-              className="w-full flex items-center justify-center py-3 px-4 border border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="w-4 h-4" />
               Back to Login
             </Link>
+            <span className="text-gray-600">|</span>
+            <Link 
+              to="/auth/register" 
+              className="text-orange-500 hover:text-orange-400 font-semibold transition-colors"
+            >
+              Create Account
+            </Link>
           </div>
-        </PartnerAuthForm>
-      </div>
+        </motion.div>
+
+        {/* Back to Landing */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="text-center mt-4"
+        >
+          <Link 
+            to="/partnership" 
+            className="text-sm text-gray-500 hover:text-gray-400 transition-colors"
+          >
+            ← Back to Partnership Program
+          </Link>
+        </motion.div>
+      </motion.div>
     </div>
   );
-} 
+};
+
+export default PartnerPasswordReset; 

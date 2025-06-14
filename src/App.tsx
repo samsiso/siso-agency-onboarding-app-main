@@ -65,6 +65,14 @@ import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
 import { BusinessOnboarding } from './components/onboarding/BusinessOnboarding';
 import PartnershipPage from './pages/PartnershipPage';
 
+// Partner Dashboard & Auth imports
+import PartnerLogin from './pages/auth/PartnerLogin';
+import PartnerRegister from './pages/auth/PartnerRegister';
+import PartnerPasswordReset from './pages/auth/PartnerPasswordReset';
+import PartnerDashboard from './pages/dashboard/PartnerDashboard';
+import DashboardLayout from './components/dashboard/DashboardLayout';
+import { PartnerAuthGuard } from './components/auth/PartnerAuthGuard';
+
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -109,6 +117,34 @@ function App() {
           <Route path="/partnership" element={<PartnershipPage />} />
           <Route path="/partners" element={<PartnershipPage />} />
           <Route path="/partner" element={<PartnershipPage />} />
+          
+          {/* Partner Authentication Routes */}
+          <Route path="/auth/login" element={<PartnerLogin />} />
+          <Route path="/auth/register" element={<PartnerRegister />} />
+          <Route path="/auth/reset-password" element={<PartnerPasswordReset />} />
+          
+          {/* Partner Dashboard Routes */}
+          <Route path="/dashboard" element={<PartnerAuthGuard><DashboardLayout /></PartnerAuthGuard>}>
+            <Route index element={<PartnerDashboard />} />
+            <Route path="coming-soon" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Coming Soon Features</h1><p className="text-gray-400 mt-2">Exciting new features are being developed. Stay tuned!</p></div>} />
+            <Route path="education" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Education Hub</h1><p className="text-gray-400 mt-2">Learning resources and training materials coming soon.</p></div>} />
+            <Route path="templates" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Templates</h1><p className="text-gray-400 mt-2">Ready-to-use templates for your projects.</p></div>} />
+            <Route path="app-plan-generator" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">App Plan Generator</h1><p className="text-gray-400 mt-2">AI-powered app planning tool coming soon.</p></div>} />
+            <Route path="pipeline" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Pipeline</h1><p className="text-gray-400 mt-2">Track your referral pipeline and progress.</p></div>} />
+            <Route path="profile" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Profile Settings</h1><p className="text-gray-400 mt-2">Manage your partner profile and preferences.</p></div>} />
+            
+            {/* Legacy routes for backward compatibility */}
+            <Route path="referrals" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Referrals - Coming Soon</h1></div>} />
+            <Route path="earnings" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Earnings - Coming Soon</h1></div>} />
+            <Route path="leaderboard" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Leaderboard - Coming Soon</h1></div>} />
+            <Route path="resources" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Resources - Coming Soon</h1></div>} />
+            <Route path="goals" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Goals & Targets - Coming Soon</h1></div>} />
+            <Route path="achievements" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Achievements - Coming Soon</h1></div>} />
+            <Route path="settings" element={<div className="p-6"><h1 className="text-2xl font-bold text-white">Settings - Coming Soon</h1></div>} />
+          </Route>
+          <Route path="/partner-dashboard" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard/partner" element={<Navigate to="/dashboard" replace />} />
+          
           <Route path="/onboarding-chat" element={<OnboardingChat />} />
           <Route path="/onboarding" element={<AuthGuard><BusinessOnboarding /></AuthGuard>} />
           <Route path="/thankyou" element={<ThankYou />} />
@@ -148,7 +184,6 @@ function App() {
           
           {/* Protected Dashboard Routes */}
           <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />
-          <Route path="/dashboard" element={<AuthGuard><Home /></AuthGuard>} />
           
           {/* Protected Project Routes */}
           <Route path="/projects" element={<AuthGuard><ProjectsAndTasksPage /></AuthGuard>} />
