@@ -33,7 +33,7 @@ const testimonials: Testimonial[] = [
 
 export const PartnershipTestimonials = memo(() => {
   return (
-    <section id="testimonials" className="py-20 px-4 bg-gradient-to-b from-gray-900/50 to-gray-800/30">
+    <div id="testimonials" className="w-full px-4">
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -181,6 +181,6 @@ export const PartnershipTestimonials = memo(() => {
           </div>
         </motion.div>
       </div>
-    </section>
+    </div>
   );
 }); 

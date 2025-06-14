@@ -4,6 +4,8 @@ import * as React from "react"
 import { motion } from "framer-motion"
 import { ArrowRight, Users, Handshake, TrendingUp, Star, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react"
+import { Waves } from "@/components/ui/waves-background"
 
 // Utils function
 function cn(...classes: (string | undefined | null | false)[]): string {
@@ -191,26 +193,28 @@ const ButtonColorful: React.FC<ButtonColorfulProps> = ({
   return (
     <Button
       className={cn(
-        "relative h-12 px-8 overflow-hidden",
-        "bg-gradient-to-r from-orange-500 to-yellow-500",
-        "transition-all duration-200",
-        "group",
+        "relative h-14 px-8 overflow-hidden group",
+        "bg-gradient-to-r from-orange-500 via-orange-600 to-red-500",
+        "hover:from-orange-600 hover:via-red-500 hover:to-red-600",
+        "transition-all duration-300 ease-out",
+        "shadow-xl shadow-orange-500/30 hover:shadow-2xl hover:shadow-orange-500/40",
+        "border border-orange-400/20 hover:border-orange-300/30",
+        "transform hover:scale-[1.02] active:scale-[0.98]",
         className
       )}
       {...props}
     >
-      <div
-        className={cn(
-          "absolute inset-0",
-          "bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500",
-          "opacity-40 group-hover:opacity-80",
-          "blur transition-opacity duration-500"
-        )}
-      />
+      {/* Animated background overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 
+        -skew-x-12 group-hover:translate-x-full transition-transform duration-700 ease-out" />
+      
+      {/* Glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-orange-400/30 via-red-400/30 to-orange-400/30 
+        opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300" />
 
-      <div className="relative flex items-center justify-center gap-2">
-        <span className="text-white font-semibold">{label}</span>
-        <ArrowRight className="w-4 h-4 text-white/90" />
+      <div className="relative flex items-center justify-center gap-3 z-10">
+        <span className="text-white font-bold text-lg tracking-tight">{label}</span>
+        <ArrowRight className="w-5 h-5 text-white group-hover:translate-x-1 transition-transform duration-300" />
       </div>
     </Button>
   )
@@ -224,32 +228,34 @@ interface AgencyPartnershipHeaderProps {
 const AgencyPartnershipHeader: React.FC<AgencyPartnershipHeaderProps> = ({
   className = ""
 }) => {
+  const [titleNumber, setTitleNumber] = useState(0);
+  
   const partnershipTypes = [
-    "referral commissions",
-    "web app solutions",
-    "MVP development", 
-    "client partnerships",
-    "revenue sharing",
-    "business growth"
+    "20% Commission",
+    "Passive Income",
+    "Guaranteed Payouts",
+    "Instant Payments"
   ]
 
-  const benefits = [
-    { icon: TrendingUp, text: "Earn 20% Commission" },
-    { icon: Users, text: "48hr MVP Delivery" },
-    { icon: Handshake, text: "Zero Risk Guarantee" },
-    { icon: Star, text: "Full Technical Support" }
-  ]
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (titleNumber === partnershipTypes.length - 1) {
+        setTitleNumber(0);
+      } else {
+        setTitleNumber(titleNumber + 1);
+      }
+    }, 3000);
+    return () => clearTimeout(timeoutId);
+  }, [titleNumber, partnershipTypes.length]);
 
   return (
     <section className={cn(
-      "relative min-h-screen bg-black text-white overflow-hidden",
+      "relative min-h-screen text-white overflow-hidden",
       className
     )}>
       {/* Animated gradient background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 isolate z-0 flex w-screen flex-1 items-start justify-center">
-          <div className="absolute top-0 z-50 h-48 w-screen bg-transparent opacity-10 backdrop-blur-md" />
-          
+        <div className="absolute top-0 isolate z-0 flex w-full flex-1 items-start justify-center">
           {/* Main glow */}
           <div className="absolute inset-auto z-50 h-36 w-[28rem] -translate-y-[-30%] rounded-full bg-gradient-to-r from-orange-500/60 to-yellow-500/60 opacity-80 blur-3xl" />
 
@@ -309,95 +315,81 @@ const AgencyPartnershipHeader: React.FC<AgencyPartnershipHeaderProps> = ({
         </div>
       </div>
 
+      {/* Wave Animation Background */}
+      <div className="fixed inset-0 z-10 opacity-80 w-screen h-screen">
+        <Waves 
+          lineColor="rgba(251, 146, 60, 0.4)"
+          waveSpeedX={0.01}
+          waveSpeedY={0.005}
+          waveAmpX={25}
+          waveAmpY={15}
+          xGap={8}
+          yGap={30}
+          className="w-full h-full"
+        />
+      </div>
+
       {/* Main content */}
-      <div className="relative z-50 container mx-auto px-4 py-20 flex flex-col items-center justify-center min-h-screen">
+      <div className="relative z-50 container mx-auto px-4 py-8 sm:py-12 flex flex-col items-center justify-center min-h-screen">
         <motion.div
           initial={{ y: 100, opacity: 0 }}
           viewport={{ once: true }}
           transition={{ ease: "easeInOut", delay: 0.3, duration: 0.8 }}
           whileInView={{ y: 0, opacity: 1 }}
-          className="text-center space-y-8 max-w-5xl"
+          className="text-center space-y-6 sm:space-y-8 w-full"
         >
           {/* Badge */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             whileInView={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-base leading-relaxed tracking-tight font-regular"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black/40 backdrop-blur-md border border-siso-orange/30 text-white/90 text-base leading-relaxed tracking-tight font-regular"
           >
             <Handshake className="w-4 h-4" />
             Partnership Program
           </motion.div>
 
-          {/* Main heading */}
-          <div className="space-y-4">
-            <h1 className="text-xl md:text-3xl md:text-5xl tracking-tighter lg:max-w-4xl font-regular text-center">
-              <span className="block text-white">Scale your agency with</span>
-              <span className="block bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-500 bg-clip-text text-transparent">
-                <TextRotate
-                  texts={partnershipTypes}
-                  rotationInterval={3000}
-                  staggerDuration={0.02}
-                  mainClassName="inline-block"
-                />
-              </span>
+          {/* Main heading - Partnership Contractor Focused */}
+          <div className="space-y-2 sm:space-y-3">
+            <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl tracking-tighter text-center font-regular leading-tight w-full`}>
+              <div className="text-white mb-2 sm:mb-4">Earn with SISO</div>
+              <div className={`relative h-[80px] md:h-[100px] flex w-full mx-auto justify-center items-center overflow-hidden text-center px-12`}>
+                {partnershipTypes.map((type, index) => (
+                  <motion.span
+                    key={index}
+                    className="absolute text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent whitespace-nowrap"
+                    initial={{ opacity: 0, y: "-100" }}
+                    transition={{ type: "spring", stiffness: 50 }}
+                    animate={
+                      titleNumber === index
+                        ? {
+                            y: 0,
+                            opacity: 1,
+                          }
+                        : {
+                            y: titleNumber > index ? -150 : 150,
+                            opacity: 0,
+                          }
+                    }
+                  >
+                    {type}
+                  </motion.span>
+                ))}
+              </div>
             </h1>
             
-            <p className="text-lg leading-relaxed tracking-tight text-gray-300 max-w-3xl mx-auto">
-              Partner with SISO and earn 20% commission on every web solution referral. 
-              We build MVPs in 48 hours with zero risk to your clients.
+            <p className="text-base sm:text-lg md:text-xl leading-relaxed tracking-tight text-gray-300 max-w-2xl text-center mx-auto mt-2 sm:mt-3">
+              Become a SISO partner and earn 20% commission on every web solution referral. 
+              We handle all development and delivery - you focus on earning.
             </p>
           </div>
-
-          {/* Benefits grid */}
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.6 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12"
-          >
-            {benefits.map((benefit, index) => (
-              <motion.div
-                key={index}
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
-                className="flex items-center gap-3 p-4 rounded-lg bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 hover:border-orange-500/30 transition-colors"
-              >
-                <benefit.icon className="w-5 h-5 text-orange-400 flex-shrink-0" />
-                <span className="text-base leading-relaxed tracking-tight text-white font-regular">{benefit.text}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* CTA buttons */}
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12"
-          >
-            <ButtonColorful 
-              label="Start Earning Today"
-              className="text-lg px-8 py-4 h-14"
-            />
-            
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="h-14 px-8 text-lg border-2 border-orange-500/50 text-orange-400 hover:bg-orange-500/5 hover:border-orange-400"
-            >
-              <CheckCircle className="w-5 h-5 mr-2" />
-              Learn More
-            </Button>
-          </motion.div>
 
           {/* Trust indicators */}
           <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 1.1, duration: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-8 mt-16 text-base leading-relaxed tracking-tight text-gray-400"
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8 mt-8 sm:mt-12 text-base leading-relaxed tracking-tight text-gray-400"
           >
             <div className="flex items-center gap-2">
               <Star className="w-4 h-4 text-yellow-500 fill-current" />
@@ -411,6 +403,35 @@ const AgencyPartnershipHeader: React.FC<AgencyPartnershipHeaderProps> = ({
               <Users className="w-4 h-4 text-orange-500" />
               <span>48hr Delivery</span>
             </div>
+          </motion.div>
+
+          {/* CTA buttons */}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8 sm:mt-10"
+          >
+            <ButtonColorful 
+              label="Start Earning Today"
+              className="text-lg px-8 py-4 h-14"
+            />
+            
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="h-14 px-8 text-lg font-bold tracking-tight
+                bg-black/30 backdrop-blur-sm
+                border-2 border-orange-500/60 hover:border-orange-400/80
+                text-orange-400 hover:text-orange-300
+                hover:bg-orange-500/10 hover:shadow-lg hover:shadow-orange-500/20
+                transition-all duration-300 ease-out
+                transform hover:scale-[1.02] active:scale-[0.98]
+                group"
+            >
+              <CheckCircle className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform duration-300" />
+              Learn More
+            </Button>
           </motion.div>
         </motion.div>
       </div>

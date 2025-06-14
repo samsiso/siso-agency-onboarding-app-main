@@ -46,7 +46,7 @@ export const PartnershipFAQ = memo(({ onApplyNow }: PartnershipFAQProps) => {
   };
 
   return (
-    <section id="faq" className="py-20 px-4 bg-gradient-to-b from-gray-800/30 to-gray-900/60">
+    <div id="faq" className="w-full px-4">
       <div className="container mx-auto max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -194,6 +194,6 @@ export const PartnershipFAQ = memo(({ onApplyNow }: PartnershipFAQProps) => {
           </div>
         </motion.div>
       </div>
-    </section>
+    </div>
   );
 }); 

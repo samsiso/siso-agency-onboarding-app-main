@@ -33,6 +33,29 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --siso-border-hover: #3A3A3A;
+    
+    /* Project Showcase Variables */
+    --halomot-button-background: #fff;
+    --halomot-button-foreground: #0a0a0a;
+    --project-showcase-name-color: #0a0a0a;
+    --project-showcase-position-color: #454545;
+    --project-showcase-testimony-color: #171717;
+    --project-showcase-name-size: 28px;
+    --project-showcase-position-size: 20px;
+    --project-showcase-testimony-size: 20px;
+    --project-showcase-name-top: 0;
+    --project-showcase-name-bottom: 10px;
+    --project-showcase-position-top: 0;
+    --project-showcase-position-bottom: 0.5em;
+    --project-showcase-testimony-top: 1.24em;
+    --project-showcase-testimony-bottom: 1em;
+    --project-showcase-line-height: 1.56;
+    --project-showcase-button-gradient: linear-gradient(to right, #603dec, #a123f4);
+    --project-showcase-button-background: #eee;
+    --project-showcase-button-text-color: #111;
+    --project-showcase-button-outer-radius: 16.2px;
+    --project-showcase-button-inner-radius: 15px;
+    --project-showcase-button-hover-text-color: #fff;
   }
 
   .dark {
@@ -60,6 +83,29 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    
+    /* Dark Theme Project Showcase Variables */
+    --halomot-button-background: #0a0a0a;
+    --halomot-button-foreground: #fff;
+    --project-showcase-name-color: #fff;
+    --project-showcase-position-color: #aaa;
+    --project-showcase-testimony-color: #eee;
+    --project-showcase-name-size: 28px;
+    --project-showcase-position-size: 20px;
+    --project-showcase-testimony-size: 20px;
+    --project-showcase-name-top: 0;
+    --project-showcase-name-bottom: 10px;
+    --project-showcase-position-top: 0;
+    --project-showcase-position-bottom: 0.5em;
+    --project-showcase-testimony-top: 1.24em;
+    --project-showcase-testimony-bottom: 1em;
+    --project-showcase-line-height: 1.56;
+    --project-showcase-button-gradient: linear-gradient(to right, #603dec, #a123f4);
+    --project-showcase-button-background: #161616;
+    --project-showcase-button-text-color: #fff;
+    --project-showcase-button-outer-radius: 6.34px;
+    --project-showcase-button-inner-radius: 6px;
+    --project-showcase-button-hover-text-color: #fff;
   }
 
   * {
@@ -202,417 +248,405 @@
 
 .spreadsheet-grid tr:hover,
 .spreadsheet-grid tbody tr:hover {
-  background-color: #222128 !important;
+  background: #222229 !important;
+  box-shadow: 0 1.5px 0 0 #4a4a65;
 }
 
-/* Sticky columns - amber border & highlight */
 .spreadsheet-grid .sticky,
-.spreadsheet-grid td.sticky,
 .spreadsheet-grid th.sticky {
-  background-color: #18181b !important;
-  z-index: 10 !important;
-  box-shadow: none !important;
-  border-right: 2px solid #ffc46b !important;
+  position: sticky;
+  left: 0;
+  background: #151521 !important;
+  z-index: 10;
+  border-right: 2px solid #3e3763 !important;
+  box-shadow: 2px 0 0 0 #3e3763;
 }
 
-/* Add row styling - plus button highlight */
 .add-expense-row-trigger {
-  border: 1.3px dashed #ffc46b;
-  background-color: #000000e6 !important;
-  color: #ffe9b6 !important;
-  transition: all 0.30s cubic-bezier(0.4,0.0,0.2,1);
+  @apply text-gray-400 hover:text-gray-200 cursor-pointer transition-colors duration-200;
+  background: #1a1a2e !important;
+  border-color: #3e3763 !important;
 }
+
 .add-expense-row-trigger:hover {
-  background-color: #1D1923 !important;
-  border-color: #f9d491;
-  color: #fffceb !important;
+  background: #222229 !important;
+  border-color: #4a4a65 !important;
 }
 
 .spreadsheet-grid .cell-editing {
-  z-index: 13;
-  background-color: #0e1d26 !important;
-  box-shadow: 0 0 0 2px #cda278;
+  background: #2a2a3e !important;
+  border: 2px solid #5a5adf !important;
+  box-shadow: 0 0 8px rgba(90, 90, 223, 0.3);
 }
 
-/* Inputs inside spreadsheet */
 .spreadsheet-grid input,
 .spreadsheet-grid select {
-  background-color: #18181b !important;
-  color: #ffecc7 !important;
-  border: 1.4px solid #282434 !important;
+  background: transparent !important;
+  color: #ffedc3 !important;
+  border: none !important;
 }
+
 .spreadsheet-grid input:focus,
 .spreadsheet-grid select:focus {
-  border-color: #ffc46b !important;
-  box-shadow: 0 0 0 1px #ffc46b40;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-/* Action column last */
 .spreadsheet-grid th:last-child,
 .spreadsheet-grid td:last-child {
-  background: #191717 !important;
+  border-right: none !important;
 }
 
-/* Make the grid header not blurry */
 .spreadsheet-grid thead {
-  backdrop-filter: none !important;
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
-/* Misc */
 .spreadsheet-grid .dropdown-menu,
-.spreadsheet-grid .dropdown-content,
-.spreadsheet-grid .select-content {
-  background-color: #18181b !important;
-  color: #ffe9b6 !important;
-  z-index: 9999 !important;
-  border-radius: 0.5rem;
-  box-shadow: 0 6px 24px 0 #000c;
+.spreadsheet-grid .popover {
+  background: #1a1a2e !important;
+  border: 1px solid #3e3763 !important;
+  color: #ffedc3 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
 }
 
-/* Row selection/hover highlight */
+.spreadsheet-grid .dropdown-menu .item:hover,
+.spreadsheet-grid .popover .item:hover {
+  background: #2a2a3e !important;
+}
+
 .spreadsheet-grid tr.bg-muted\/20,
-.spreadsheet-grid tr.selected-row {
-  background: #181117 !important;
-  outline: 1.5px solid #ffc46b50 !important;
-  border-bottom: 2px solid #ffb74d !important; /* vivid gold eline for selected */
-  box-shadow: 0 1.5px 0 0 #ffb74d;
+.spreadsheet-grid tbody tr.bg-muted\/20 {
+  background: #242438 !important;
 }
 
-/* Inputs inside spreadsheet */
+.spreadsheet-grid tr.bg-muted\/20:hover,
+.spreadsheet-grid tbody tr.bg-muted\/20:hover {
+  background: #2a2a3e !important;
+}
+
 .spreadsheet-grid input,
 .spreadsheet-grid select {
-  background-color: #18181b !important;
-  color: #ffecc7 !important;
-  border: 1.4px solid #282434 !important;
+  background: transparent !important;
+  color: #ffedc3 !important;
+  border: none !important;
 }
+
 .spreadsheet-grid input:focus,
 .spreadsheet-grid select:focus {
-  border-color: #ffc46b !important;
-  box-shadow: 0 0 0 1px #ffc46b40;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
-/* Action column last */
 .spreadsheet-grid th:last-child,
 .spreadsheet-grid td:last-child {
-  background: #191717 !important;
+  border-right: none !important;
 }
 
-/* Make the grid header not blurry */
 .spreadsheet-grid thead {
-  backdrop-filter: none !important;
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
-/* Misc */
 .spreadsheet-grid .dropdown-menu,
-.spreadsheet-grid .dropdown-content,
-.spreadsheet-grid .select-content {
-  background-color: #18181b !important;
-  color: #ffe9b6 !important;
-  z-index: 9999 !important;
-  border-radius: 0.5rem;
-  box-shadow: 0 6px 24px 0 #000c;
+.spreadsheet-grid .popover {
+  background: #1a1a2e !important;
+  border: 1px solid #3e3763 !important;
+  color: #ffedc3 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
 }
 
-/* Row selection/hover highlight */
+.spreadsheet-grid .dropdown-menu .item:hover,
+.spreadsheet-grid .popover .item:hover {
+  background: #2a2a3e !important;
+}
+
 .spreadsheet-grid tr.bg-muted\/20,
-.spreadsheet-grid tr.selected-row {
-  background: #181117 !important;
-  outline: 1.5px solid #ffc46b50 !important;
+.spreadsheet-grid tbody tr.bg-muted\/20 {
+  background: #242438 !important;
 }
 
-/* Enhanced Table Styles */
 .enhanced-table {
-  width: 100%;
-  border-collapse: collapse;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
-  overflow: hidden;
+  @apply bg-gradient-to-br from-slate-900/80 via-slate-800/60 to-slate-900/80;
+  border: 1px solid rgba(71, 85, 105, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
 }
 
 .enhanced-table thead {
-  background-color: rgba(249, 250, 251, 0.75);
-  backdrop-filter: blur(8px);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  @apply bg-gradient-to-r from-slate-800/90 to-slate-700/90;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.4);
+  backdrop-filter: blur(10px);
 }
 
 .enhanced-table th,
 .enhanced-table td {
+  @apply text-slate-100 border-slate-600/30;
   padding: 12px 16px;
-  text-align: left;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid rgba(71, 85, 105, 0.2);
 }
 
 .enhanced-table th {
-  font-weight: 600;
-  color: #4b5563;
+  @apply font-semibold text-slate-200 bg-slate-800/40;
 }
 
 .enhanced-table tbody tr:hover {
-  background-color: rgba(243, 244, 246, 0.5);
+  @apply bg-slate-700/30;
+  backdrop-filter: blur(4px);
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-/* Spreadsheet styles */
+/* Enhanced Spreadsheet Grid */
 .spreadsheet-grid {
-  --grid-border-color: rgba(0, 0, 0, 0.1);
-  --grid-hover-color: rgba(0, 0, 0, 0.02);
-  --grid-focus-color: rgba(79, 70, 229, 0.1);
+  @apply bg-slate-900/95 border border-slate-700/50 rounded-xl overflow-hidden;
+  backdrop-filter: blur(10px);
 }
 
 .spreadsheet-grid th {
-  position: relative;
-  background-color: #f9fafb;
-  border-bottom: 1px solid var(--grid-border-color);
-  font-weight: 500;
+  @apply bg-slate-800/80 text-slate-200 font-semibold;
+  border-bottom: 2px solid rgba(71, 85, 105, 0.4);
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .spreadsheet-grid td {
-  font-size: 0.875rem;
+  @apply text-slate-100 bg-slate-900/40;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.2);
 }
 
 .spreadsheet-grid tbody tr {
-  transition: background-color 0.2s;
+  @apply transition-all duration-150;
 }
 
 .spreadsheet-grid tbody tr:hover {
-  background-color: var(--grid-hover-color);
+  @apply bg-slate-700/50;
 }
 
 .spreadsheet-grid .cell-editable {
-  cursor: cell;
-  transition: background-color 0.2s;
+  @apply cursor-pointer;
+  transition: background-color 0.15s ease;
 }
 
 .spreadsheet-grid .cell-editable:hover {
-  background-color: var(--grid-hover-color);
+  @apply bg-slate-600/30;
 }
 
 .spreadsheet-grid td.cell-editing {
-  z-index: 10;
-  box-shadow: 0 0 0 2px #4f46e5;
+  @apply bg-slate-600/50 ring-2 ring-slate-400/50;
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.5);
 }
 
 .spreadsheet-grid td.cell-editing input,
 .spreadsheet-grid td.cell-editing select {
-  background-color: white;
-  box-shadow: 0 0 0 2px #4f46e5;
+  @apply bg-transparent text-slate-100 border-0 outline-none w-full;
 }
 
-/* Airtable-like styles */
+/* Airtable-style grid improvements */
 .airtable-grid {
-  --grid-bg: #f9fafb;
-  --header-bg: #edf2f7;
-  --cell-border: #e5e7eb;
-  --row-hover: #f3f4f6;
-  --selection-color: #ebf4ff;
-  --focus-color: #3b82f6;
+  @apply bg-slate-900/95 border border-slate-700/50 rounded-xl overflow-hidden;
+  backdrop-filter: blur(12px);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.3),
+    0 10px 10px -5px rgba(0, 0, 0, 0.2);
 }
 
 .dark .airtable-grid {
-  --grid-bg: #1a1b26;
-  --header-bg: #1e212f;
-  --cell-border: #2d3748;
-  --row-hover: #252a3c;
-  --selection-color: #2d3748;
-  --focus-color: #4f46e5;
+  @apply bg-slate-900/[0.98] border-slate-600/40;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(71, 85, 105, 0.1);
 }
 
 .airtable-grid table {
-  border-spacing: 0;
-  width: 100%;
+  @apply w-full border-collapse;
+  background: transparent;
 }
 
 .airtable-grid th {
-  background-color: var(--header-bg);
-  border-bottom: 1px solid var(--cell-border);
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
+  @apply bg-slate-800/90 text-slate-200 font-semibold text-left;
+  padding: 14px 16px;
+  border-bottom: 2px solid rgba(71, 85, 105, 0.4);
+  border-right: 1px solid rgba(71, 85, 105, 0.3);
   position: sticky;
   top: 0;
-  z-index: 5;
-  box-shadow: 0 1px 0 var(--cell-border);
+  z-index: 10;
+  backdrop-filter: blur(8px);
 }
 
 .airtable-grid td {
-  border-bottom: 1px solid var(--cell-border);
-  border-right: 1px solid var(--cell-border);
-  transition: all 0.2s;
+  @apply text-slate-100;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.2);
+  border-right: 1px solid rgba(71, 85, 105, 0.15);
 }
 
 .airtable-grid tr:hover td {
-  background-color: var(--row-hover);
+  @apply bg-slate-700/40;
 }
 
 .airtable-grid tr[data-state="selected"] td {
-  background-color: var(--selection-color);
+  @apply bg-slate-600/50 ring-1 ring-slate-400/30;
 }
 
 .airtable-grid td[data-editing="true"] {
-  padding: 0;
-  box-shadow: 0 0 0 2px var(--focus-color);
-  z-index: 10;
-  position: relative;
+  @apply bg-slate-600/60 ring-2 ring-slate-400/50;
+  box-shadow: 
+    0 0 0 1px rgba(148, 163, 184, 0.5),
+    0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
 /* Resizable columns */
 .resizable-header {
-  position: relative;
+  @apply relative;
 }
 
 .resize-handle {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  width: 4px;
-  cursor: col-resize;
+  @apply absolute right-0 top-0 w-1 h-full cursor-col-resize;
+  background: transparent;
+  transition: background-color 0.15s ease;
 }
 
 .resize-handle:hover,
-.resize-handle.active {
-  background-color: rgba(79, 70, 229, 0.3);
+.resize-handle:active {
+  @apply bg-slate-400/50;
+  box-shadow: 0 0 4px rgba(148, 163, 184, 0.3);
 }
 
-/* Dropdown menus in headers */
 th:hover .header-column-menu {
-  opacity: 1;
+  @apply opacity-100;
 }
 
 .header-column-menu {
-  opacity: 0;
-  transition: opacity 0.2s;
+  @apply opacity-0 transition-opacity duration-150;
 }
 
-/* Keyboard navigation highlight */
+/* Cell types styling */
 .cell-focused {
-  box-shadow: inset 0 0 0 2px var(--focus-color);
+  @apply ring-2 ring-slate-400/50 bg-slate-600/40;
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.5);
 }
 
-/* Cell types */
 .cell-text {
-  font-family: inherit;
+  @apply text-slate-100;
 }
 
 .cell-number {
-  font-variant-numeric: tabular-nums;
-  text-align: right;
+  @apply text-emerald-300 font-mono text-right;
 }
 
 .cell-date {
-  font-variant-numeric: tabular-nums;
+  @apply text-blue-300;
 }
 
 .cell-select {}
 
 .cell-checkbox {
-  text-align: center;
+  @apply flex items-center justify-center;
 }
 
-/* Add row style */
+/* Add row button */
 .add-row-button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--muted-foreground);
-  transition: color 0.2s, background-color 0.2s;
+  @apply w-full py-2 text-slate-400 hover:text-slate-200 
+    hover:bg-slate-700/30 border-t border-slate-600/30 
+    transition-all duration-150 cursor-pointer;
+  background: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.3),
+    rgba(51, 65, 85, 0.2)
+  );
+  backdrop-filter: blur(4px);
 }
 
 .add-row-button:hover {
-  color: var(--foreground);
-  background-color: var(--row-hover);
+  background: linear-gradient(
+    135deg,
+    rgba(51, 65, 85, 0.4),
+    rgba(71, 85, 105, 0.3)
+  );
+  backdrop-filter: blur(6px);
 }
 
-/* Notion Editor Styles */
+/* Notion Editor styles */
 @layer components {
   .notion-editor {
-    @apply relative;
+    @apply bg-slate-800/60 border border-slate-600/50 rounded-lg p-4;
   }
 
   .notion-block {
-    @apply relative;
+    @apply mb-2 p-2 rounded transition-colors duration-150 hover:bg-slate-700/30;
   }
 
-  /* Inline code styling */
   .inline-code {
-    @apply bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-1 py-0.5 rounded text-sm font-mono;
+    @apply bg-slate-700/50 text-slate-200 px-1.5 py-0.5 rounded text-sm font-mono;
   }
 
-  /* Focus styles for contentEditable elements */
   .notion-editor [contenteditable="true"]:focus {
-    @apply outline-none ring-2 ring-blue-500/50 ring-offset-2 ring-offset-transparent rounded;
+    @apply outline-none ring-2 ring-slate-400/50 bg-slate-700/40 rounded;
   }
 
-  /* Placeholder styles */
   .notion-editor [contenteditable="true"]:empty:before {
     content: attr(data-placeholder);
-    @apply text-gray-400 dark:text-gray-600 pointer-events-none;
+    @apply text-slate-400 pointer-events-none;
   }
 
-  /* Block hover effects */
   .notion-block:hover .block-actions {
     @apply opacity-100;
   }
 
   .block-actions {
-    @apply opacity-0 transition-opacity duration-200;
+    @apply opacity-0 transition-opacity duration-150;
   }
 
-  /* Slash menu animation */
   .slash-menu {
-    @apply animate-in fade-in-0 zoom-in-95 duration-200;
+    @apply bg-slate-800/95 border border-slate-600/50 rounded-lg shadow-xl backdrop-blur-sm;
   }
 
-  /* Toggle block animations */
   .toggle-content {
-    @apply transition-all duration-200 ease-in-out;
+    @apply transition-all duration-200 ease-in-out overflow-hidden;
   }
 
   .toggle-content.collapsed {
-    @apply h-0 overflow-hidden opacity-0;
+    @apply max-h-0 opacity-0;
   }
 
   .toggle-content.expanded {
-    @apply h-auto opacity-100;
+    @apply max-h-96 opacity-100;
   }
 
-  /* Callout block styles */
+  /* Callout blocks */
   .callout-block {
-    @apply border-l-4 rounded-r-lg transition-colors duration-200;
+    @apply border-l-4 pl-4 py-2 rounded-r-lg;
   }
 
   .callout-block.info {
-    @apply border-blue-500 bg-blue-50 dark:bg-blue-950/20;
+    @apply border-blue-400 bg-blue-400/10;
   }
 
   .callout-block.warning {
-    @apply border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20;
+    @apply border-yellow-400 bg-yellow-400/10;
   }
 
   .callout-block.error {
-    @apply border-red-500 bg-red-50 dark:bg-red-950/20;
+    @apply border-red-400 bg-red-400/10;
   }
 
   .callout-block.success {
-    @apply border-green-500 bg-green-50 dark:bg-green-950/20;
+    @apply border-green-400 bg-green-400/10;
   }
 
   /* Code block syntax highlighting placeholder */
@@ -811,4 +845,13 @@ th:hover .header-column-menu {
 /* Slash command menu styling */
 .notion-editor-enhanced .slash-menu {
   @apply bg-slate-800/95 border border-slate-600/50 shadow-2xl backdrop-blur-md;
+}
+
+/* Project Showcase specific styles */
+.project-showcase-image-container {
+  transition: background-color 0.3s ease-in-out;
+}
+
+.project-showcase-image-container:hover {
+  background-color: var(--project-showcase-hover-outline-color, #403d4d) !important;
 }

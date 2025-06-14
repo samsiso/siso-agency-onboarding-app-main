@@ -1,17 +1,14 @@
 import { memo, useState, useEffect } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { Waves } from '@/components/ui/waves-background';
 import { AgencyPartnershipHeader } from '@/components/ui/agency-partnership-header';
 import { Stats } from '@/components/ui/stats-section-with-text';
-import PartnershipStats from '@/components/partnership/PartnershipStats';
-import CommissionCalculator from '@/components/partnership/CommissionCalculator';
 import { PartnershipNavigation } from '@/components/partnership/PartnershipNavigation';
 import { PartnershipPortfolio } from '@/components/partnership/PartnershipPortfolio';
 import { PartnershipBenefits } from '@/components/partnership/PartnershipBenefits';
 import { PartnershipProcess } from '@/components/partnership/PartnershipProcess';
-import { PartnershipClientTypes } from '@/components/partnership/PartnershipClientTypes';
-import { PartnershipTestimonials } from '@/components/partnership/PartnershipTestimonials';
-import { PartnershipFAQ } from '@/components/partnership/PartnershipFAQ';
+import { PartnershipAIChat } from '@/components/partnership/PartnershipAIChat';
 import Footer from '@/components/Footer';
 
 const PartnershipPage = memo(() => {
@@ -37,17 +34,14 @@ const PartnershipPage = memo(() => {
     });
   };
 
-  // Navigation sections for the sticky nav
+  // Navigation sections for the sticky nav (removed calculator and clients)
   const navigationSections = [
     { id: 'hero', label: 'Get Started' },
     { id: 'stats', label: 'Program Stats' },
     { id: 'portfolio', label: 'Our Work' },
     { id: 'benefits', label: 'Benefits' },
     { id: 'process', label: 'How It Works' },
-    { id: 'calculator', label: 'Calculator' },
-    { id: 'clients', label: 'Client Types' },
-    { id: 'testimonials', label: 'Success Stories' },
-    { id: 'faq', label: 'FAQ' }
+    { id: 'faq', label: 'AI Chat' }
   ];
 
   const scrollToSection = (sectionId: string) => {
@@ -81,7 +75,7 @@ const PartnershipPage = memo(() => {
   }, [activeSection, navigationSections]);
 
   return (
-    <div className="min-h-screen w-full bg-black overflow-x-hidden">
+    <div className="min-h-screen w-full bg-gradient-to-b from-black via-siso-bg to-black overflow-x-hidden">
       {/* Scroll Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-orange-500 transform-origin-left z-50"
@@ -97,7 +91,7 @@ const PartnershipPage = memo(() => {
       />
 
       {/* SISO Swirly Animation Background - Matching Main Landing Page */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-1/4 -left-1/4 w-[250px] md:w-[600px] h-[250px] md:h-[600px] 
           bg-siso-red/15 rounded-full filter blur-[80px] md:blur-[120px] 
           animate-float-slow transform-gpu will-change-transform"
@@ -112,63 +106,56 @@ const PartnershipPage = memo(() => {
         />
       </div>
 
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <section id="hero">
+      {/* Waves Animation - Matching Main Landing Page HeroSection */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-10">
+        <Waves 
+          lineColor="rgba(255, 87, 34, 0.2)"
+          backgroundColor="transparent"
+          waveSpeedX={0.018}
+          waveSpeedY={0.015}
+          waveAmpX={70}
+          waveAmpY={35}
+          friction={0.92}
+          tension={0.012}
+          maxCursorMove={180}
+          xGap={22}
+          yGap={55}
+        />
+      </div>
+
+      <div className="relative z-30">
+        {/* Hero Section - Full Screen */}
+        <section id="hero" className="min-h-screen flex items-center justify-center">
           <AgencyPartnershipHeader />
         </section>
 
-        {/* SISO Platform Stats */}
-        <section id="stats">
+        {/* SISO Platform Stats - Full Screen */}
+        <section id="stats" className="min-h-screen flex items-center justify-center">
           <Stats />
         </section>
 
-        {/* Partnership Statistics */}
-        <PartnershipStats />
-
-        {/* Portfolio Section */}
-        <PartnershipPortfolio onApplyNow={handleApplyNow} />
-
-        {/* Benefits Section */}
-        <PartnershipBenefits />
-
-        {/* Process Section */}
-        <PartnershipProcess />
-
-        {/* Commission Calculator */}
-        <section id="calculator" className="py-20">
-          <CommissionCalculator />
+        {/* Portfolio Section - Full Screen */}
+        <section className="min-h-screen flex items-center justify-center">
+          <PartnershipPortfolio onApplyNow={handleApplyNow} />
         </section>
 
-        {/* Client Types Section */}
-        <PartnershipClientTypes />
+        {/* Benefits Section - Full Screen */}
+        <section className="min-h-screen flex items-center justify-center">
+          <PartnershipBenefits />
+        </section>
 
-        {/* Testimonials Section */}
-        <PartnershipTestimonials />
+        {/* Process Section - Full Screen */}
+        <section className="min-h-screen flex items-center justify-center">
+          <PartnershipProcess />
+        </section>
 
-        {/* FAQ Section */}
-        <PartnershipFAQ onApplyNow={handleApplyNow} />
+        {/* AI Chat Section - Full Screen */}
+        <section className="min-h-screen flex items-center justify-center">
+          <PartnershipAIChat onApplyNow={handleApplyNow} />
+        </section>
 
         {/* Footer Section */}
         <Footer />
-
-        {/* Floating Action Styles */}
-        <style>{`
-          @keyframes float-slow {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-          }
-          @keyframes float-slower {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-30px) rotate(-3deg); }
-          }
-          .animate-float-slow {
-            animation: float-slow 8s ease-in-out infinite;
-          }
-          .animate-float-slower {
-            animation: float-slower 12s ease-in-out infinite;
-          }
-        `}</style>
       </div>
     </div>
   );

@@ -166,7 +166,7 @@ export function VercelV0Chat() {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-center gap-3 mt-6">
+                <div className="flex items-center justify-center gap-4 mt-8 px-4">
                     <ActionButton
                         icon={<ImageIcon className="w-4 h-4" />}
                         label="Clone a Screenshot"
@@ -202,10 +202,15 @@ function ActionButton({ icon, label }: ActionButtonProps) {
     return (
         <button
             type="button"
-            className="flex items-center gap-2 px-4 py-2 bg-neutral-900 hover:bg-neutral-800 rounded-full border border-neutral-800 text-neutral-400 hover:text-white transition-colors"
+            className="group flex items-center gap-3 px-5 py-3 bg-neutral-900/80 hover:bg-neutral-800/80 
+                rounded-xl border border-neutral-800/50 hover:border-neutral-700 text-neutral-400 
+                hover:text-white transition-all duration-300 backdrop-blur-sm shadow-lg 
+                shadow-black/20 hover:shadow-neutral-500/20 hover:-translate-y-0.5"
         >
-            {icon}
-            <span className="text-xs">{label}</span>
+            <div className="transition-transform duration-300 group-hover:scale-110">
+                {icon}
+            </div>
+            <span className="text-sm font-medium">{label}</span>
         </button>
     );
 }

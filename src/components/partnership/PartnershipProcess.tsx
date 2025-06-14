@@ -43,7 +43,7 @@ const processSteps: ProcessStep[] = [
 
 export const PartnershipProcess = memo(() => {
   return (
-    <section id="process" className="py-20 px-4 bg-gradient-to-b from-gray-900/30 to-gray-800/50">
+    <div id="process" className="w-full px-4">
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -52,10 +52,10 @@ export const PartnershipProcess = memo(() => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
-            How It <span className="text-orange-500">Works</span>
+          <h2 className="text-xl md:text-3xl md:text-5xl tracking-tighter lg:max-w-xl font-regular text-center text-white mx-auto mb-6">
+            How It <span className="text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-500 bg-clip-text">Works</span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg leading-relaxed tracking-tight text-gray-300 max-w-2xl mx-auto">
             Our simple 4-step process makes it easy to start earning commissions
           </p>
         </motion.div>
@@ -154,16 +154,16 @@ export const PartnershipProcess = memo(() => {
           <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 
             backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8
             max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              It's That <span className="text-orange-500">Simple</span>
+            <h3 className="text-xl md:text-3xl tracking-tighter font-regular text-white mb-4">
+              It's That <span className="text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-500 bg-clip-text">Simple</span>
             </h3>
-            <p className="text-lg text-gray-300 leading-relaxed">
+            <p className="text-lg leading-relaxed tracking-tight text-gray-300">
               You focus on relationships and referrals. We handle everything else - 
               from building the MVP to managing client communications and payments.
             </p>
           </div>
         </motion.div>
       </div>
-    </section>
+    </div>
   );
 }); 

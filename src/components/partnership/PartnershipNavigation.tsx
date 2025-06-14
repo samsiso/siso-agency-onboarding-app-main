@@ -79,11 +79,11 @@ export const PartnershipNavigation = memo(({
                       onClick={() => handleSectionClick(section.id)}
                       whileHover={{ scale: 1.02, x: 5 }}
                       whileTap={{ scale: 0.98 }}
-                      className={`w-full text-left px-6 py-4 rounded-xl font-semibold transition-all duration-300 
-                        min-h-[56px] flex items-center border relative overflow-hidden group backdrop-blur-sm
+                      className={`w-full text-left px-4 py-3 rounded-lg font-semibold transition-all duration-300 
+                        min-h-[48px] flex items-center relative
                         ${activeSection === section.id 
-                          ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-white border-orange-400/50 shadow-lg shadow-orange-500/25' 
-                          : 'text-white hover:text-orange-300 bg-gray-900/30 hover:bg-orange-500/10 border-gray-700/50 hover:border-orange-500/30'
+                          ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-white shadow-md' 
+                          : 'text-white hover:text-orange-300 hover:bg-orange-500/10'
                         }`}
                     >
                       <span className="relative z-10">{section.label}</span>
@@ -123,38 +123,34 @@ export const PartnershipNavigation = memo(({
       </AnimatePresence>
 
       {/* Desktop Sticky Navigation */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50 
-          bg-gradient-to-r from-black/80 via-gray-900/80 to-black/80 
-          backdrop-blur-xl border border-orange-500/20 rounded-2xl 
-          shadow-2xl shadow-orange-500/10 hidden lg:block
-          before:absolute before:inset-0 before:rounded-2xl 
-          before:bg-gradient-to-r before:from-orange-500/5 before:to-yellow-500/5 
-          before:opacity-50 hover:before:opacity-70 before:transition-opacity before:duration-300"
-      >
-        <div className="flex items-center justify-center gap-2 px-6 py-3 relative z-10">
-          {navigationSections.map((section) => (
-            <button
-              key={section.id}
-              onClick={() => onSectionClick(section.id)}
-              className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 
-                whitespace-nowrap border text-center min-w-fit relative overflow-hidden group
-                ${activeSection === section.id 
-                  ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-white shadow-lg shadow-orange-500/25 border-orange-400/50 scale-102' 
-                  : 'text-white hover:text-orange-300 bg-black/20 hover:bg-orange-500/10 border-gray-700/50 hover:border-orange-500/30 hover:scale-102 backdrop-blur-sm'
-                }`}
-            >
-              <span className="relative z-10">{section.label}</span>
-              {activeSection !== section.id && (
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-yellow-500/0 
-                  opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              )}
-            </button>
-          ))}
+      <div className="fixed top-8 left-0 right-0 z-50 pointer-events-none hidden lg:block">
+        <div className="flex justify-center w-full">
+          <motion.nav
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            className="bg-black/15 backdrop-blur-xl border border-white/10 rounded-xl 
+              shadow-xl shadow-black/10 pointer-events-auto w-fit
+              supports-[backdrop-filter]:bg-black/20"
+          >
+          <div className="flex items-center gap-2 px-6 py-3 relative z-10">
+            {navigationSections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => onSectionClick(section.id)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 
+                  whitespace-nowrap text-center min-w-fit relative
+                  ${activeSection === section.id 
+                    ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-white shadow-md' 
+                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                  }`}
+              >
+                <span className="relative z-10">{section.label}</span>
+              </button>
+            ))}
+          </div>
+        </motion.nav>
         </div>
-      </motion.nav>
+      </div>
 
       {/* CSS for enhanced styles */}
       <style>{`

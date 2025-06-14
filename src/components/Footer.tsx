@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
   const isMobile = useIsMobile();
   
   return (
-    <footer className="bg-siso-bg border-t border-gray-800 py-12 md:py-16">
+    <footer className="relative z-50 bg-siso-bg-alt border-t border-gray-800 py-12 md:py-16">
       <div className="container mx-auto px-4 flex flex-col items-center text-center">
         {/* Logo only - bigger and centered */}
         <div className="flex flex-col items-center space-y-3 md:space-y-4 mb-8 md:mb-10">

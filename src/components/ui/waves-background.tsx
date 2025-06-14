@@ -335,14 +335,14 @@ export function Waves({
         backgroundColor,
       }}
       className={cn(
-        "absolute top-0 left-0 w-full h-full overflow-hidden -z-10",
+        "absolute top-0 left-0 w-full h-full overflow-hidden z-0",
         className,
       )}
     >
       <div
         className={cn(
           "absolute top-0 left-0 rounded-full",
-          "w-2 h-2 bg-foreground/10 -z-10",
+          "w-2 h-2 bg-foreground/10 z-5",
         )}
         style={{
           transform:
@@ -352,7 +352,7 @@ export function Waves({
       />
       <canvas 
         ref={canvasRef} 
-        className="block w-full h-full -z-10 pointer-events-none" 
+        className="block w-full h-full z-10 pointer-events-none" 
       />
     </div>
   )
