@@ -63,6 +63,7 @@ import UserFlowNodesPage from './pages/projects/UserFlowNodesPage';
 import UserFlowCodePage from './pages/projects/UserFlowCodePage';
 import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
 import { BusinessOnboarding } from './components/onboarding/BusinessOnboarding';
+import PartnershipPage from './pages/PartnershipPage';
 
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
@@ -105,6 +106,9 @@ function App() {
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/portfolio" element={<PublicPortfolio />} />
+          <Route path="/partnership" element={<PartnershipPage />} />
+          <Route path="/partners" element={<PartnershipPage />} />
+          <Route path="/partner" element={<PartnershipPage />} />
           <Route path="/onboarding-chat" element={<OnboardingChat />} />
           <Route path="/onboarding" element={<AuthGuard><BusinessOnboarding /></AuthGuard>} />
           <Route path="/thankyou" element={<ThankYou />} />
