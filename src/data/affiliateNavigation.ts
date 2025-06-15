@@ -1,108 +1,151 @@
 import { 
-  LayoutDashboard, 
+  BarChart3, 
   Trophy, 
   Users, 
-  Target, 
-  GraduationCap, 
+  Link, 
   FileText, 
   Zap, 
-  BarChart3, 
-  User, 
-  Settings,
-  CreditCard,
-  Link2,
-  MessageSquare,
-  Calendar,
+  GraduationCap, 
+  BookOpen, 
+  Video, 
+  HelpCircle, 
+  MessageCircle,
+  Home,
   TrendingUp
 } from 'lucide-react';
-import { NavigationItem, SidebarConfig } from '@/components/dashboard/UnifiedSidebar';
+
+export interface NavigationItem {
+  id: string;
+  label: string;
+  icon: any;
+  path: string;
+  children?: NavigationItem[];
+  badge?: string;
+  isActive?: boolean;
+}
 
 export const affiliateNavigationItems: NavigationItem[] = [
   {
-    name: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Performance',
-    href: '/dashboard/performance',
-    icon: TrendingUp,
+    id: 'dashboard',
+    label: 'Dashboard',
+    icon: Home,
+    path: '/dashboard',
+    isActive: true,
     children: [
       {
-        name: 'Statistics',
-        href: '/dashboard/statistics',
-        icon: BarChart3,
-      },
+        id: 'statistics',
+        label: 'Statistics',
+        icon: TrendingUp,
+        path: '/dashboard/statistics',
+        badge: 'New'
+      }
+    ]
+  },
+  {
+    id: 'performance',
+    label: 'Performance',
+    icon: BarChart3,
+    path: '/dashboard/performance',
+    children: [
       {
-        name: 'Leaderboard',
-        href: '/dashboard/leaderboard',
+        id: 'leaderboard',
+        label: 'Leaderboard',
         icon: Trophy,
+        path: '/dashboard/leaderboard',
+        isActive: true
       },
       {
-        name: 'Referrals',
-        href: '/dashboard/referrals',
+        id: 'referrals',
+        label: 'Referrals',
         icon: Users,
+        path: '/dashboard/referrals',
+        badge: 'Coming Soon',
+        children: [
+          {
+            id: 'referral-links',
+            label: 'Referral Links',
+            icon: Link,
+            path: '/dashboard/referral-links',
+            badge: 'Coming Soon'
+          }
+        ]
       }
     ]
   },
   {
-    name: 'Marketing Tools',
-    href: '/dashboard/tools',
+    id: 'marketing-tools',
+    label: 'Marketing Tools',
     icon: Zap,
+    path: '/dashboard/tools',
     children: [
       {
-        name: 'Referral Links',
-        href: '/dashboard/referral-links',
-        icon: Link2,
-      },
-      {
-        name: 'Templates',
-        href: '/dashboard/templates',
-        icon: FileText,
-      },
-      {
-        name: 'App Plan Generator',
-        href: '/dashboard/app-plan-generator',
+        id: 'app-plan-generator',
+        label: 'App Plan Generator',
         icon: Zap,
+        path: '/dashboard/app-plan-generator',
+        badge: 'Coming Soon',
+        children: [
+          {
+            id: 'templates',
+            label: 'Templates',
+            icon: FileText,
+            path: '/dashboard/templates',
+            badge: 'Coming Soon'
+          }
+        ]
       }
     ]
   },
   {
-    name: 'Education',
-    href: '/dashboard/education',
+    id: 'education',
+    label: 'Education',
     icon: GraduationCap,
+    path: '/dashboard/education',
     children: [
       {
-        name: 'Training Hub',
-        href: '/dashboard/training',
-        icon: GraduationCap,
-      },
-      {
-        name: 'Resources',
-        href: '/dashboard/resources',
-        icon: FileText,
-      },
-      {
-        name: 'Webinars',
-        href: '/dashboard/webinars',
-        icon: Calendar,
+        id: 'training-hub',
+        label: 'Training Hub',
+        icon: BookOpen,
+        path: '/dashboard/training-hub',
+        badge: 'Coming Soon',
+        children: [
+          {
+            id: 'resources',
+            label: 'Resources',
+            icon: BookOpen,
+            path: '/dashboard/resources',
+            badge: 'Coming Soon'
+          },
+          {
+            id: 'webinars',
+            label: 'Webinars',
+            icon: Video,
+            path: '/dashboard/webinars',
+            badge: 'Coming Soon'
+          }
+        ]
       }
     ]
   },
   {
-    name: 'Support',
-    href: '/dashboard/support',
-    icon: MessageSquare,
+    id: 'support',
+    label: 'Support',
+    icon: HelpCircle,
+    path: '/dashboard/support',
     children: [
       {
-        name: 'Help Center',
-        href: '/dashboard/help',
-        icon: MessageSquare,
+        id: 'help-center',
+        label: 'Help Center',
+        icon: HelpCircle,
+        path: '/dashboard/help-center',
+        badge: 'Coming Soon'
       },
       {
-        name: 'Contact Support',
-        href: '/dashboard/contact',
-        icon: MessageSquare,
+        id: 'contact-support',
+        label: 'Contact Support',
+        icon: MessageCircle,
+        path: '/dashboard/contact-support',
+        badge: 'Coming Soon'
       }
     ]
   }

@@ -52,7 +52,7 @@ export const Sidebar = () => {
     expanded: {
       width: isMobile ? "16rem" : "16rem",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 200,
         damping: 25,
         mass: 0.8
@@ -61,7 +61,7 @@ export const Sidebar = () => {
     collapsed: {
       width: isMobile ? "0" : "4rem",
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 300,
         damping: 35,
         mass: 0.8
@@ -92,7 +92,7 @@ export const Sidebar = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="fixed top-4 right-4 z-50 bg-neutral-900/80 backdrop-blur-sm border border-neutral-700/50"
+            className="fixed top-4 right-4 z-50 bg-siso-bg/90 backdrop-blur-sm border border-siso-border"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -124,8 +124,8 @@ export const Sidebar = () => {
         variants={sidebarVariants}
         className={`
           fixed top-0 h-screen overflow-y-auto
-          bg-neutral-900/95 backdrop-blur-sm
-          border-r border-neutral-700/50 shadow-xl
+          bg-gradient-to-b from-siso-bg via-siso-bg to-siso-bg-alt backdrop-blur-sm
+          border-r border-siso-border shadow-xl
           ${isMobile ? 'left-0 z-40' : ''}
         `}
         onMouseEnter={handleMouseEnter}

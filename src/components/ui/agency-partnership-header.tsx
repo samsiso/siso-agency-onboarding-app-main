@@ -316,7 +316,7 @@ const AgencyPartnershipHeader: React.FC<AgencyPartnershipHeaderProps> = ({
       </div>
 
       {/* Wave Animation Background */}
-      <div className="fixed inset-0 z-10 opacity-80 w-screen h-screen">
+      <div className="fixed inset-0 z-10 opacity-80 w-screen h-screen pointer-events-none">
         <Waves 
           lineColor="rgba(251, 146, 60, 0.4)"
           waveSpeedX={0.01}

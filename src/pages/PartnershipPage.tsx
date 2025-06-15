@@ -9,6 +9,7 @@ import { PartnershipPortfolio } from '@/components/partnership/PartnershipPortfo
 import { PartnershipBenefits } from '@/components/partnership/PartnershipBenefits';
 import { PartnershipProcess } from '@/components/partnership/PartnershipProcess';
 import { PartnershipAIChat } from '@/components/partnership/PartnershipAIChat';
+import { PartnershipTraining } from '@/components/partnership/PartnershipTraining';
 import Footer from '@/components/Footer';
 
 const PartnershipPage = memo(() => {
@@ -34,13 +35,14 @@ const PartnershipPage = memo(() => {
     });
   };
 
-  // Navigation sections for the sticky nav (removed calculator and clients)
+  // Navigation sections for the sticky nav - OPTIMIZED ORDER for better UX flow
   const navigationSections = [
     { id: 'hero', label: 'Get Started' },
-    { id: 'stats', label: 'Program Stats' },
-    { id: 'portfolio', label: 'Our Work' },
     { id: 'benefits', label: 'Benefits' },
+    { id: 'portfolio', label: 'Our Work' },
     { id: 'process', label: 'How It Works' },
+    { id: 'training', label: 'Training & Hub' },
+    { id: 'stats', label: 'Program Stats' },
     { id: 'faq', label: 'AI Chat' }
   ];
 
@@ -129,28 +131,33 @@ const PartnershipPage = memo(() => {
           <AgencyPartnershipHeader />
         </section>
 
-        {/* SISO Platform Stats - Full Screen */}
+        {/* Benefits Section - Full Screen - MOVED UP for better UX flow */}
+        <section id="benefits" className="min-h-screen flex items-center justify-center">
+          <PartnershipBenefits />
+        </section>
+
+        {/* Portfolio Section - Full Screen */}
+        <section id="portfolio" className="min-h-screen flex items-center justify-center">
+          <PartnershipPortfolio onApplyNow={handleApplyNow} />
+        </section>
+
+        {/* Process Section - Full Screen */}
+        <section id="process" className="min-h-screen flex items-center justify-center">
+          <PartnershipProcess />
+        </section>
+
+        {/* Training & Hub Section - Full Screen */}
+        <section id="training" className="min-h-screen flex items-center justify-center">
+          <PartnershipTraining />
+        </section>
+
+        {/* SISO Platform Stats - Full Screen - MOVED DOWN for better trust building */}
         <section id="stats" className="min-h-screen flex items-center justify-center">
           <Stats />
         </section>
 
-        {/* Portfolio Section - Full Screen */}
-        <section className="min-h-screen flex items-center justify-center">
-          <PartnershipPortfolio onApplyNow={handleApplyNow} />
-        </section>
-
-        {/* Benefits Section - Full Screen */}
-        <section className="min-h-screen flex items-center justify-center">
-          <PartnershipBenefits />
-        </section>
-
-        {/* Process Section - Full Screen */}
-        <section className="min-h-screen flex items-center justify-center">
-          <PartnershipProcess />
-        </section>
-
         {/* AI Chat Section - Full Screen */}
-        <section className="min-h-screen flex items-center justify-center">
+        <section id="faq" className="min-h-screen flex items-center justify-center">
           <PartnershipAIChat onApplyNow={handleApplyNow} />
         </section>
 

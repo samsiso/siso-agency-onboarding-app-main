@@ -91,7 +91,7 @@ export const AdminSidebarNavigation = ({ collapsed, onItemClick, visible }: Navi
               key={index}
               className={cn(
                 "space-y-1",
-                section.type === 'section' && "border-b border-neutral-700/30 pb-2"
+                section.type === 'section' && "border-b border-siso-border/50 pb-2"
               )}
             >
               <SidebarSection

@@ -99,10 +99,10 @@ export function AdminSidebarLogo({
             initial={{ opacity: 0, width: 0 }}
             animate={{ opacity: 1, width: "auto" }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="ml-2.5 font-semibold text-lg whitespace-nowrap"
+            className="ml-2.5 font-semibold text-lg whitespace-nowrap text-siso-text-bold"
           >
             SISO{" "}
-            <span className="font-extrabold bg-gradient-to-r from-red-500 to-orange-500 bg-clip-text text-transparent">
+            <span className="font-extrabold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent">
               ADMIN
             </span>
           </motion.span>

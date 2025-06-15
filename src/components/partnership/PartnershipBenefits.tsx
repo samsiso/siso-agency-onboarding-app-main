@@ -113,7 +113,7 @@ export const PartnershipBenefits = memo(() => {
       </motion.div>
 
       {/* Bottom instruction */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 text-center">
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 text-center pointer-events-none">
         <motion.p 
           className="text-sm text-gray-400 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-600/30"
           initial={{ opacity: 0, y: 20 }}

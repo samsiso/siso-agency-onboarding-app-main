@@ -41,7 +41,10 @@ export default function RadialOrbitalTimeline({
   const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === containerRef.current || e.target === orbitRef.current) {
+    // Only close if clicking on the background, not on any child elements
+    const target = e.target as HTMLElement;
+    if (target === containerRef.current || target === orbitRef.current || 
+        target.classList.contains('timeline-background')) {
       setExpandedItems({});
       setActiveNodeId(null);
       setPulseEffect({});
@@ -50,7 +53,9 @@ export default function RadialOrbitalTimeline({
   };
 
   const toggleItem = (id: number) => {
+    console.log(`🔄 TOGGLE ITEM ${id} called`);
     setExpandedItems((prev) => {
+      console.log(`📋 Previous state:`, prev);
       const newState = { ...prev };
       Object.keys(newState).forEach((key) => {
         if (parseInt(key) !== id) {
@@ -59,8 +64,11 @@ export default function RadialOrbitalTimeline({
       });
 
       newState[id] = !prev[id];
+      console.log(`✨ New state:`, newState);
+      console.log(`🎯 Item ${id} will be expanded:`, newState[id]);
 
       if (!prev[id]) {
+        console.log(`🚀 Opening item ${id}`);
         setActiveNodeId(id);
         setAutoRotate(false);
 
@@ -73,6 +81,7 @@ export default function RadialOrbitalTimeline({
 
         centerViewOnNode(id);
       } else {
+        console.log(`🔒 Closing item ${id}`);
         setActiveNodeId(null);
         setAutoRotate(true);
         setPulseEffect({});
@@ -154,7 +163,7 @@ export default function RadialOrbitalTimeline({
 
   return (
     <div
-      className="w-full h-screen flex flex-col items-center justify-center bg-transparent overflow-hidden"
+      className="w-full h-screen flex flex-col items-center justify-center bg-transparent overflow-hidden timeline-background relative z-20"
       ref={containerRef}
       onClick={handleContainerClick}
     >
@@ -185,6 +194,11 @@ export default function RadialOrbitalTimeline({
             const isPulsing = pulseEffect[item.id];
             const Icon = item.icon;
 
+            // Debug logging for each render
+            if (isExpanded) {
+              console.log(`🎨 RENDERING EXPANDED: Item ${item.id} (${item.title}) - isExpanded: ${isExpanded}`);
+            }
+
             const nodeStyle = {
               transform: `translate(${position.x}px, ${position.y}px)`,
               zIndex: isExpanded ? 200 : position.zIndex,
@@ -199,10 +213,14 @@ export default function RadialOrbitalTimeline({
                 style={nodeStyle}
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log(`Clicked on node ${item.id}: ${item.title}`);
+                  console.log(`🔥 CLICKED NODE ${item.id}: ${item.title}`);
+                  console.log(`📊 Current expandedItems:`, expandedItems);
+                  console.log(`🎯 isExpanded before:`, expandedItems[item.id]);
                   toggleItem(item.id);
                 }}
               >
+                {/* Larger invisible click area */}
+                <div className="absolute -inset-4 w-18 h-18 rounded-full"></div>
                 <div
                   className={`absolute rounded-full -inset-1 pointer-events-none ${
                     isPulsing ? "animate-pulse duration-1000" : ""
@@ -218,7 +236,7 @@ export default function RadialOrbitalTimeline({
 
                 <div
                   className={`
-                  w-10 h-10 rounded-full flex items-center justify-center
+                  w-10 h-10 rounded-full flex items-center justify-center relative
                   ${
                     isExpanded
                       ? "bg-orange-500 text-white"
@@ -236,9 +254,12 @@ export default function RadialOrbitalTimeline({
                   }
                   transition-all duration-300 transform
                   ${isExpanded ? "scale-150" : ""}
+                  hover:scale-110 hover:border-orange-400
                 `}
                 >
-                  <Icon size={16} />
+                  {/* Larger click area */}
+                  <div className="absolute inset-0 w-full h-full rounded-full"></div>
+                  <Icon size={16} className="relative z-10" />
                 </div>
 
                 <div
@@ -249,11 +270,12 @@ export default function RadialOrbitalTimeline({
                   ${isExpanded ? "text-white scale-125" : "text-gray-300"}
                 `}
                 >
-                  {item.title}
+                  {item.title} {isExpanded ? "🔥" : ""}
                 </div>
 
+                {/* Original card */}
                 {isExpanded && (
-                  <Card className="absolute top-20 left-1/2 -translate-x-1/2 w-64 bg-gray-900/95 backdrop-blur-lg border-gray-600/40 shadow-xl shadow-gray-900/20 overflow-visible">
+                  <Card className="absolute top-20 left-1/2 -translate-x-1/2 w-64 bg-gray-900/95 backdrop-blur-lg border-gray-600/40 shadow-xl shadow-gray-900/20 overflow-visible z-[300]">
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-gray-500/50"></div>
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-center">
