@@ -48,8 +48,7 @@ export const affiliateNavigationItems: NavigationItem[] = [
   {
     name: 'Training Hub',
     href: '/dashboard/training-hub',
-    icon: BookOpen,
-    badge: 'Coming Soon'
+    icon: BookOpen
   },
   {
     name: 'Help Center',
