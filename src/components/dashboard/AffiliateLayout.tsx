@@ -33,7 +33,7 @@ export function AffiliateLayout({
   }, [isMobile]);
 
   return (
-    <div className="flex min-h-screen bg-gray-900">
+    <div className="flex min-h-screen bg-black">
       {/* Unified Sidebar */}
       <UnifiedSidebar 
         config={sidebarConfig}
@@ -56,7 +56,7 @@ export function AffiliateLayout({
       >
         {/* Page Header */}
         {(title || subtitle || actions) && (
-          <div className="bg-gray-800 border-b border-gray-700 px-4 py-6 lg:px-6">
+          <div className="bg-black border-b border-orange-500/20 px-4 py-6 lg:px-6">
             <div className="max-w-7xl mx-auto">
               <div className="flex items-center justify-between">
                 <div>

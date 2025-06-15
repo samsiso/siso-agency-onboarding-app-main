@@ -73,6 +73,8 @@ import PartnerDashboard from './pages/dashboard/PartnerDashboard';
 import { PartnerAuthGuard } from './components/auth/PartnerAuthGuard';
 import { PartnerLeaderboard } from './components/dashboard/PartnerLeaderboard';
 import { ComingSoonSection } from './components/dashboard/ComingSoonSection';
+import EducationHub from './pages/dashboard/EducationHub';
+import TrainingHub from './pages/dashboard/TrainingHub';
 
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
@@ -127,7 +129,8 @@ function App() {
           {/* Partner Dashboard Routes - Using AffiliateLayout directly */}
           <Route path="/dashboard" element={<PartnerAuthGuard><PartnerDashboard /></PartnerAuthGuard>} />
           <Route path="/dashboard/coming-soon" element={<PartnerAuthGuard><div className="p-6"><ComingSoonSection /></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/education" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Education Hub</h1><p className="text-gray-400 mt-2">Learning resources and training materials coming soon.</p></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/education" element={<PartnerAuthGuard><EducationHub /></PartnerAuthGuard>} />
+          <Route path="/dashboard/training-hub" element={<PartnerAuthGuard><TrainingHub /></PartnerAuthGuard>} />
           <Route path="/dashboard/templates" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Templates</h1><p className="text-gray-400 mt-2">Ready-to-use templates for your projects.</p></div></PartnerAuthGuard>} />
           <Route path="/dashboard/app-plan-generator" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">App Plan Generator</h1><p className="text-gray-400 mt-2">AI-powered app planning tool coming soon.</p></div></PartnerAuthGuard>} />
           <Route path="/dashboard/pipeline" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Pipeline</h1><p className="text-gray-400 mt-2">Track your referral pipeline and progress.</p></div></PartnerAuthGuard>} />

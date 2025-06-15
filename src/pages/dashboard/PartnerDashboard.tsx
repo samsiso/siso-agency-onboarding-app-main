@@ -422,7 +422,7 @@ const PartnerDashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.6 }}
       >
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="bg-black border-orange-500/20">
           <CardHeader>
             <CardTitle className="text-lg sm:text-xl text-white flex items-center">
               <Zap className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
@@ -435,15 +435,15 @@ const PartnerDashboard = () => {
                 <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 New Referral
               </Button>
-              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 h-12 sm:h-14 text-sm sm:text-base">
+              <Button variant="outline" className="border-orange-500/30 text-gray-300 hover:bg-orange-500/10 h-12 sm:h-14 text-sm sm:text-base">
                 <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 View Templates
               </Button>
-              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 h-12 sm:h-14 text-sm sm:text-base">
+              <Button variant="outline" className="border-orange-500/30 text-gray-300 hover:bg-orange-500/10 h-12 sm:h-14 text-sm sm:text-base">
                 <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Analytics
               </Button>
-              <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 h-12 sm:h-14 text-sm sm:text-base">
+              <Button variant="outline" className="border-orange-500/30 text-gray-300 hover:bg-orange-500/10 h-12 sm:h-14 text-sm sm:text-base">
                 <Award className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Achievements
               </Button>

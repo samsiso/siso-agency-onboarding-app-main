@@ -254,7 +254,7 @@ export function PartnerLeaderboard() {
             variant="outline"
             size="sm"
             onClick={() => setViewMode(viewMode === 'public' ? 'anonymous' : 'public')}
-            className="border-gray-600 text-gray-300 hover:bg-gray-700"
+            className="border-orange-500/30 text-gray-300 hover:bg-orange-500/10"
           >
             {viewMode === 'public' ? (
               <>
@@ -271,29 +271,29 @@ export function PartnerLeaderboard() {
 
           {/* Time Period Filter */}
           <Select value={timePeriod} onValueChange={(value: TimePeriod) => setTimePeriod(value)}>
-            <SelectTrigger className="w-32 bg-gray-800 border-gray-600 text-white">
+            <SelectTrigger className="w-32 bg-black border-orange-500/30 text-white">
               <Calendar className="h-4 w-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600">
-              <SelectItem value="monthly" className="text-white hover:bg-gray-700">Monthly</SelectItem>
-              <SelectItem value="quarterly" className="text-white hover:bg-gray-700">Quarterly</SelectItem>
-              <SelectItem value="yearly" className="text-white hover:bg-gray-700">Yearly</SelectItem>
+            <SelectContent className="bg-black border-orange-500/30">
+              <SelectItem value="monthly" className="text-white hover:bg-orange-500/10">Monthly</SelectItem>
+              <SelectItem value="quarterly" className="text-white hover:bg-orange-500/10">Quarterly</SelectItem>
+              <SelectItem value="yearly" className="text-white hover:bg-orange-500/10">Yearly</SelectItem>
             </SelectContent>
           </Select>
 
           {/* Tier Filter */}
           <Select value={selectedTier} onValueChange={setSelectedTier}>
-            <SelectTrigger className="w-32 bg-gray-800 border-gray-600 text-white">
+            <SelectTrigger className="w-32 bg-black border-orange-500/30 text-white">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder="All Tiers" />
             </SelectTrigger>
-            <SelectContent className="bg-gray-800 border-gray-600">
-              <SelectItem value="all" className="text-white hover:bg-gray-700">All Tiers</SelectItem>
-              <SelectItem value="platinum" className="text-white hover:bg-gray-700">Platinum</SelectItem>
-              <SelectItem value="gold" className="text-white hover:bg-gray-700">Gold</SelectItem>
-              <SelectItem value="silver" className="text-white hover:bg-gray-700">Silver</SelectItem>
-              <SelectItem value="bronze" className="text-white hover:bg-gray-700">Bronze</SelectItem>
+            <SelectContent className="bg-black border-orange-500/30">
+              <SelectItem value="all" className="text-white hover:bg-orange-500/10">All Tiers</SelectItem>
+              <SelectItem value="platinum" className="text-white hover:bg-orange-500/10">Platinum</SelectItem>
+              <SelectItem value="gold" className="text-white hover:bg-orange-500/10">Gold</SelectItem>
+              <SelectItem value="silver" className="text-white hover:bg-orange-500/10">Silver</SelectItem>
+              <SelectItem value="bronze" className="text-white hover:bg-orange-500/10">Bronze</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -301,7 +301,7 @@ export function PartnerLeaderboard() {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <div className="bg-black border border-orange-500/20 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Your Rank</p>
@@ -313,17 +313,17 @@ export function PartnerLeaderboard() {
           </div>
         </div>
         
-        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <div className="bg-black border border-orange-500/20 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Total Partners</p>
               <p className="text-2xl font-bold text-white">{sortedPartners.length}</p>
             </div>
-            <Users className="h-8 w-8 text-blue-500" />
+            <Users className="h-8 w-8 text-orange-500" />
           </div>
         </div>
         
-        <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+        <div className="bg-black border border-orange-500/20 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Your Tier</p>
@@ -337,14 +337,14 @@ export function PartnerLeaderboard() {
       </div>
 
       {/* Leaderboard */}
-      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-        <div className="p-6 border-b border-gray-700">
+      <div className="bg-black rounded-lg border border-orange-500/20 overflow-hidden">
+        <div className="p-6 border-b border-orange-500/20">
           <h2 className="text-xl font-semibold text-white">
             {timePeriod.charAt(0).toUpperCase() + timePeriod.slice(1)} Rankings
           </h2>
         </div>
         
-        <div className="divide-y divide-gray-700">
+        <div className="divide-y divide-orange-500/20">
           <AnimatePresence>
             {sortedPartners.map((partner, index) => (
               <motion.div
@@ -353,7 +353,7 @@ export function PartnerLeaderboard() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                className={`p-6 hover:bg-gray-700/50 transition-colors ${
+                className={`p-6 hover:bg-orange-500/10 transition-colors ${
                   partner.isCurrentUser ? 'bg-orange-500/10 border-l-4 border-orange-500' : ''
                 }`}
               >
