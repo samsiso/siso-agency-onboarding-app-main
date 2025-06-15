@@ -14,35 +14,35 @@ export function QuickActions() {
       icon: Users,
       href: "/admin/clients/new",
       variant: "default" as const,
-      color: "from-purple-500/20 to-purple-700/20"
+      color: "from-orange-500/20 to-orange-600/20"
     },
     {
       title: "Create Invoice",
       icon: FileText,
       href: "/admin/invoices/new",
       variant: "outline" as const,
-      color: "from-blue-500/20 to-blue-700/20"
+      color: "from-orange-400/20 to-orange-500/20"
     },
     {
       title: "Schedule Meeting",
       icon: Calendar,
       href: "/admin/calendar",
       variant: "outline" as const,
-      color: "from-green-500/20 to-green-700/20"
+      color: "from-orange-500/20 to-orange-600/20"
     },
     {
       title: "Settings",
       icon: Settings,
       href: "/admin/settings",
       variant: "outline" as const,
-      color: "from-amber-500/20 to-amber-700/20"
+      color: "from-orange-600/20 to-orange-700/20"
     }
   ];
 
   return (
-    <Card className="border-gray-800 bg-black/30 backdrop-blur-sm">
+    <Card className="border-orange-500/20 bg-black backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">Quick Actions</CardTitle>
+        <CardTitle className="text-lg font-semibold text-white">Quick Actions</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-2 gap-2">
         {actions.map((action, index) => (

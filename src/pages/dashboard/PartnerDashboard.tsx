@@ -257,14 +257,14 @@ const PartnerDashboard = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
       >
         {/* Total Earnings */}
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="bg-black border-orange-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-gray-400">Total Earnings</CardTitle>
-            <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-400" />
+            <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold text-white">£{stats.totalEarnings.toLocaleString()}</div>
-            <div className="flex items-center text-xs text-green-400 mt-1">
+            <div className="flex items-center text-xs text-orange-400 mt-1">
               <ArrowUpRight className="w-3 h-3 mr-1" />
               +12% from last month
             </div>
@@ -272,7 +272,7 @@ const PartnerDashboard = () => {
         </Card>
 
         {/* Monthly Earnings */}
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="bg-black border-orange-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-gray-400">This Month</CardTitle>
             <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-orange-400" />
@@ -287,14 +287,14 @@ const PartnerDashboard = () => {
         </Card>
 
         {/* Active Referrals */}
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="bg-black border-orange-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-gray-400">Active Referrals</CardTitle>
-            <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 text-orange-400" />
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold text-white">{stats.activeReferrals}</div>
-            <div className="flex items-center text-xs text-blue-400 mt-1">
+            <div className="flex items-center text-xs text-orange-400 mt-1">
               <Clock className="w-3 h-3 mr-1" />
               In progress
             </div>
@@ -302,14 +302,14 @@ const PartnerDashboard = () => {
         </Card>
 
         {/* Conversion Rate */}
-        <Card className="bg-gray-800 border-gray-700">
+        <Card className="bg-black border-orange-500/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-xs sm:text-sm font-medium text-gray-400">Conversion Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-purple-400" />
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-orange-400" />
           </CardHeader>
           <CardContent>
             <div className="text-xl sm:text-2xl font-bold text-white">{stats.conversionRate}%</div>
-            <div className="flex items-center text-xs text-purple-400 mt-1">
+            <div className="flex items-center text-xs text-orange-400 mt-1">
               <ArrowUpRight className="w-3 h-3 mr-1" />
               +5% from last month
             </div>
@@ -327,7 +327,7 @@ const PartnerDashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-black border-orange-500/20">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl text-white flex items-center">
                   <Clock className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
@@ -336,7 +336,7 @@ const PartnerDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                  <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-orange-500/10 transition-colors">
                     <div className={cn(
                       'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0',
                       getStatusColor(activity.status)
@@ -373,7 +373,7 @@ const PartnerDashboard = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-black border-orange-500/20">
               <CardHeader>
                 <CardTitle className="text-lg sm:text-xl text-white flex items-center">
                   <Target className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
@@ -387,16 +387,16 @@ const PartnerDashboard = () => {
                 </div>
                 <Progress value={stats.nextTierProgress} className="h-2 sm:h-3" />
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                  <div className="text-center p-3 bg-gray-700/50 rounded-lg">
+                  <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
                     <div className="text-lg sm:text-xl font-bold text-white">{stats.completedReferrals}</div>
                     <div className="text-xs sm:text-sm text-gray-400">Completed</div>
                   </div>
-                  <div className="text-center p-3 bg-gray-700/50 rounded-lg">
+                  <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
                     <div className="text-lg sm:text-xl font-bold text-orange-400">3</div>
                     <div className="text-xs sm:text-sm text-gray-400">Needed</div>
                   </div>
-                  <div className="text-center p-3 bg-gray-700/50 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-green-400">£500</div>
+                  <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
+                    <div className="text-lg sm:text-xl font-bold text-orange-400">£500</div>
                     <div className="text-xs sm:text-sm text-gray-400">Bonus</div>
                   </div>
                 </div>

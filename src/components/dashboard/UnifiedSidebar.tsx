@@ -159,8 +159,8 @@ export function UnifiedSidebar({
           "flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200",
           "min-h-[48px] relative group",
           isActive 
-            ? `${theme.accentColor} text-white shadow-lg` 
-            : `text-gray-300 hover:bg-gray-700 hover:text-white`,
+            ? `${theme.accentColor} text-white shadow-lg shadow-orange-500/30` 
+            : `text-gray-300 hover:bg-orange-500/10 hover:text-orange-300`,
           isCollapsed && "justify-center"
         )}
         title={isCollapsed ? item.name : undefined}
@@ -213,7 +213,7 @@ export function UnifiedSidebar({
         <Button
           variant="ghost"
           size="icon"
-          className="fixed top-4 right-4 z-50 bg-gray-900/80 backdrop-blur-sm border border-gray-700/50"
+          className="fixed top-4 right-4 z-50 bg-black/90 backdrop-blur-sm border border-orange-500/40"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           <AnimatePresence mode="wait">
@@ -303,7 +303,7 @@ export function UnifiedSidebar({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="bg-gray-700 rounded-lg p-4"
+                    className="bg-gray-900 border border-orange-500/20 rounded-lg p-4"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-gray-300 text-sm">{config.stats.title}</span>
@@ -333,7 +333,7 @@ export function UnifiedSidebar({
                   <Button 
                     variant="ghost" 
                     className={cn(
-                      "w-full justify-start px-2 hover:bg-gray-700",
+                      "w-full justify-start px-2 hover:bg-orange-500/10",
                       isCollapsed && "justify-center px-0"
                     )}
                   >
@@ -368,18 +368,18 @@ export function UnifiedSidebar({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
                   align="end" 
-                  className="w-56 bg-gray-800 border-gray-700"
+                  className="w-56 bg-black border-orange-500/20"
                 >
                   <DropdownMenuItem 
-                    className="text-gray-300 focus:bg-gray-700"
+                    className="text-gray-300 focus:bg-orange-500/10"
                     onClick={() => navigate('/dashboard/profile')}
                   >
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile & Settings</span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuSeparator className="bg-orange-500/20" />
                   <DropdownMenuItem 
-                    className="text-gray-300 focus:bg-gray-700 cursor-pointer"
+                    className="text-gray-300 focus:bg-orange-500/10 cursor-pointer"
                     onClick={handleSignOut}
                   >
                     <LogOut className="mr-2 h-4 w-4" />

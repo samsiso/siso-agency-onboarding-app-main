@@ -35,8 +35,8 @@ export const PartnershipNavigation = memo(({
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 right-4 z-50 bg-black/90 backdrop-blur-xl border border-orange-500/30 
-          p-3 rounded-full shadow-2xl shadow-orange-500/10 hover:bg-orange-500/10 hover:border-orange-400/50 
+        className="lg:hidden fixed top-4 right-4 z-50 bg-black backdrop-blur-xl border border-orange-500/40 
+          p-3 rounded-full shadow-2xl shadow-orange-500/20 hover:bg-orange-500/20 hover:border-orange-400/60 
           transition-all duration-200 min-h-[48px] min-w-[48px]"
       >
         {isMobileMenuOpen ? (
@@ -65,8 +65,8 @@ export const PartnershipNavigation = memo(({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed right-0 top-0 h-full w-80 bg-black/95 backdrop-blur-xl 
-                border-l border-orange-500/20 z-45 overflow-y-auto"
+              className="lg:hidden fixed right-0 top-0 h-full w-80 bg-black backdrop-blur-xl 
+                border-l border-orange-500/30 z-45 overflow-y-auto shadow-xl shadow-orange-500/10"
             >
               <div className="p-6 pt-20">
                 <div className="space-y-2">
@@ -128,9 +128,8 @@ export const PartnershipNavigation = memo(({
           <motion.nav
             initial={{ y: -100 }}
             animate={{ y: 0 }}
-            className="bg-black/15 backdrop-blur-xl border border-white/10 rounded-xl 
-              shadow-xl shadow-black/10 pointer-events-auto w-fit
-              supports-[backdrop-filter]:bg-black/20"
+            className="bg-black/90 backdrop-blur-xl border border-orange-500/20 rounded-xl 
+              shadow-xl shadow-orange-500/10 pointer-events-auto w-fit"
           >
           <div className="flex items-center gap-2 px-6 py-3 relative z-10">
             {navigationSections.map((section) => (
@@ -140,8 +139,8 @@ export const PartnershipNavigation = memo(({
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 
                   whitespace-nowrap text-center min-w-fit relative
                   ${activeSection === section.id 
-                    ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-white shadow-md' 
-                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md shadow-orange-500/30' 
+                    : 'text-white/90 hover:text-orange-300 hover:bg-orange-500/10'
                   }`}
               >
                 <span className="relative z-10">{section.label}</span>

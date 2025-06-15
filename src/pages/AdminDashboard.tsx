@@ -35,8 +35,8 @@ export default function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-gray-900 to-black">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-500 mb-4" />
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black">
+        <Loader2 className="w-8 h-8 animate-spin text-orange-500 mb-4" />
         <p className="text-gray-200">Verifying admin access...</p>
       </div>
     );

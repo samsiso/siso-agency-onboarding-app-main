@@ -55,25 +55,25 @@ export const AdminStats = () => {
 
   if (isLoading) {
     return (
-      <Card className="border border-gray-800 bg-black/30">
+      <Card className="border border-orange-500/20 bg-black">
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <BarChart3 className="mr-2 h-5 w-5 text-purple-400" />
+          <CardTitle className="flex items-center text-white">
+            <BarChart3 className="mr-2 h-5 w-5 text-orange-500" />
             Analytics Overview
           </CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-10">
-          <Loader2 className="h-8 w-8 text-purple-500 animate-spin" />
+          <Loader2 className="h-8 w-8 text-orange-500 animate-spin" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="border border-gray-800 bg-black/30">
+    <Card className="border border-orange-500/20 bg-black">
       <CardHeader>
-        <CardTitle className="flex items-center">
-          <BarChart3 className="mr-2 h-5 w-5 text-purple-400" />
+        <CardTitle className="flex items-center text-white">
+          <BarChart3 className="mr-2 h-5 w-5 text-orange-500" />
           Analytics Overview
         </CardTitle>
       </CardHeader>
@@ -81,7 +81,7 @@ export const AdminStats = () => {
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-white">Monthly Growth</h3>
-            <div className="flex items-center text-green-400 text-xs font-medium">
+            <div className="flex items-center text-orange-400 text-xs font-medium">
               <TrendingUp className="h-3.5 w-3.5 mr-1" />
               15.3%
             </div>
@@ -102,7 +102,7 @@ export const AdminStats = () => {
                   type="monotone" 
                   dataKey="leads" 
                   name="Leads"
-                  stroke="#8b5cf6" 
+                  stroke="#f97316" 
                   strokeWidth={2} 
                   dot={{ r: 3 }} 
                   activeDot={{ r: 5 }} 
@@ -111,7 +111,7 @@ export const AdminStats = () => {
                   type="monotone" 
                   dataKey="clients" 
                   name="Clients"
-                  stroke="#22c55e" 
+                  stroke="#ea580c" 
                   strokeWidth={2} 
                   dot={{ r: 3 }} 
                   activeDot={{ r: 5 }} 
@@ -124,7 +124,7 @@ export const AdminStats = () => {
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-white">Weekly Tasks</h3>
-            <div className="flex items-center text-red-400 text-xs font-medium">
+            <div className="flex items-center text-orange-600 text-xs font-medium">
               <TrendingDown className="h-3.5 w-3.5 mr-1" />
               5.2%
             </div>
@@ -161,10 +161,10 @@ export const AdminStats = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4 pt-2">
-          <div className="bg-gray-900/50 rounded-lg p-3">
+          <div className="bg-black/50 border border-orange-500/20 rounded-lg p-3">
             <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                <Inbox className="h-5 w-5 text-blue-400" />
+              <div className="h-10 w-10 rounded-full bg-orange-500/20 flex items-center justify-center">
+                <Inbox className="h-5 w-5 text-orange-400" />
               </div>
               <div>
                 <p className="text-sm text-white">Total Leads</p>
@@ -173,10 +173,10 @@ export const AdminStats = () => {
             </div>
           </div>
           
-          <div className="bg-gray-900/50 rounded-lg p-3">
+          <div className="bg-black/50 border border-orange-500/20 rounded-lg p-3">
             <div className="flex items-center gap-2">
-              <div className="h-10 w-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                <Users className="h-5 w-5 text-green-400" />
+              <div className="h-10 w-10 rounded-full bg-orange-600/20 flex items-center justify-center">
+                <Users className="h-5 w-5 text-orange-500" />
               </div>
               <div>
                 <p className="text-sm text-white">Total Clients</p>

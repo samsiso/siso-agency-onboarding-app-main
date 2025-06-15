@@ -24,25 +24,25 @@ const StatCard = ({ title, value, icon, change, trend, loading, delay = 0 }: Sta
       whileHover={{ y: -5 }}
       className="will-change-transform"
     >
-      <Card className="bg-black/30 border-gray-800 hover:border-purple-500/30 transition-all duration-300">
+      <Card className="bg-black border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
         <CardContent className="p-6">
           <div className="flex justify-between">
             <div>
               <p className="text-white text-sm">{title}</p>
               {loading ? (
-                <div className="h-8 w-24 bg-gray-700 rounded animate-pulse mt-1" />
+                <div className="h-8 w-24 bg-gray-900 rounded animate-pulse mt-1" />
               ) : (
                 <p className="text-2xl font-bold text-white mt-1">{value}</p>
               )}
             </div>
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-500/20 to-purple-700/20 flex items-center justify-center text-purple-400">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center text-orange-400">
               {icon}
             </div>
           </div>
           {!loading && change && (
             <div className="flex items-center mt-4">
               <span className={`text-xs font-medium flex items-center ${
-                trend === "up" ? "text-green-400" : "text-red-400"
+                trend === "up" ? "text-orange-400" : "text-orange-600"
               }`}>
                 {trend === "up" ? "↑" : "↓"} {change}
               </span>

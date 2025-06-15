@@ -11,143 +11,51 @@ import {
   HelpCircle, 
   MessageCircle,
   Home,
-  TrendingUp
+  TrendingUp,
+  Target
 } from 'lucide-react';
-
-export interface NavigationItem {
-  id: string;
-  label: string;
-  icon: any;
-  path: string;
-  children?: NavigationItem[];
-  badge?: string;
-  isActive?: boolean;
-}
+import { SidebarConfig, NavigationItem } from '@/components/dashboard/UnifiedSidebar';
 
 export const affiliateNavigationItems: NavigationItem[] = [
   {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: Home,
-    path: '/dashboard',
-    isActive: true,
-    children: [
-      {
-        id: 'statistics',
-        label: 'Statistics',
-        icon: TrendingUp,
-        path: '/dashboard/statistics',
-        badge: 'New'
-      }
-    ]
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: Home
   },
   {
-    id: 'performance',
-    label: 'Performance',
-    icon: BarChart3,
-    path: '/dashboard/performance',
-    children: [
-      {
-        id: 'leaderboard',
-        label: 'Leaderboard',
-        icon: Trophy,
-        path: '/dashboard/leaderboard',
-        isActive: true
-      },
-      {
-        id: 'referrals',
-        label: 'Referrals',
-        icon: Users,
-        path: '/dashboard/referrals',
-        badge: 'Coming Soon',
-        children: [
-          {
-            id: 'referral-links',
-            label: 'Referral Links',
-            icon: Link,
-            path: '/dashboard/referral-links',
-            badge: 'Coming Soon'
-          }
-        ]
-      }
-    ]
+    name: 'Statistics',
+    href: '/dashboard/statistics',
+    icon: TrendingUp,
+    badge: 'New'
   },
   {
-    id: 'marketing-tools',
-    label: 'Marketing Tools',
+    name: 'Leaderboard',
+    href: '/dashboard/leaderboard',
+    icon: Trophy
+  },
+  {
+    name: 'Referrals',
+    href: '/dashboard/referrals',
+    icon: Users,
+    badge: 'Coming Soon'
+  },
+  {
+    name: 'App Plan Generator',
+    href: '/dashboard/app-plan-generator',
     icon: Zap,
-    path: '/dashboard/tools',
-    children: [
-      {
-        id: 'app-plan-generator',
-        label: 'App Plan Generator',
-        icon: Zap,
-        path: '/dashboard/app-plan-generator',
-        badge: 'Coming Soon',
-        children: [
-          {
-            id: 'templates',
-            label: 'Templates',
-            icon: FileText,
-            path: '/dashboard/templates',
-            badge: 'Coming Soon'
-          }
-        ]
-      }
-    ]
+    badge: 'Coming Soon'
   },
   {
-    id: 'education',
-    label: 'Education',
-    icon: GraduationCap,
-    path: '/dashboard/education',
-    children: [
-      {
-        id: 'training-hub',
-        label: 'Training Hub',
-        icon: BookOpen,
-        path: '/dashboard/training-hub',
-        badge: 'Coming Soon',
-        children: [
-          {
-            id: 'resources',
-            label: 'Resources',
-            icon: BookOpen,
-            path: '/dashboard/resources',
-            badge: 'Coming Soon'
-          },
-          {
-            id: 'webinars',
-            label: 'Webinars',
-            icon: Video,
-            path: '/dashboard/webinars',
-            badge: 'Coming Soon'
-          }
-        ]
-      }
-    ]
+    name: 'Training Hub',
+    href: '/dashboard/training-hub',
+    icon: BookOpen,
+    badge: 'Coming Soon'
   },
   {
-    id: 'support',
-    label: 'Support',
+    name: 'Help Center',
+    href: '/dashboard/help-center',
     icon: HelpCircle,
-    path: '/dashboard/support',
-    children: [
-      {
-        id: 'help-center',
-        label: 'Help Center',
-        icon: HelpCircle,
-        path: '/dashboard/help-center',
-        badge: 'Coming Soon'
-      },
-      {
-        id: 'contact-support',
-        label: 'Contact Support',
-        icon: MessageCircle,
-        path: '/dashboard/contact-support',
-        badge: 'Coming Soon'
-      }
-    ]
+    badge: 'Coming Soon'
   }
 ];
 
@@ -174,8 +82,8 @@ export const getAffiliateSidebarConfig = (
     icon: Target
   },
   theme: {
-    bgColor: 'bg-gray-800',
-    borderColor: 'border-gray-700',
+    bgColor: 'bg-black',
+    borderColor: 'border-orange-500/20',
     textColor: 'text-white',
     accentColor: 'bg-orange-600'
   }
