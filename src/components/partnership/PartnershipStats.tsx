@@ -102,7 +102,7 @@ const PartnershipStats = memo(() => {
                 className="group"
               >
                 <Card className="relative bg-gradient-to-br from-gray-800/80 via-gray-800/60 to-gray-900/80 
-                  border border-gray-700/50 hover:border-orange-500/50 backdrop-blur-sm
+                  border border-gray-700/50 hover:border-orange-500/50 backdrop-blur-md
                   transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/10">
                   
                   {/* Verified Badge */}

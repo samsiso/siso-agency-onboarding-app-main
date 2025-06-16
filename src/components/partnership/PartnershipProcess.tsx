@@ -85,7 +85,7 @@ export const PartnershipProcess = memo(() => {
 
                 {/* Step Card */}
                 <div className="relative bg-gradient-to-br from-gray-800/60 to-gray-900/60 
-                  backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 
+                  backdrop-blur-md border border-gray-700/50 rounded-2xl p-8 
                   hover:border-orange-500/50 transition-all duration-500 
                   hover:shadow-2xl hover:shadow-orange-500/20 text-center group-hover:scale-105">
                   
@@ -152,7 +152,7 @@ export const PartnershipProcess = memo(() => {
           className="text-center mt-16"
         >
           <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 
-            backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8
+            backdrop-blur-md border border-gray-700/50 rounded-2xl p-8
             max-w-4xl mx-auto">
             <h3 className="text-xl md:text-3xl tracking-tighter font-regular text-white mb-4">
               It's That <span className="text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-yellow-500 bg-clip-text">Simple</span>

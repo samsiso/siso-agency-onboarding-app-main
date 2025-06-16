@@ -75,6 +75,8 @@ import { PartnerLeaderboard } from './components/dashboard/PartnerLeaderboard';
 import { ComingSoonSection } from './components/dashboard/ComingSoonSection';
 import EducationHub from './pages/dashboard/EducationHub';
 import TrainingHub from './pages/dashboard/TrainingHub';
+import ReferralsManagement from './pages/dashboard/ReferralsManagement';
+import Statistics from './pages/dashboard/Statistics';
 
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
@@ -128,6 +130,7 @@ function App() {
           
           {/* Partner Dashboard Routes - Using AffiliateLayout directly */}
           <Route path="/dashboard" element={<PartnerAuthGuard><PartnerDashboard /></PartnerAuthGuard>} />
+          <Route path="/dashboard/statistics" element={<PartnerAuthGuard><Statistics /></PartnerAuthGuard>} />
           <Route path="/dashboard/coming-soon" element={<PartnerAuthGuard><div className="p-6"><ComingSoonSection /></div></PartnerAuthGuard>} />
           <Route path="/dashboard/education" element={<PartnerAuthGuard><EducationHub /></PartnerAuthGuard>} />
           <Route path="/dashboard/training-hub" element={<PartnerAuthGuard><TrainingHub /></PartnerAuthGuard>} />
@@ -137,7 +140,7 @@ function App() {
           <Route path="/dashboard/profile" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Profile Settings</h1><p className="text-gray-400 mt-2">Manage your partner profile and preferences.</p></div></PartnerAuthGuard>} />
           
           {/* Legacy routes for backward compatibility */}
-          <Route path="/dashboard/referrals" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Referrals - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/dashboard/referrals" element={<PartnerAuthGuard><ReferralsManagement /></PartnerAuthGuard>} />
           <Route path="/dashboard/earnings" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Earnings - Coming Soon</h1></div></PartnerAuthGuard>} />
           <Route path="/dashboard/leaderboard" element={<PartnerAuthGuard><PartnerLeaderboard /></PartnerAuthGuard>} />
           <Route path="/dashboard/resources" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Resources - Coming Soon</h1></div></PartnerAuthGuard>} />

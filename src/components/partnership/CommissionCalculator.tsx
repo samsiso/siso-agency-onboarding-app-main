@@ -104,7 +104,7 @@ const CommissionCalculator = memo(() => {
             whileHover={{ scale: 1.02, y: -4 }}
           >
             <Card className="relative bg-gradient-to-br from-gray-800/80 via-gray-800/60 to-gray-900/80 
-              border border-gray-700/50 hover:border-orange-500/60 backdrop-blur-sm
+                                border border-gray-700/50 hover:border-orange-500/60 backdrop-blur-md
               transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/20">
               
               {/* Glow effect */}
@@ -198,7 +198,7 @@ const CommissionCalculator = memo(() => {
             whileHover={{ scale: 1.02, y: -4 }}
           >
             <Card className="relative bg-gradient-to-br from-gray-800/80 via-gray-700/60 to-gray-900/80 
-              border border-gray-700/50 hover:border-green-500/60 backdrop-blur-sm
+                                border border-gray-700/50 hover:border-green-500/60 backdrop-blur-md
               transition-all duration-500 hover:shadow-2xl hover:shadow-green-500/20">
               
               {/* Glow effect */}

@@ -133,7 +133,7 @@ const EducationHub: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-6"
         >
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-black border-orange-500/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-400">Overall Progress</CardTitle>
               <GraduationCap className="h-4 w-4 text-orange-400" />
@@ -144,7 +144,7 @@ const EducationHub: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-black border-orange-500/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-400">Completed Modules</CardTitle>
               <CheckCircle className="h-4 w-4 text-green-400" />
@@ -157,29 +157,29 @@ const EducationHub: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-black border-orange-500/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-400">Learning Time</CardTitle>
-              <Clock className="h-4 w-4 text-blue-400" />
+              <Clock className="h-4 w-4 text-orange-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">
                 {Math.round(mockModules.reduce((sum, m) => sum + (m.duration * m.progress / 100), 0))}m
               </div>
-              <p className="text-xs text-blue-400 mt-1">This month</p>
+              <p className="text-xs text-orange-400 mt-1">This month</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-black border-orange-500/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-400">Certifications</CardTitle>
-              <Award className="h-4 w-4 text-purple-400" />
+              <Award className="h-4 w-4 text-orange-400" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">
                 {mockCertifications.filter(c => c.earned).length}/{mockCertifications.length}
               </div>
-              <p className="text-xs text-purple-400 mt-1">Earned</p>
+              <p className="text-xs text-orange-400 mt-1">Earned</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -191,7 +191,7 @@ const EducationHub: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 bg-gray-800 border-gray-700">
+            <TabsList className="grid w-full grid-cols-5 bg-black border-orange-500/20">
               <TabsTrigger 
                 value="modules" 
                 className="data-[state=active]:bg-orange-600 data-[state=active]:text-white"
@@ -239,13 +239,13 @@ const EducationHub: React.FC = () => {
                     placeholder="Search learning modules..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-gray-800 border-gray-700 text-white"
+                    className="pl-10 bg-black border-orange-500/20 text-white"
                   />
                 </div>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-md"
+                  className="px-3 py-2 bg-black border border-orange-500/20 text-white rounded-md"
                 >
                   {categories.map(category => (
                     <option key={category} value={category}>
@@ -264,7 +264,7 @@ const EducationHub: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <Card className={`bg-gray-800 border-gray-700 ${
+                    <Card className={`bg-black border-orange-500/20 ${
                       module.locked ? 'opacity-60' : 'hover:border-orange-500/50'
                     } transition-all duration-300`}>
                       <CardHeader>
@@ -361,7 +361,7 @@ const EducationHub: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <Card className="bg-gray-800 border-gray-700">
+                    <Card className="bg-black border-orange-500/20">
                       <CardHeader>
                         <CardTitle className="text-white flex items-center">
                           <Award className="w-5 h-5 mr-2 text-orange-500" />
@@ -414,7 +414,7 @@ const EducationHub: React.FC = () => {
 
             {/* Other tabs - placeholder content */}
             <TabsContent value="resources">
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-black border-orange-500/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center">
                     <Download className="w-5 h-5 mr-2 text-orange-500" />
@@ -431,7 +431,7 @@ const EducationHub: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="webinars">
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-black border-orange-500/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center">
                     <Calendar className="w-5 h-5 mr-2 text-orange-500" />
@@ -448,7 +448,7 @@ const EducationHub: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="community">
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-black border-orange-500/20">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center">
                     <Users className="w-5 h-5 mr-2 text-orange-500" />
