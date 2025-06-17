@@ -19,7 +19,10 @@ import {
   BarChart3,
   BookOpen,
   HelpCircle,
-  User
+  User,
+  Plus,
+  MessageSquare,
+  Lightbulb
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -499,6 +502,101 @@ const PartnerDashboard = () => {
           </Card>
         </motion.div>
       </div>
+
+      {/* Quick Action Cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.7 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
+        {/* App Plan Generator */}
+        <Card className="bg-gradient-to-br from-orange-600/20 via-orange-500/10 to-amber-500/20 border border-orange-500/30 hover:border-orange-500/50 transition-all cursor-pointer"
+              onClick={() => window.location.href = '/partner/app-plan-generator'}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-white flex items-center">
+              <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
+                <Lightbulb className="h-4 w-4 text-orange-400" />
+              </div>
+              App Plan Generator
+              <Badge className="ml-auto bg-orange-500 text-white text-xs">Featured</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 text-sm mb-4">
+              Create detailed project plans that wow your clients and close more deals.
+            </p>
+            <Button 
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = '/partner/app-plan-generator';
+              }}
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              Generate Plan
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Help Center */}
+        <Card className="bg-black border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer"
+              onClick={() => window.location.href = '/partner/support'}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-white flex items-center">
+              <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
+                <HelpCircle className="h-4 w-4 text-orange-400" />
+              </div>
+              Help Center
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 text-sm mb-4">
+              Get support, access guides, and connect with our team for assistance.
+            </p>
+            <Button 
+              variant="outline" 
+              className="w-full border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = '/partner/support';
+              }}
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Get Help
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* New Client Referral */}
+        <Card className="bg-black border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer"
+              onClick={() => window.location.href = '/partner/referrals'}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-white flex items-center">
+              <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
+                <Plus className="h-4 w-4 text-orange-400" />
+              </div>
+              New Client
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 text-sm mb-4">
+              Submit a new client referral and start earning commissions.
+            </p>
+            <Button 
+              variant="outline" 
+              className="w-full border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = '/partner/referrals';
+              }}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Add Referral
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       </div>
     </PartnershipLayout>
