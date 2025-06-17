@@ -16,19 +16,22 @@ import {
   Rocket,
   Zap,
   FileText,
-  BarChart3
+  BarChart3,
+  BookOpen,
+  HelpCircle,
+  User
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ComingSoonSection } from '@/components/dashboard/ComingSoonSection';
-import { PartnerLeaderboard } from '@/components/dashboard/PartnerLeaderboard';
 import { PartnerOnboarding } from '@/components/dashboard/PartnerOnboarding';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { AffiliateLayout } from '@/components/dashboard/AffiliateLayout';
+import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
+import { useUser } from '@/hooks/useUser';
 
 interface DashboardStats {
   totalEarnings: number;
@@ -51,6 +54,7 @@ interface RecentActivity {
 }
 
 const PartnerDashboard = () => {
+  const { user } = useUser();
   const [isOnboardingComplete, setIsOnboardingComplete] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<DashboardStats>({
@@ -62,6 +66,18 @@ const PartnerDashboard = () => {
     currentTier: 'Silver Partner',
     nextTierProgress: 65
   });
+
+  // Define leaderboard data
+  const leaderboardData = [
+    { rank: 1, name: 'Sarah Johnson', tier: 'Platinum', referrals: 28, earnings: 15420, badges: ['🎯', '🏆', '💎'] },
+    { rank: 2, name: 'Michael Chen', tier: 'Gold', referrals: 22, earnings: 12350, badges: ['🎯', '🏆'] },
+    { rank: 3, name: 'Emma Rodriguez', tier: 'Gold', referrals: 19, earnings: 11200, badges: ['🎯', '💎'] },
+    { rank: 4, name: 'James Wilson', tier: 'Gold', referrals: 18, earnings: 10980, badges: ['🎯', '🏆', '💎'] },
+    { rank: 5, name: 'You', tier: 'Silver', referrals: 15, earnings: 8750, badges: ['🎯', '🏆'], isCurrentUser: true },
+    { rank: 6, name: 'David Kim', tier: 'Silver', referrals: 13, earnings: 7890, badges: ['🎯', '🏆'] },
+    { rank: 7, name: 'Anna Martinez', tier: 'Silver', referrals: 11, earnings: 6750, badges: ['🎯', '🏆'] },
+    { rank: 8, name: 'Lisa Thompson', tier: 'Bronze', referrals: 8, earnings: 4560, badges: ['🎯'] }
+  ];
 
   // Move recentActivity useState to top to fix hooks order
   const [recentActivity] = useState<RecentActivity[]>([
@@ -223,37 +239,25 @@ const PartnerDashboard = () => {
   };
 
   return (
-    <AffiliateLayout 
+    <PartnershipLayout 
       title="Partner Dashboard"
       subtitle="Here's what's happening with your partnership today"
     >
       <div className="space-y-6 sm:space-y-8">
-      {/* Current Tier Badge */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="flex justify-end"
-      >
-        <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
-          {stats.currentTier}
-        </Badge>
-      </motion.div>
+      
+      {/* Dashboard Greeting Card */}
+      <DashboardGreetingCard 
+        userName={user?.email?.split('@')[0] || user?.user_metadata?.full_name}
+        welcomeMessage="Welcome to your partnership dashboard"
+        showDate={true}
+      />
 
-      {/* Coming Soon Section - Featured prominently */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-      >
-        <ComingSoonSection />
-      </motion.div>
 
       {/* Stats Grid */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
       >
         {/* Total Earnings */}
@@ -325,7 +329,7 @@ const PartnerDashboard = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
             <Card className="bg-black border-orange-500/20">
               <CardHeader>
@@ -371,7 +375,7 @@ const PartnerDashboard = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
           >
             <Card className="bg-black border-orange-500/20">
               <CardHeader>
@@ -409,50 +413,95 @@ const PartnerDashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           className="lg:col-span-1"
         >
-          <PartnerLeaderboard />
+          <Card className="bg-black border-orange-500/20">
+            <CardHeader>
+              <CardTitle className="text-lg text-white flex items-center justify-between">
+                <div className="flex items-center">
+                  <Award className="h-5 w-5 mr-2 text-orange-500" />
+                  Partner Leaderboard
+                </div>
+                <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                  #5
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-orange-400">#5</div>
+                  <div className="text-xs text-gray-400">Your Rank</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-white">8</div>
+                  <div className="text-xs text-gray-400">Total Partners</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-orange-400">Silver</div>
+                  <div className="text-xs text-gray-400">Your Tier</div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                {leaderboardData.slice(0, 5).map((partner) => (
+                  <div 
+                    key={partner.rank} 
+                    className={cn(
+                      "flex items-center justify-between p-3 rounded-lg border transition-colors",
+                      partner.isCurrentUser 
+                        ? "bg-orange-500/10 border-orange-500/30" 
+                        : "bg-gray-900/50 border-gray-700/30 hover:bg-gray-800/50"
+                    )}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={cn(
+                        "text-sm font-bold flex items-center justify-center w-6 h-6 rounded-full",
+                        partner.rank <= 3 ? "bg-orange-500 text-white" : "bg-gray-700 text-gray-300"
+                      )}>
+                        #{partner.rank}
+                      </div>
+                      <div>
+                        <div className={cn(
+                          "text-sm font-medium",
+                          partner.isCurrentUser ? "text-orange-400" : "text-white"
+                        )}>
+                          {partner.name}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {partner.tier} • {partner.referrals} referrals
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-green-400">
+                        £{partner.earnings.toLocaleString()}
+                      </div>
+                      <div className="flex space-x-1">
+                        {partner.badges.map((badge, idx) => (
+                          <span key={idx} className="text-xs">{badge}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <Button 
+                variant="outline" 
+                className="w-full mt-4 border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
+                onClick={() => window.location.href = '/partner/leaderboard'}
+              >
+                View Full Rankings
+              </Button>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
 
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-      >
-        <Card className="bg-black border-orange-500/20">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl text-white flex items-center">
-              <Zap className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white h-12 sm:h-14 text-sm sm:text-base">
-                <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                New Referral
-              </Button>
-              <Button variant="outline" className="border-orange-500/30 text-gray-300 hover:bg-orange-500/10 h-12 sm:h-14 text-sm sm:text-base">
-                <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                View Templates
-              </Button>
-              <Button variant="outline" className="border-orange-500/30 text-gray-300 hover:bg-orange-500/10 h-12 sm:h-14 text-sm sm:text-base">
-                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                Analytics
-              </Button>
-              <Button variant="outline" className="border-orange-500/30 text-gray-300 hover:bg-orange-500/10 h-12 sm:h-14 text-sm sm:text-base">
-                <Award className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                Achievements
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
       </div>
-    </AffiliateLayout>
+    </PartnershipLayout>
   );
 };
 
