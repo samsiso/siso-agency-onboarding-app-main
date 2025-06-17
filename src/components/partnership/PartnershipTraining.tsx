@@ -1,250 +1,263 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Users, Target, Zap, BarChart3, MessageSquare, Calendar, FileText, Award, CheckCircle2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Users, Target, Zap, Headphones, BarChart3, Award, BookOpen, Link, ArrowRight } from 'lucide-react';
+import RadialOrbitalTimeline from '@/components/ui/radial-orbital-timeline';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
-const trainingRequirements = [
+interface TimelineItem {
+  id: number;
+  title: string;
+  date: string;
+  content: string;
+  category: string;
+  icon: React.ElementType;
+  relatedIds: number[];
+  status: "completed" | "in-progress" | "pending";
+  energy: number;
+}
+
+const partnerHubFeatures: TimelineItem[] = [
   {
+    id: 1,
+    title: "Training Course",
+    date: "Complete",
+    content: "Comprehensive partner training program covering sales techniques, SISO methodology, and client management best practices.",
+    category: "Education",
     icon: BookOpen,
-    title: "Basic Business Acumen",
-    description: "Understanding of client needs and business fundamentals",
-    level: "Required"
+    relatedIds: [2, 6],
+    status: "completed" as const,
+    energy: 95,
   },
   {
-    icon: Users,
-    title: "Communication Skills",
-    description: "Ability to present ideas and build relationships with clients",
-    level: "Required"
-  },
-  {
-    icon: Target,
-    title: "Sales Experience",
-    description: "Previous sales or client-facing experience preferred",
-    level: "Preferred"
-  },
-  {
-    icon: Zap,
-    title: "Tech Enthusiasm",
-    description: "Interest in technology and digital solutions",
-    level: "Helpful"
-  }
-];
-
-const hubFeatures = [
-  {
+    id: 2,
+    title: "Custom Database",
+    date: "Active",
+    content: "Dedicated partner database system to track all client information, project history, and communication logs.",
+    category: "Tools",
     icon: BarChart3,
-    title: "Partner Dashboard",
-    description: "Real-time tracking of leads, commissions, and performance metrics",
-    features: ["Commission tracking", "Lead pipeline", "Performance analytics"]
+    relatedIds: [1, 3, 7],
+    status: "completed" as const,
+    energy: 100,
   },
   {
-    icon: MessageSquare,
-    title: "Client Communication Hub",
-    description: "Centralized platform for managing all client interactions",
-    features: ["Chat integration", "Project updates", "Feedback management"]
+    id: 3,
+    title: "Sales Team Support",
+    date: "24/7",
+    content: "Direct access to our experienced sales team for backup support, complex negotiations, and deal closure assistance.",
+    category: "Support",
+    icon: Users,
+    relatedIds: [2, 5],
+    status: "completed" as const,
+    energy: 90,
   },
   {
-    icon: Calendar,
-    title: "Project Management",
-    description: "Track project timelines, milestones, and deliverables",
-    features: ["Timeline tracking", "Milestone alerts", "Delivery schedules"]
+    id: 5,
+    title: "Performance Bonuses",
+    date: "Monthly",
+    content: "Additional performance-based bonuses for exceeding targets, maintaining high client satisfaction, and consistent deal closure.",
+    category: "Rewards",
+    icon: Target,
+    relatedIds: [3, 6],
+    status: "completed" as const,
+    energy: 85,
   },
   {
-    icon: FileText,
-    title: "Resource Library",
-    description: "Access to sales materials, case studies, and training content",
-    features: ["Sales templates", "Case studies", "Training videos"]
-  },
-  {
+    id: 6,
+    title: "Marketing Materials",
+    date: "Updated",
+    content: "Professional marketing materials, case studies, proposals templates, and branded resources to support your sales efforts.",
+    category: "Resources",
     icon: Award,
-    title: "Certification System",
-    description: "Structured learning path with partner certifications",
-    features: ["Learning modules", "Skill assessments", "Digital badges"]
+    relatedIds: [1, 5, 7],
+    status: "completed" as const,
+    energy: 88,
+  },
+  {
+    id: 7,
+    title: "Project Management",
+    date: "End-to-End",
+    content: "Complete project management system handling client onboarding, development tracking, and delivery coordination.",
+    category: "Operations",
+    icon: Zap,
+    relatedIds: [2, 6],
+    status: "completed" as const,
+    energy: 92,
   }
 ];
 
 export const PartnershipTraining = memo(() => {
+  // State to track the currently selected item for the left side card
+  const [selectedItem, setSelectedItem] = useState<TimelineItem>(
+    partnerHubFeatures.find(item => item.id === 6) || partnerHubFeatures[0]
+  );
+
+  // Handler for when an orb is clicked
+  const handleItemSelect = (item: TimelineItem) => {
+    setSelectedItem(item);
+  };
   return (
-    <div id="training" className="w-full px-4">
-      <div className="container mx-auto max-w-7xl">
-        {/* Training Requirements Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+    <div id="training" className="relative w-full overflow-hidden">
+      {/* Section Header */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-50 text-center pointer-events-none">
+        <motion.h2 
+          className="text-2xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight"
+          initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
-            Partner <span className="text-orange-500">Requirements</span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-            We welcome partners from diverse backgrounds. Here's what helps you succeed in our program.
-          </p>
+          Why Partner with{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-red-500">
+            SISO
+          </span>?
+        </motion.h2>
+        <motion.p 
+          className="text-lg text-gray-300 max-w-2xl mx-auto"
+          initial={{ opacity: 0, y: -10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          Explore our partnership features in this interactive timeline
+        </motion.p>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-            {trainingRequirements.map((requirement, index) => (
-              <motion.div
-                key={requirement.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: index * 0.1
-                }}
-                className="group"
-              >
-                <Card className="relative h-full bg-gradient-to-br from-gray-800/60 to-gray-900/60 
-                  border border-gray-700/50 hover:border-orange-500/50 backdrop-blur-md
-                  transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/20
-                  group-hover:scale-105">
-                  
-                  <CardContent className="relative p-6 space-y-4">
-                    {/* Level Badge */}
-                    <div className="flex justify-between items-start mb-4">
-                      <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        requirement.level === 'Required' 
-                          ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                          : requirement.level === 'Preferred'
-                          ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30'
-                          : 'bg-green-500/20 text-green-300 border border-green-500/30'
-                      }`}>
-                        {requirement.level}
+      {/* Radial Orbital Timeline with Side Cards */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 0.4 }}
+        viewport={{ once: true }}
+        className="relative"
+      >
+        <div className="w-full h-screen flex">
+          {/* Side Card Section - Left 33% */}
+          <div className="w-1/3 h-full p-8 flex flex-col justify-center bg-black/20 backdrop-blur-sm border-r border-gray-700/30">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              {/* Show the selected card */}
+              {(() => {
+                if (!selectedItem) return null;
+                
+                const getStatusStyles = (status: "completed" | "in-progress" | "pending"): string => {
+                  switch (status) {
+                    case "completed":
+                      return "text-white bg-gray-900 border-white";
+                    case "in-progress":
+                      return "text-black bg-white border-black";
+                    case "pending":
+                      return "text-white bg-gray-900/40 border-white/50";
+                    default:
+                      return "text-white bg-gray-900/40 border-white/50";
+                  }
+                };
+
+                return (
+                  <Card className="w-full bg-gray-900/95 backdrop-blur-lg border-gray-600/40 shadow-xl shadow-gray-900/20">
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-center">
+                        <Badge
+                          className={`px-2 text-xs ${getStatusStyles(selectedItem.status)}`}
+                        >
+                          {selectedItem.status === "completed"
+                            ? "COMPLETE"
+                            : selectedItem.status === "in-progress"
+                            ? "IN PROGRESS"
+                            : "PENDING"}
+                        </Badge>
+                        <span className="text-xs font-mono text-gray-400">
+                          {selectedItem.date}
+                        </span>
                       </div>
-                    </div>
+                      <CardTitle className="text-lg mt-2 text-white">
+                        {selectedItem.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm text-gray-300">
+                      <p className="leading-relaxed">{selectedItem.content}</p>
 
-                    {/* Icon */}
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-500/20 via-orange-600/30 to-red-500/20 
-                      rounded-xl flex items-center justify-center mb-4
-                      shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40
-                      border border-orange-500/20 group-hover:border-orange-500/40
-                      transition-all duration-500">
-                      <requirement.icon className="w-6 h-6 text-orange-400" />
-                    </div>
-
-                    {/* Content */}
-                    <h3 className="text-lg font-bold text-white group-hover:text-orange-100 transition-colors duration-300">
-                      {requirement.title}
-                    </h3>
-                    
-                    <p className="text-sm text-gray-300 group-hover:text-gray-200 leading-relaxed transition-colors duration-300">
-                      {requirement.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Partnership Hub Features Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-6">
-            Your Partner <span className="text-orange-500">Hub</span>
-          </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-12">
-            Everything you need to succeed, all in one powerful platform designed specifically for our partners.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {hubFeatures.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: index * 0.15
-                }}
-                className="group"
-              >
-                <Card className="relative h-full bg-gradient-to-br from-gray-800/60 to-gray-900/60 
-                  border border-gray-700/50 hover:border-orange-500/50 backdrop-blur-md
-                  transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/20
-                  group-hover:scale-105">
-                  
-                  <CardContent className="relative p-8 space-y-6">
-                    {/* Icon */}
-                    <div className="w-16 h-16 bg-gradient-to-br from-orange-500/20 via-orange-600/30 to-red-500/20 
-                      rounded-xl flex items-center justify-center mb-6 mx-auto
-                      shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40
-                      border border-orange-500/20 group-hover:border-orange-500/40
-                      transition-all duration-500">
-                      <feature.icon className="w-8 h-8 text-orange-400" />
-                    </div>
-
-                    {/* Content */}
-                    <div className="text-center">
-                      <h3 className="text-xl font-bold text-white group-hover:text-orange-100 transition-colors duration-300 mb-3">
-                        {feature.title}
-                      </h3>
-                      
-                      <p className="text-sm text-gray-300 group-hover:text-gray-200 leading-relaxed mb-6 transition-colors duration-300">
-                        {feature.description}
-                      </p>
-
-                      {/* Feature List */}
-                      <div className="space-y-2">
-                        {feature.features.map((item, itemIndex) => (
-                          <motion.div
-                            key={item}
-                            initial={{ opacity: 0, x: -20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 + itemIndex * 0.05 }}
-                            className="flex items-center gap-2 text-sm text-gray-400 group-hover:text-gray-300"
-                          >
-                            <CheckCircle2 className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                            <span>{item}</span>
-                          </motion.div>
-                        ))}
+                      <div className="mt-6 pt-4 border-t border-gray-600/30">
+                        <div className="flex justify-between items-center text-sm mb-2">
+                          <span className="flex items-center text-gray-400">
+                            <Zap size={12} className="mr-2" />
+                            Energy Level
+                          </span>
+                          <span className="font-mono text-white">{selectedItem.energy}%</span>
+                        </div>
+                        <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-orange-500 to-red-500"
+                            style={{ width: `${selectedItem.energy}%` }}
+                          ></div>
+                        </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
 
-        {/* Getting Started CTA */}
-        <motion.div
+                      {selectedItem.relatedIds.length > 0 && (
+                        <div className="mt-6 pt-4 border-t border-gray-600/30">
+                          <div className="flex items-center mb-3">
+                            <Link size={12} className="text-gray-400 mr-2" />
+                            <h4 className="text-sm uppercase tracking-wider font-medium text-gray-400">
+                              Connected Features
+                            </h4>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedItem.relatedIds.map((relatedId) => {
+                              const relatedItem = partnerHubFeatures.find(
+                                (i) => i.id === relatedId
+                              );
+                              return (
+                                <Button
+                                  key={relatedId}
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex items-center h-8 px-3 py-0 text-xs border-gray-600/40 bg-transparent hover:bg-gray-700/50 text-gray-300 hover:text-white transition-all"
+                                >
+                                  {relatedItem?.title}
+                                  <ArrowRight
+                                    size={10}
+                                    className="ml-2 text-gray-400"
+                                  />
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })()}
+            </motion.div>
+          </div>
+
+          {/* Orbital Timeline Section - Right 67% */}
+          <div className="w-2/3 h-full">
+            <RadialOrbitalTimeline 
+              timelineData={partnerHubFeatures} 
+              showPopupCards={false}
+              onItemSelect={handleItemSelect}
+            />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Bottom instruction */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50 text-center pointer-events-none">
+        <motion.p 
+          className="text-sm text-gray-400 bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-600/30"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-center"
         >
-          <div className="bg-gradient-to-r from-gray-800/50 to-gray-900/50 
-            backdrop-blur-md border border-gray-700/50 rounded-2xl p-8
-            max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              Ready to Get <span className="text-orange-500">Started?</span>
-            </h3>
-            <p className="text-lg text-gray-300 leading-relaxed mb-6">
-              Join our next partner onboarding session and get access to your personalized hub within 24 hours.
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
-              <div className="bg-gray-800/50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-orange-400 mb-2">24 Hours</div>
-                <div className="text-sm text-gray-400">Hub Access After Approval</div>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-orange-400 mb-2">7 Days</div>
-                <div className="text-sm text-gray-400">Complete Training Program</div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+          Click on any feature to explore details • Auto-rotating timeline
+        </motion.p>
       </div>
     </div>
   );

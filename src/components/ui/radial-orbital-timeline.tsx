@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight, Link, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,13 +20,17 @@ interface TimelineItem {
 
 interface RadialOrbitalTimelineProps {
   timelineData: TimelineItem[];
+  showPopupCards?: boolean;
+  onItemSelect?: (item: TimelineItem) => void;
 }
 
 export default function RadialOrbitalTimeline({
   timelineData,
+  showPopupCards = true,
+  onItemSelect,
 }: RadialOrbitalTimelineProps) {
   const [expandedItems, setExpandedItems] = useState<Record<number, boolean>>(
-    {}
+    { 6: true }
   );
   const [viewMode, setViewMode] = useState<"orbital">("orbital");
   const [rotationAngle, setRotationAngle] = useState<number>(0);
@@ -35,10 +40,20 @@ export default function RadialOrbitalTimeline({
     x: 0,
     y: 0,
   });
-  const [activeNodeId, setActiveNodeId] = useState<number | null>(null);
+  const [activeNodeId, setActiveNodeId] = useState<number | null>(6);
   const containerRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
   const nodeRefs = useRef<Record<number, HTMLDivElement | null>>({});
+
+  // Initialize with the default selected item (Marketing Materials - ID: 6)
+  useEffect(() => {
+    if (onItemSelect) {
+      const defaultItem = timelineData.find(item => item.id === 6);
+      if (defaultItem) {
+        onItemSelect(defaultItem);
+      }
+    }
+  }, [onItemSelect, timelineData]);
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only close if clicking on the background, not on any child elements
@@ -71,6 +86,14 @@ export default function RadialOrbitalTimeline({
         console.log(`🚀 Opening item ${id}`);
         setActiveNodeId(id);
         setAutoRotate(false);
+
+        // Call the callback to update external state
+        if (onItemSelect) {
+          const selectedItem = timelineData.find(item => item.id === id);
+          if (selectedItem) {
+            onItemSelect(selectedItem);
+          }
+        }
 
         const relatedItems = getRelatedItems(id);
         const newPulseEffect: Record<number, boolean> = {};
@@ -274,7 +297,7 @@ export default function RadialOrbitalTimeline({
                 </div>
 
                 {/* Original card */}
-                {isExpanded && (
+                {showPopupCards && isExpanded && (
                   <Card className="absolute top-20 left-1/2 -translate-x-1/2 w-64 bg-gray-900/95 backdrop-blur-lg border-gray-600/40 shadow-xl shadow-gray-900/20 overflow-visible z-[300]">
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-px h-3 bg-gray-500/50"></div>
                     <CardHeader className="pb-2">

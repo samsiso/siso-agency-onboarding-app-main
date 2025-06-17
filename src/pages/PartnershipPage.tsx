@@ -11,6 +11,7 @@ import { PartnershipProcess } from '@/components/partnership/PartnershipProcess'
 import { PartnershipAIChat } from '@/components/partnership/PartnershipAIChat';
 import { PartnershipTraining } from '@/components/partnership/PartnershipTraining';
 import Footer from '@/components/Footer';
+import { PartnerRequirements } from '@/components/partnership/PartnerRequirements';
 
 const PartnershipPage = memo(() => {
   const navigate = useNavigate();
@@ -38,12 +39,12 @@ const PartnershipPage = memo(() => {
   // Navigation sections for the sticky nav - OPTIMIZED ORDER for better UX flow
   const navigationSections = [
     { id: 'hero', label: 'Get Started' },
-    { id: 'benefits', label: 'Benefits' },
     { id: 'portfolio', label: 'Our Work' },
     { id: 'process', label: 'How It Works' },
     { id: 'training', label: 'Training & Hub' },
     { id: 'stats', label: 'Program Stats' },
-    { id: 'faq', label: 'AI Chat' }
+    { id: 'faq', label: 'AI Chat' },
+    { id: 'requirements', label: 'Requirements' }
   ];
 
   const scrollToSection = (sectionId: string) => {
@@ -131,10 +132,6 @@ const PartnershipPage = memo(() => {
           <AgencyPartnershipHeader />
         </section>
 
-        {/* Benefits Section - Full Screen - MOVED UP for better UX flow */}
-        <section id="benefits" className="min-h-screen flex items-center justify-center">
-          <PartnershipBenefits />
-        </section>
 
         {/* Portfolio Section - Full Screen */}
         <section id="portfolio" className="min-h-screen flex items-center justify-center">
@@ -159,6 +156,11 @@ const PartnershipPage = memo(() => {
         {/* AI Chat Section - Full Screen */}
         <section id="faq" className="min-h-screen flex items-center justify-center">
           <PartnershipAIChat onApplyNow={handleApplyNow} />
+        </section>
+
+        {/* Partner Requirements Section - Full Screen */}
+        <section id="requirements" className="min-h-screen flex items-center justify-center">
+          <PartnerRequirements />
         </section>
 
         {/* Footer Section */}
