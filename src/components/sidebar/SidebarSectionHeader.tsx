@@ -13,7 +13,7 @@ export const SidebarSectionHeader = ({ icon: Icon, title }: SidebarSectionHeader
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-siso-text-bold"
+      className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-siso-text-bold"
     >
       <Icon className="w-4 h-4 text-siso-text-muted" />
       {title}

@@ -76,7 +76,20 @@ import { ComingSoonSection } from './components/dashboard/ComingSoonSection';
 import EducationHub from './pages/dashboard/EducationHub';
 import TrainingHub from './pages/dashboard/TrainingHub';
 import ReferralsManagement from './pages/dashboard/ReferralsManagement';
-import Statistics from './pages/dashboard/Statistics';
+import Clients from './pages/dashboard/Clients';
+import AppPlanGeneratorPage from './pages/dashboard/AppPlanGenerator';
+import AffiliateLeaderboard from './pages/dashboard/AffiliateLeaderboard';
+import Support from './pages/dashboard/Support';
+
+// Admin Partnership imports
+import AdminPartnershipDashboard from './pages/admin/AdminPartnershipDashboard';
+import AdminPartnershipLeaderboard from './pages/admin/AdminPartnershipLeaderboard';
+import AdminPartnershipReferrals from './pages/admin/AdminPartnershipReferrals';
+import AdminPartnershipStatistics from './pages/admin/AdminPartnershipStatistics';
+import AdminPartnershipTraining from './pages/admin/AdminPartnershipTraining';
+
+// Automation System imports
+import { AutomationPage } from './pages/automation/AutomationPage';
 
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
@@ -121,34 +134,45 @@ function App() {
           <Route path="/portfolio" element={<PublicPortfolio />} />
           <Route path="/partnership" element={<PartnershipPage />} />
           <Route path="/partners" element={<PartnershipPage />} />
-          <Route path="/partner" element={<PartnershipPage />} />
           
           {/* Partner Authentication Routes */}
           <Route path="/auth/login" element={<PartnerLogin />} />
           <Route path="/auth/register" element={<PartnerRegister />} />
           <Route path="/auth/reset-password" element={<PartnerPasswordReset />} />
           
-          {/* Partner Dashboard Routes - Using AffiliateLayout directly */}
-          <Route path="/dashboard" element={<PartnerAuthGuard><PartnerDashboard /></PartnerAuthGuard>} />
-          <Route path="/dashboard/statistics" element={<PartnerAuthGuard><Statistics /></PartnerAuthGuard>} />
-          <Route path="/dashboard/coming-soon" element={<PartnerAuthGuard><div className="p-6"><ComingSoonSection /></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/education" element={<PartnerAuthGuard><EducationHub /></PartnerAuthGuard>} />
-          <Route path="/dashboard/training-hub" element={<PartnerAuthGuard><TrainingHub /></PartnerAuthGuard>} />
-          <Route path="/dashboard/templates" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Templates</h1><p className="text-gray-400 mt-2">Ready-to-use templates for your projects.</p></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/app-plan-generator" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">App Plan Generator</h1><p className="text-gray-400 mt-2">AI-powered app planning tool coming soon.</p></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/pipeline" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Pipeline</h1><p className="text-gray-400 mt-2">Track your referral pipeline and progress.</p></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/profile" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Profile Settings</h1><p className="text-gray-400 mt-2">Manage your partner profile and preferences.</p></div></PartnerAuthGuard>} />
+          {/* Partner Dashboard Routes - New /partner/* URL structure */}
+          <Route path="/partner" element={<PartnerAuthGuard><PartnerDashboard /></PartnerAuthGuard>} />
+          <Route path="/partner/dashboard" element={<PartnerAuthGuard><PartnerDashboard /></PartnerAuthGuard>} />
+          <Route path="/partner/clients" element={<PartnerAuthGuard><Clients /></PartnerAuthGuard>} />
+          <Route path="/partner/referrals" element={<PartnerAuthGuard><ReferralsManagement /></PartnerAuthGuard>} />
+          <Route path="/partner/leaderboard" element={<PartnerAuthGuard><AffiliateLeaderboard /></PartnerAuthGuard>} />
+          <Route path="/partner/training-hub" element={<PartnerAuthGuard><TrainingHub /></PartnerAuthGuard>} />
+          <Route path="/partner/app-plan-generator" element={<PartnerAuthGuard><AppPlanGeneratorPage /></PartnerAuthGuard>} />
+          <Route path="/partner/support" element={<PartnerAuthGuard><Support /></PartnerAuthGuard>} />
+          <Route path="/partner/pipeline" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Pipeline</h1><p className="text-gray-400 mt-2">Track your referral pipeline and progress.</p></div></PartnerAuthGuard>} />
+          <Route path="/partner/profile" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Profile Settings</h1><p className="text-gray-400 mt-2">Manage your partner profile and preferences.</p></div></PartnerAuthGuard>} />
+          <Route path="/partner/earnings" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Earnings - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/partner/resources" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Resources - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/partner/goals" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Goals & Targets - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/partner/achievements" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Achievements - Coming Soon</h1></div></PartnerAuthGuard>} />
+          <Route path="/partner/settings" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Settings - Coming Soon</h1></div></PartnerAuthGuard>} />
           
-          {/* Legacy routes for backward compatibility */}
-          <Route path="/dashboard/referrals" element={<PartnerAuthGuard><ReferralsManagement /></PartnerAuthGuard>} />
-          <Route path="/dashboard/earnings" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Earnings - Coming Soon</h1></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/leaderboard" element={<PartnerAuthGuard><PartnerLeaderboard /></PartnerAuthGuard>} />
-          <Route path="/dashboard/resources" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Resources - Coming Soon</h1></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/goals" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Goals & Targets - Coming Soon</h1></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/achievements" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Achievements - Coming Soon</h1></div></PartnerAuthGuard>} />
-          <Route path="/dashboard/settings" element={<PartnerAuthGuard><div className="p-6"><h1 className="text-2xl font-bold text-white">Settings - Coming Soon</h1></div></PartnerAuthGuard>} />
-          <Route path="/partner-dashboard" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard/partner" element={<Navigate to="/dashboard" replace />} />
+          {/* Backward compatibility redirects - /dashboard/* → /partner/* */}
+          <Route path="/dashboard" element={<Navigate to="/partner" replace />} />
+          <Route path="/dashboard/statistics" element={<Navigate to="/partner/clients" replace />} />
+          <Route path="/dashboard/referrals" element={<Navigate to="/partner/referrals" replace />} />
+          <Route path="/dashboard/leaderboard" element={<Navigate to="/partner/leaderboard" replace />} />
+          <Route path="/dashboard/training-hub" element={<Navigate to="/partner/training-hub" replace />} />
+          <Route path="/dashboard/app-plan-generator" element={<Navigate to="/partner/app-plan-generator" replace />} />
+          <Route path="/dashboard/pipeline" element={<Navigate to="/partner/pipeline" replace />} />
+          <Route path="/dashboard/profile" element={<Navigate to="/partner/profile" replace />} />
+          <Route path="/dashboard/earnings" element={<Navigate to="/partner/earnings" replace />} />
+          <Route path="/dashboard/resources" element={<Navigate to="/partner/resources" replace />} />
+          <Route path="/dashboard/goals" element={<Navigate to="/partner/goals" replace />} />
+          <Route path="/dashboard/achievements" element={<Navigate to="/partner/achievements" replace />} />
+          <Route path="/dashboard/settings" element={<Navigate to="/partner/settings" replace />} />
+          <Route path="/partner-dashboard" element={<Navigate to="/partner" replace />} />
+          <Route path="/dashboard/partner" element={<Navigate to="/partner" replace />} />
           
           <Route path="/onboarding-chat" element={<OnboardingChat />} />
           <Route path="/onboarding" element={<AuthGuard><BusinessOnboarding /></AuthGuard>} />
@@ -186,6 +210,17 @@ function App() {
           <Route path="/admin/wireframes/:projectId" element={<AuthGuard adminOnly={true}><AdminWireframes /></AuthGuard>} />
           <Route path="/admin/userflow" element={<AuthGuard adminOnly={true}><AdminUserFlow /></AuthGuard>} />
           <Route path="/admin/userflow/:projectId" element={<AuthGuard adminOnly={true}><UserFlow /></AuthGuard>} />
+          
+          {/* Admin Partnership Routes */}
+          <Route path="/admin/partnership" element={<AuthGuard adminOnly={true}><AdminPartnershipDashboard /></AuthGuard>} />
+          <Route path="/admin/partnership/leaderboard" element={<AuthGuard adminOnly={true}><AdminPartnershipLeaderboard /></AuthGuard>} />
+          <Route path="/admin/partnership/referrals" element={<AuthGuard adminOnly={true}><AdminPartnershipReferrals /></AuthGuard>} />
+          <Route path="/admin/partnership/statistics" element={<AuthGuard adminOnly={true}><AdminPartnershipStatistics /></AuthGuard>} />
+          <Route path="/admin/partnership/training" element={<AuthGuard adminOnly={true}><AdminPartnershipTraining /></AuthGuard>} />
+          
+          {/* Automation System Routes */}
+          <Route path="/automation" element={<AuthGuard adminOnly={true}><AutomationPage /></AuthGuard>} />
+          <Route path="/admin/automation" element={<AuthGuard adminOnly={true}><AutomationPage /></AuthGuard>} />
           
           {/* Protected Dashboard Routes */}
           <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />

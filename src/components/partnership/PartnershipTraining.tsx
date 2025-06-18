@@ -87,7 +87,7 @@ const partnerHubFeatures: TimelineItem[] = [
   }
 ];
 
-export const PartnershipTraining = memo(() => {
+export const PartnershipTraining = () => {
   // State to track the currently selected item for the left side card
   const [selectedItem, setSelectedItem] = useState<TimelineItem>(
     partnerHubFeatures.find(item => item.id === 6) || partnerHubFeatures[0]
@@ -95,6 +95,7 @@ export const PartnershipTraining = memo(() => {
 
   // Handler for when an orb is clicked
   const handleItemSelect = (item: TimelineItem) => {
+    console.log(`🎯 PartnershipTraining received item:`, item.title);
     setSelectedItem(item);
   };
   return (
@@ -136,10 +137,10 @@ export const PartnershipTraining = memo(() => {
           {/* Side Card Section - Left 33% */}
           <div className="w-1/3 h-full p-8 flex flex-col justify-center bg-black/20 backdrop-blur-sm border-r border-gray-700/30">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
+              key={selectedItem.id}
+              initial={{ opacity: 0, x: -20, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
             >
               {/* Show the selected card */}
               {(() => {
@@ -159,7 +160,10 @@ export const PartnershipTraining = memo(() => {
                 };
 
                 return (
-                  <Card className="w-full bg-gray-900/95 backdrop-blur-lg border-gray-600/40 shadow-xl shadow-gray-900/20">
+                  <Card 
+                    key={selectedItem.id}
+                    className="w-full bg-gray-900/95 backdrop-blur-lg border-gray-600/40 shadow-xl shadow-gray-900/20"
+                  >
                     <CardHeader className="pb-2">
                       <div className="flex justify-between items-center">
                         <Badge
@@ -261,6 +265,4 @@ export const PartnershipTraining = memo(() => {
       </div>
     </div>
   );
-});
-
-PartnershipTraining.displayName = 'PartnershipTraining'; 
+}; 

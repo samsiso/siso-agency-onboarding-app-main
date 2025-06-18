@@ -1,69 +1,230 @@
-# Welcome to your Lovable project
+# SISO Agency Onboarding App
 
-## Project info
+A comprehensive React + TypeScript application for SISO Agency's client onboarding process, featuring advanced project management, financial tracking, and AI-powered development tools.
 
-**URL**: https://lovable.dev/projects/1b5c997d-f4e6-406f-ae1a-d2f0ab46ae4f
+## 🚀 Features
 
-## How can I edit this code?
+### Core Application
+- **Client Onboarding**: Streamlined onboarding process with step-by-step guidance
+- **Project Management**: Advanced project tracking with timeline visualization
+- **Financial Management**: Comprehensive expense tracking and revenue management
+- **Partnership Program**: Multi-tier partnership system with rewards
+- **Real-time Collaboration**: Live updates and team coordination tools
 
-There are several ways of editing your application.
+### 🧠 AI-Powered Development (NEW!)
+- **Self-Updating Context Engine**: Automatic commit processing for enhanced Claude AI assistance
+- **Semantic Code Search**: Vector-based search through your development history
+- **Intelligent Context**: Claude automatically understands your codebase patterns
+- **Zero-Config AI**: Automatic setup with Git hooks and CI/CD integration
 
-**Use Lovable**
+## 🛠️ Technology Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1b5c997d-f4e6-406f-ae1a-d2f0ab46ae4f) and start prompting.
+- **Frontend**: React 18+ with TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **Icons**: Lucide React
+- **Build Tool**: Vite
+- **Database**: Supabase with pgvector for AI features
+- **AI Integration**: OpenAI GPT-4o-mini + Embeddings
+- **Deployment**: Vercel
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📦 Quick Start
 
-**Use your preferred IDE**
+### Prerequisites
+```bash
+# Required for AI features
+OPENAI_API_KEY=sk-...
+VITE_SUPABASE_URL=https://...
+VITE_SUPABASE_ANON_KEY=eyJ...
+```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
+```bash
+# Clone and install
+git clone <repository-url>
+cd siso-agency-onboarding-app
+npm install --legacy-peer-deps
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+# Setup AI Context Engine (optional but recommended)
+./scripts/install-git-hooks.sh
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Development with AI Enhancement
+```bash
+# Your normal workflow now automatically enhances Claude's context
+git add .
+git commit -m "Add new feature"
+git push origin dev
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+# Claude now knows about your changes automatically! 🎉
+```
 
-**Use GitHub Codespaces**
+## 🧠 Context Engine Benefits
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+**Before**: Manual context sharing
+```
+You: "Help me fix this bug"
+Claude: "Can you show me the relevant code?"
+You: *copy-pastes multiple files*
+Claude: "What's your project structure?"
+You: *explains manually*
+```
 
-## What technologies are used for this project?
+**After**: Automatic context intelligence
+```
+You: "Help me fix this bug"
+Claude: "Based on your recent authentication refactor and the React patterns you use, here's the exact fix..."
+```
 
-This project is built with .
+**10× Productivity Gains:**
+- ⚡ Instant context without copy-pasting
+- 🧠 Claude learns your coding patterns  
+- 🎯 Project-aware suggestions
+- 📈 Faster development cycles
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📁 Project Structure
 
-## How can I deploy this project?
+```
+src/
+├── components/          # Reusable UI components
+│   ├── admin/          # Admin dashboard components
+│   ├── client/         # Client portal components
+│   ├── auth/           # Authentication components
+│   └── ui/             # shadcn/ui components
+├── pages/              # Main application pages
+├── hooks/              # Custom React hooks
+├── lib/                # Utility libraries
+├── types/              # TypeScript type definitions
+└── utils/              # Helper utilities
 
-Simply open [Lovable](https://lovable.dev/projects/1b5c997d-f4e6-406f-ae1a-d2f0ab46ae4f) and click on Share -> Publish.
+scripts/                # AI Context Engine
+├── brain-commit-processor.js  # Core AI processing
+├── install-git-hooks.sh      # Team setup script
+└── README.md                 # AI system docs
 
-## I want to use a custom domain - is that possible?
+docs/                   # Documentation
+├── context-engine/     # AI system documentation
+├── api/               # API documentation
+└── guides/            # Development guides
+```
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## 🎯 Key Components
+
+### Admin Dashboard
+- **Client Management**: Complete client lifecycle management
+- **Financial Overview**: Revenue tracking and expense management
+- **Project Planning**: Timeline and milestone management
+- **Team Collaboration**: Task assignment and progress tracking
+
+### Client Portal  
+- **Onboarding Flow**: Step-by-step guided process
+- **Project Visibility**: Real-time project status updates
+- **Document Management**: Secure file sharing and collaboration
+- **Communication Hub**: Direct messaging and notifications
+
+### Partnership Program
+- **Multi-tier System**: Bronze, Silver, Gold, Platinum tiers
+- **Reward Tracking**: Points, achievements, and benefits
+- **Referral Management**: Automated referral processing
+- **Performance Analytics**: Partner performance metrics
+
+## 🔧 Development Commands
+
+```bash
+# Development
+npm run dev              # Start dev server (localhost:8081)
+npm run build            # Production build
+npm run preview          # Preview production build
+npm run lint             # Run ESLint
+
+# AI Context Engine
+node scripts/brain-commit-processor.js HEAD    # Process latest commit
+./scripts/install-git-hooks.sh                # Install Git hooks
+```
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+```bash
+# Deploy to Vercel
+vercel --prod
+
+# Environment variables required:
+# - OPENAI_API_KEY
+# - VITE_SUPABASE_URL  
+# - VITE_SUPABASE_ANON_KEY
+```
+
+### Other Platforms
+The app is compatible with any static hosting platform that supports single-page applications.
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm test
+
+# Test AI Context Engine
+node scripts/brain-commit-processor.js HEAD
+
+# Test Git hooks
+.git/hooks/pre-push origin https://github.com/user/repo < /dev/null
+```
+
+## 📚 Documentation
+
+- **[Context Engine Guide](docs/context-engine/README.md)**: Complete AI system documentation
+- **[API Reference](docs/api/)**: Backend integration guides  
+- **[Component Library](docs/components/)**: UI component documentation
+- **[Development Guides](docs/guides/)**: Step-by-step development tutorials
+
+## 🤝 Contributing
+
+1. **Setup**: Install dependencies and AI hooks
+2. **Develop**: Use standard Git workflow (AI enhancement automatic)
+3. **Test**: Ensure all tests pass
+4. **Submit**: Create PR (AI will add context summary)
+
+### Code Standards
+- **TypeScript**: Strict typing, no `any` types
+- **React**: Functional components with hooks only
+- **Styling**: Tailwind CSS with dark theme (SISO orange accents)
+- **Commits**: Descriptive messages (processed by AI system)
+
+## 🔮 Roadmap
+
+### Current (v1.0)
+- ✅ Self-Updating Context Engine
+- ✅ Git hooks integration  
+- ✅ CI/CD processing
+- ✅ Comprehensive documentation
+
+### Next (v1.1)
+- 🔄 Prompt-Aware Retrieval Middleware (`/api/brain/search`)
+- 🤖 Autonomous Task Generator (PR → Tasks)
+- 🗄️ Real-Time Schema Mirror (Auto TypeScript types)
+- 🎨 Dark-Theme Component CLI (`@siso/ui`)
+
+### Future (v2.0)
+- 📊 Analytics Dashboard
+- 🔗 Slack/Discord Integration
+- 🎯 Custom AI Prompts
+- 🌐 Multi-project Support
+
+## 📄 License
+
+This project is proprietary to SISO Agency. All rights reserved.
+
+## 🆘 Support
+
+- **Documentation**: Check `docs/` directory
+- **Issues**: Create GitHub issue with AI context
+- **Questions**: Contact the development team
+
+---
+
+**🎉 Enhanced with AI-powered development tools for 10× productivity gains!**
+
+*The Self-Updating Context Engine automatically makes Claude smarter about your codebase with every commit.*

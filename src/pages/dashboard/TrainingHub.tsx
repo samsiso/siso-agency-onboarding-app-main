@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AffiliateLayout } from '@/components/dashboard/AffiliateLayout';
+import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -202,7 +202,7 @@ const TrainingHub: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   return (
-    <AffiliateLayout
+    <PartnershipLayout
       title="Training & Development Hub"
       subtitle="Master your skills and accelerate your partner success with comprehensive learning resources"
     >
@@ -629,7 +629,7 @@ const TrainingHub: React.FC = () => {
           </Card>
         </motion.section>
       </div>
-    </AffiliateLayout>
+    </PartnershipLayout>
   );
 };
 

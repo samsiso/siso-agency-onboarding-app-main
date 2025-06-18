@@ -22,7 +22,17 @@ import {
   User,
   Plus,
   MessageSquare,
-  Lightbulb
+  Lightbulb,
+  Play,
+  Trophy,
+  Activity,
+  Brain,
+  ExternalLink,
+  ChevronRight,
+  Sparkles,
+  GraduationCap,
+  Video,
+  Download
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -509,155 +519,331 @@ const PartnerDashboard = () => {
         </motion.div>
       </div>
 
-      {/* Quick Action Cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.7 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
-      >
-        {/* Training Hub */}
-        <Card className="bg-gradient-to-br from-green-600/20 via-green-500/10 to-emerald-500/20 border border-green-500/30 hover:border-green-500/50 transition-all cursor-pointer"
-              onClick={() => window.location.href = '/partner/training-hub'}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-white flex items-center">
-              <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mr-3">
-                <BookOpen className="h-4 w-4 text-green-400" />
+      {/* Enhanced Feature Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        
+        {/* Training Hub - Rich Interactive Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+        >
+          <Card className="bg-black/60 backdrop-blur-xl border-green-500/20 shadow-2xl hover:border-green-500/40 transition-all">
+            <CardContent className="p-6 space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500">
+                    <GraduationCap className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Training Hub</h3>
+                    <p className="text-sm text-gray-400">Master partnership skills</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.href = '/partner/training-hub'}
+                  className="border-green-500/30 text-green-400 hover:bg-green-500/10"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View All
+                </Button>
               </div>
-              Training Hub
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-300 text-sm mb-4">
-              Master partnership skills with comprehensive training materials and SOPs.
-            </p>
-            <Button 
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = '/partner/training-hub';
-              }}
-            >
-              <BookOpen className="h-4 w-4 mr-2" />
-              Browse Courses
-            </Button>
-          </CardContent>
-        </Card>
 
-        {/* Leaderboard */}
-        <Card className="bg-gradient-to-br from-purple-600/20 via-purple-500/10 to-violet-500/20 border border-purple-500/30 hover:border-purple-500/50 transition-all cursor-pointer"
-              onClick={() => window.location.href = '/partner/leaderboard'}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-white flex items-center">
-              <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center mr-3">
-                <Award className="h-4 w-4 text-purple-400" />
+              {/* Progress Stats */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <div className="text-xl font-bold text-green-400">8</div>
+                  <div className="text-xs text-gray-400">Completed</div>
+                </div>
+                <div className="text-center p-3 bg-gray-900/50 border border-gray-700/30 rounded-lg">
+                  <div className="text-xl font-bold text-white">3</div>
+                  <div className="text-xs text-gray-400">In Progress</div>
+                </div>
+                <div className="text-center p-3 bg-gray-900/50 border border-gray-700/30 rounded-lg">
+                  <div className="text-xl font-bold text-orange-400">5</div>
+                  <div className="text-xs text-gray-400">New</div>
+                </div>
               </div>
-              Leaderboard
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-300 text-sm mb-4">
-              View full rankings and compete with other partners for top positions.
-            </p>
-            <Button 
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = '/partner/leaderboard';
-              }}
-            >
-              <Award className="h-4 w-4 mr-2" />
-              View Rankings
-            </Button>
-          </CardContent>
-        </Card>
 
-        {/* Help Center */}
-        <Card className="bg-black border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer"
-              onClick={() => window.location.href = '/partner/support'}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-white flex items-center">
-              <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
-                <HelpCircle className="h-4 w-4 text-orange-400" />
+              {/* Recent Courses */}
+              <div className="space-y-2">
+                <p className="text-xs text-gray-400 font-medium">Recent Courses:</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg hover:bg-green-500/10 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <Video className="h-4 w-4 text-green-400" />
+                      <span className="text-sm text-white">Partnership Fundamentals</span>
+                    </div>
+                    <Badge className="bg-green-500/20 text-green-400 text-xs">100%</Badge>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg hover:bg-green-500/10 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <Play className="h-4 w-4 text-orange-400" />
+                      <span className="text-sm text-white">Advanced Sales Techniques</span>
+                    </div>
+                    <Badge className="bg-orange-500/20 text-orange-400 text-xs">60%</Badge>
+                  </div>
+                </div>
               </div>
-              Support
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-300 text-sm mb-4">
-              Get support, access guides, and connect with our team for assistance.
-            </p>
-            <Button 
-              variant="outline" 
-              className="w-full border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = '/partner/support';
-              }}
-            >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Get Help
-            </Button>
-          </CardContent>
-        </Card>
 
-        {/* Clients Management */}
-        <Card className="bg-gradient-to-br from-blue-600/20 via-blue-500/10 to-cyan-500/20 border border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer"
-              onClick={() => window.location.href = '/partner/clients'}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-white flex items-center">
-              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3">
-                <Users className="h-4 w-4 text-blue-400" />
-              </div>
-              Clients
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-300 text-sm mb-4">
-              Manage your client relationships and track engagement.
-            </p>
-            <Button 
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = '/partner/clients';
-              }}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              View Clients
-            </Button>
-          </CardContent>
-        </Card>
+              {/* Action Button */}
+              <Button 
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => window.location.href = '/partner/training-hub'}
+              >
+                <BookOpen className="h-4 w-4 mr-2" />
+                Continue Learning
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        {/* New Client Referral */}
-        <Card className="bg-black border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer"
-              onClick={() => window.location.href = '/partner/referrals'}>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg text-white flex items-center">
-              <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
-                <Plus className="h-4 w-4 text-orange-400" />
+        {/* Leaderboard Preview - Rich Data Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <Card className="bg-black/60 backdrop-blur-xl border-purple-500/20 shadow-2xl hover:border-purple-500/40 transition-all">
+            <CardContent className="p-6 space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-violet-500">
+                    <Trophy className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Leaderboard</h3>
+                    <p className="text-sm text-gray-400">Your position: #5 of 8</p>
+                  </div>
+                </div>
+                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                  Silver Tier
+                </Badge>
               </div>
-              New Referral
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-300 text-sm mb-4">
-              Submit a new client referral and start earning commissions.
-            </p>
-            <Button 
-              variant="outline" 
-              className="w-full border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = '/partner/referrals';
-              }}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              Add Referral
-            </Button>
-          </CardContent>
-        </Card>
-      </motion.div>
+
+              {/* Mini Leaderboard */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-xs font-bold text-black">1</div>
+                    <span className="text-sm text-white">Sarah Johnson</span>
+                  </div>
+                  <span className="text-sm text-green-400">£15,420</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-xs font-bold text-black">2</div>
+                    <span className="text-sm text-white">Michael Chen</span>
+                  </div>
+                  <span className="text-sm text-green-400">£12,350</span>
+                </div>
+                <div className="flex items-center justify-between p-2 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold text-white">5</div>
+                    <span className="text-sm text-orange-400 font-medium">You</span>
+                  </div>
+                  <span className="text-sm text-green-400">£8,750</span>
+                </div>
+              </div>
+
+              {/* Progress to Next Tier */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Progress to Gold</span>
+                  <span className="text-white">£1,250 more needed</span>
+                </div>
+                <Progress value={65} className="h-2" />
+              </div>
+
+              {/* Action Button */}
+              <Button 
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                onClick={() => window.location.href = '/partner/leaderboard'}
+              >
+                <Trophy className="h-4 w-4 mr-2" />
+                View Full Rankings
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Client Management - Rich Data Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
+        >
+          <Card className="bg-black/60 backdrop-blur-xl border-blue-500/20 shadow-2xl hover:border-blue-500/40 transition-all">
+            <CardContent className="p-6 space-y-4">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500">
+                    <Users className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">Client Management</h3>
+                    <p className="text-sm text-gray-400">Track relationships & engagement</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.location.href = '/partner/clients'}
+                  className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Manage
+                </Button>
+              </div>
+
+              {/* Client Stats */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                  <div className="text-xl font-bold text-blue-400">12</div>
+                  <div className="text-xs text-gray-400">Active</div>
+                </div>
+                <div className="text-center p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <div className="text-xl font-bold text-green-400">8</div>
+                  <div className="text-xs text-gray-400">Converted</div>
+                </div>
+                <div className="text-center p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                  <div className="text-xl font-bold text-orange-400">3</div>
+                  <div className="text-xs text-gray-400">Pending</div>
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="space-y-2">
+                <p className="text-xs text-gray-400 font-medium">Recent Activity:</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                      <span className="text-sm text-white">TechCorp signed contract</span>
+                    </div>
+                    <span className="text-xs text-gray-400">2h ago</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                      <span className="text-sm text-white">StartupXYZ meeting scheduled</span>
+                    </div>
+                    <span className="text-xs text-gray-400">1d ago</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+                  onClick={() => window.location.href = '/partner/clients'}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  View All
+                </Button>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
+                  onClick={() => window.location.href = '/partner/referrals'}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Client
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Support Center - Image Card with Rich Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.0 }}
+        >
+          <Card className="bg-black/60 backdrop-blur-xl border-orange-500/20 shadow-2xl hover:border-orange-500/40 transition-all overflow-hidden">
+            <div className="relative">
+              {/* Header with Background Pattern */}
+              <div className="bg-gradient-to-r from-orange-500/20 to-amber-500/20 p-6 border-b border-orange-500/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500">
+                      <HelpCircle className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">Support Center</h3>
+                      <p className="text-sm text-gray-400">Get help when you need it</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                    24/7 Available
+                  </Badge>
+                </div>
+              </div>
+              
+              <CardContent className="p-6 space-y-4">
+                {/* Support Options */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-gray-900/50 border border-gray-700/30 rounded-lg hover:bg-orange-500/10 transition-colors cursor-pointer">
+                    <MessageSquare className="h-5 w-5 text-orange-400 mb-2" />
+                    <div className="text-sm font-medium text-white">Live Chat</div>
+                    <div className="text-xs text-gray-400">Instant help</div>
+                  </div>
+                  <div className="p-3 bg-gray-900/50 border border-gray-700/30 rounded-lg hover:bg-orange-500/10 transition-colors cursor-pointer">
+                    <FileText className="h-5 w-5 text-orange-400 mb-2" />
+                    <div className="text-sm font-medium text-white">Knowledge Base</div>
+                    <div className="text-xs text-gray-400">Self-service</div>
+                  </div>
+                  <div className="p-3 bg-gray-900/50 border border-gray-700/30 rounded-lg hover:bg-orange-500/10 transition-colors cursor-pointer">
+                    <Video className="h-5 w-5 text-orange-400 mb-2" />
+                    <div className="text-sm font-medium text-white">Video Guides</div>
+                    <div className="text-xs text-gray-400">Step-by-step</div>
+                  </div>
+                  <div className="p-3 bg-gray-900/50 border border-gray-700/30 rounded-lg hover:bg-orange-500/10 transition-colors cursor-pointer">
+                    <Download className="h-5 w-5 text-orange-400 mb-2" />
+                    <div className="text-sm font-medium text-white">Resources</div>
+                    <div className="text-xs text-gray-400">Templates & tools</div>
+                  </div>
+                </div>
+
+                {/* Quick Stats */}
+                <div className="flex justify-between text-sm">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-orange-400">&lt; 2min</div>
+                    <div className="text-xs text-gray-400">Avg Response</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-green-400">98%</div>
+                    <div className="text-xs text-gray-400">Satisfaction</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-blue-400">24/7</div>
+                    <div className="text-xs text-gray-400">Available</div>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <Button 
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                  onClick={() => window.location.href = '/partner/support'}
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Get Support Now
+                </Button>
+              </CardContent>
+            </div>
+          </Card>
+        </motion.div>
+
+      </div>
 
       </div>
     </PartnershipLayout>

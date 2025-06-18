@@ -1,82 +1,63 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 interface PartnerAuthGuardProps {
   children: React.ReactNode;
 }
 
 export const PartnerAuthGuard = ({ children }: PartnerAuthGuardProps) => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const { toast } = useToast();
 
   useEffect(() => {
+    let isMounted = true;
+    
     const checkPartnerAuth = async () => {
       try {
-        console.log('PartnerAuthGuard - Checking partner auth session');
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (sessionError) {
-          console.error('PartnerAuthGuard - Session error:', sessionError);
-          navigate('/auth/login', { 
-            replace: true,
-            state: { from: location.pathname }
-          });
+        if (!isMounted) return;
+        
+        if (session?.user) {
+          setIsAuthenticated(true);
+        } else {
+          // Redirect to login without using navigate to avoid loops
+          window.location.href = '/auth/login';
           return;
         }
         
-        if (!session) {
-          console.log('PartnerAuthGuard - No active session found, redirecting to partner login');
-          toast({
-            title: "Authentication Required",
-            description: "Please log in to access the partner dashboard."
-          });
-          navigate('/auth/login', { 
-            replace: true,
-            state: { from: location.pathname }
-          });
-          return;
-        } 
-        
-        console.log('PartnerAuthGuard - Partner session found:', session.user.id, session.user.email);
-        setIsAuthenticated(true);
-        
       } catch (error) {
         console.error('Partner auth check error:', error);
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "There was a problem verifying your authentication."
-        });
-        navigate('/auth/login', { replace: true });
+        if (isMounted) {
+          window.location.href = '/auth/login';
+          return;
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     checkPartnerAuth();
 
+    // Simple auth state listener without complex logic
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('PartnerAuthGuard - Auth state change:', event);
+      if (!isMounted) return;
+      
       if (event === 'SIGNED_OUT' || !session) {
-        toast({
-          title: "Session Ended",
-          description: "You have been logged out."
-        });
-        navigate('/auth/login', { replace: true });
-      } else if (event === 'SIGNED_IN') {
+        window.location.href = '/auth/login';
+      } else if (event === 'SIGNED_IN' && session?.user) {
         setIsAuthenticated(true);
+        setIsLoading(false);
       }
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, toast, location.pathname]);
+  }, [])
 
   if (isLoading) {
     return (

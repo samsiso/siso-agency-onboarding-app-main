@@ -19,42 +19,44 @@ import { SidebarConfig, NavigationItem } from '@/components/dashboard/UnifiedSid
 export const affiliateNavigationItems: NavigationItem[] = [
   {
     name: 'Dashboard',
-    href: '/dashboard',
+    href: '/partner',
     icon: Home
   },
   {
-    name: 'Statistics',
-    href: '/dashboard/statistics',
-    icon: TrendingUp,
-    badge: 'New'
-  },
-  {
-    name: 'Leaderboard',
-    href: '/dashboard/leaderboard',
-    icon: Trophy
-  },
-  {
-    name: 'Referrals',
-    href: '/dashboard/referrals',
-    icon: Users,
-    badge: 'Coming Soon'
-  },
-  {
     name: 'App Plan Generator',
-    href: '/dashboard/app-plan-generator',
+    href: '/partner/app-plan-generator',
     icon: Zap,
-    badge: 'Coming Soon'
+    badge: 'Most Important'
   },
   {
     name: 'Training Hub',
-    href: '/dashboard/training-hub',
+    href: '/partner/training-hub',
     icon: BookOpen
   },
   {
-    name: 'Help Center',
-    href: '/dashboard/help-center',
-    icon: HelpCircle,
-    badge: 'Coming Soon'
+    name: 'Support',
+    href: '/partner/support',
+    icon: HelpCircle
+  },
+  {
+    name: 'Clients',
+    href: '/partner/clients',
+    icon: Users
+  },
+  {
+    name: 'Referrals',
+    href: '/partner/referrals',
+    icon: Users
+  },
+  {
+    name: 'Leaderboard',
+    href: '/partner/leaderboard',
+    icon: Trophy
+  },
+  {
+    name: 'Templates',
+    href: '/partner/templates',
+    icon: FileText
   }
 ];
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AffiliateLayout } from '@/components/dashboard/AffiliateLayout';
+import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -243,7 +243,10 @@ const ReferralsManagement = () => {
   };
 
   return (
-    <AffiliateLayout>
+    <PartnershipLayout
+      title="Referral Management"
+      subtitle="Track your referrals, manage your pipeline, and optimize your performance"
+    >
       <div className="space-y-6">
         {/* Header */}
         <motion.div
@@ -716,7 +719,7 @@ const ReferralsManagement = () => {
           </Card>
         </motion.div>
       </div>
-    </AffiliateLayout>
+    </PartnershipLayout>
   );
 };
 

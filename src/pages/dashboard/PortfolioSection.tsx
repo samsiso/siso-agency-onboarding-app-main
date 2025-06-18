@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AffiliateLayout } from '@/components/dashboard/AffiliateLayout';
+import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -91,7 +91,7 @@ const PortfolioSection: React.FC = () => {
   const industries = ['all', ...Array.from(new Set(mockProjects.map(p => p.industry.toLowerCase())))];
 
   return (
-    <AffiliateLayout
+    <PartnershipLayout
       title="Portfolio Showcase"
       subtitle="Demonstrate your expertise with successful client projects"
       actions={
@@ -345,7 +345,7 @@ const PortfolioSection: React.FC = () => {
           </Tabs>
         </motion.div>
       </div>
-    </AffiliateLayout>
+    </PartnershipLayout>
   );
 };
 

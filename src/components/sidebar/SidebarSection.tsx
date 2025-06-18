@@ -45,14 +45,14 @@ export const SidebarSection = ({
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-0.5">
       {!collapsed && section.title && (
         <SidebarSectionHeader icon={section.icon} title={section.title} />
       )}
       <motion.div 
         className={cn(
-          "space-y-1",
-          !collapsed && "pl-3 border-l-2 border-siso-border ml-4"
+          "space-y-0.5",
+          !collapsed && "pl-2 border-l-2 border-siso-border ml-3"
         )}
         variants={containerVariants}
       >

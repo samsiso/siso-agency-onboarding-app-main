@@ -64,17 +64,21 @@ export function ClientSidebarNavigation({ collapsed = false, onItemClick = () =>
         className={cn("px-2 py-4", collapsed && "px-1")}
       >
         <div className="space-y-2">
-          <AnimatePresence mode="wait">
-            {clientMenuSections.map((section, index) => (
+          {clientMenuSections.map((section, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
               <ClientSidebarMenuSection
-                key={index}
                 section={section}
                 isItemActive={isItemActive}
                 onItemClick={onItemClick}
                 collapsed={collapsed}
               />
-            ))}
-          </AnimatePresence>
+            </motion.div>
+          ))}
         </div>
       </motion.nav>
     </SidebarContent>

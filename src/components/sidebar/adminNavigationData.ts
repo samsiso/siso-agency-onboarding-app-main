@@ -2,7 +2,9 @@ import {
   LayoutDashboard, Users, MessageSquare, UserCheck,
   ListTodo, CalendarClock, CreditCard, Settings,
   ClipboardList, Building2, UserCog, FileText,
-  ScrollText, Zap, Bot, Database
+  ScrollText, Zap, Bot, Database, Handshake,
+  Trophy, BarChart3, Activity, BookOpen, 
+  Workflow, Layers, FolderOpen
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -33,6 +35,38 @@ export const getAdminMenuSections = (): MenuSection[] => {
     },
     {
       type: 'section',
+      title: 'Partnership Program',
+      icon: Handshake,
+      items: [
+        {
+          href: '/admin/partnership',
+          icon: LayoutDashboard,
+          label: 'Overview',
+        },
+        {
+          href: '/admin/partnership/leaderboard',
+          icon: Trophy,
+          label: 'Leaderboard',
+        },
+        {
+          href: '/admin/partnership/referrals',
+          icon: Activity,
+          label: 'Referrals',
+        },
+        {
+          href: '/admin/partnership/statistics',
+          icon: BarChart3,
+          label: 'Statistics',
+        },
+        {
+          href: '/admin/partnership/training',
+          icon: BookOpen,
+          label: 'Training Hub',
+        }
+      ]
+    },
+    {
+      type: 'section',
       title: 'Team Operations',
       icon: UserCheck,
       items: [
@@ -45,6 +79,28 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/tasks',
           icon: ListTodo,
           label: 'Tasks',
+        }
+      ]
+    },
+    {
+      type: 'section',
+      title: 'Project Management',
+      icon: FolderOpen,
+      items: [
+        {
+          href: '/admin/plans/create',
+          icon: FileText,
+          label: 'Plans',
+        },
+        {
+          href: '/admin/wireframes',
+          icon: Layers,
+          label: 'Wireframes',
+        },
+        {
+          href: '/admin/userflow',
+          icon: Workflow,
+          label: 'User Flows',
         }
       ]
     },

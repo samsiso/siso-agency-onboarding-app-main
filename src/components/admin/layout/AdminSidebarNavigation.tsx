@@ -85,24 +85,25 @@ export const AdminSidebarNavigation = ({ collapsed, onItemClick, visible }: Navi
       className={cn("px-2 py-4", collapsed && "px-1")}
     >
       <div className="space-y-2">
-        <AnimatePresence mode="wait">
-          {menuSections.map((section, index) => (
-            <motion.div 
-              key={index}
-              className={cn(
-                "space-y-1",
-                section.type === 'section' && "border-b border-siso-border/50 pb-2"
-              )}
-            >
-              <SidebarSection
-                section={section}
-                collapsed={collapsed}
-                onItemClick={onItemClick}
-                isItemActive={(href) => isItemActive(href, section.type === 'main')}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {menuSections.map((section, index) => (
+          <motion.div 
+            key={index}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className={cn(
+              "space-y-1",
+              section.type === 'section' && "border-b border-siso-border/50 pb-2"
+            )}
+          >
+            <SidebarSection
+              section={section}
+              collapsed={collapsed}
+              onItemClick={onItemClick}
+              isItemActive={(href) => isItemActive(href, section.type === 'main')}
+            />
+          </motion.div>
+        ))}
       </div>
     </motion.nav>
   );

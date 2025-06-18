@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Link, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -50,10 +50,11 @@ export default function RadialOrbitalTimeline({
     if (onItemSelect) {
       const defaultItem = timelineData.find(item => item.id === 6);
       if (defaultItem) {
+        console.log(`🎬 Initial selection:`, defaultItem.title);
         onItemSelect(defaultItem);
       }
     }
-  }, [onItemSelect, timelineData]);
+  }, [timelineData]); // Remove onItemSelect from dependencies to avoid infinite loops
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Only close if clicking on the background, not on any child elements
@@ -69,49 +70,33 @@ export default function RadialOrbitalTimeline({
 
   const toggleItem = (id: number) => {
     console.log(`🔄 TOGGLE ITEM ${id} called`);
-    setExpandedItems((prev) => {
-      console.log(`📋 Previous state:`, prev);
-      const newState = { ...prev };
-      Object.keys(newState).forEach((key) => {
-        if (parseInt(key) !== id) {
-          newState[parseInt(key)] = false;
-        }
-      });
+    
+    // Always set this item as active
+    setActiveNodeId(id);
+    setAutoRotate(false);
 
-      newState[id] = !prev[id];
-      console.log(`✨ New state:`, newState);
-      console.log(`🎯 Item ${id} will be expanded:`, newState[id]);
+    // Clear all expanded items and set only this one as expanded
+    const newExpandedState = { [id]: true };
+    setExpandedItems(newExpandedState);
 
-      if (!prev[id]) {
-        console.log(`🚀 Opening item ${id}`);
-        setActiveNodeId(id);
-        setAutoRotate(false);
-
-        // Call the callback to update external state
-        if (onItemSelect) {
-          const selectedItem = timelineData.find(item => item.id === id);
-          if (selectedItem) {
-            onItemSelect(selectedItem);
-          }
-        }
-
-        const relatedItems = getRelatedItems(id);
-        const newPulseEffect: Record<number, boolean> = {};
-        relatedItems.forEach((relId) => {
-          newPulseEffect[relId] = true;
-        });
-        setPulseEffect(newPulseEffect);
-
-        centerViewOnNode(id);
-      } else {
-        console.log(`🔒 Closing item ${id}`);
-        setActiveNodeId(null);
-        setAutoRotate(true);
-        setPulseEffect({});
+    // Call the callback to update external state
+    if (onItemSelect) {
+      const selectedItem = timelineData.find(item => item.id === id);
+      if (selectedItem) {
+        console.log(`🚀 Calling onItemSelect with:`, selectedItem.title);
+        onItemSelect(selectedItem);
       }
+    }
 
-      return newState;
+    // Set pulse effect for related items
+    const relatedItems = getRelatedItems(id);
+    const newPulseEffect: Record<number, boolean> = {};
+    relatedItems.forEach((relId) => {
+      newPulseEffect[relId] = true;
     });
+    setPulseEffect(newPulseEffect);
+
+    centerViewOnNode(id);
   };
 
   useEffect(() => {

@@ -90,10 +90,10 @@ export const SidebarMenuItem = ({
         to={href}
         onClick={onClick}
         className={cn(
-          'relative flex items-center gap-4 rounded-lg px-4 py-2.5 text-siso-text transition-all duration-300',
+          'relative flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all duration-300',
           isActive && 'bg-gradient-to-r from-siso-red/10 to-siso-orange/10 text-siso-text-bold shadow-sm',
           !isActive && 'hover:bg-gradient-to-r hover:from-siso-red/5 hover:to-siso-orange/5 hover:text-siso-text-bold',
-          isMain ? 'text-lg font-semibold' : 'text-sm',
+          isMain ? 'text-base font-semibold' : 'text-sm',
           collapsed ? 'justify-center' : '',
           className
         )}

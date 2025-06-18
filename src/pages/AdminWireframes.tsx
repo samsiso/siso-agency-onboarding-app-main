@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { AppLayout } from '@/components/layout/AppLayout';
+import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { WireframeAdmin } from '@/components/projects/admin/WireframeAdmin';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -7,7 +7,7 @@ export default function AdminWireframes() {
   const { projectId } = useParams<{ projectId: string }>();
   
   return (
-    <AppLayout>
+    <AdminLayout>
       <div className="container mx-auto px-4 py-8">
         <Card className="bg-black/20 border-gray-800 mb-6">
           <CardHeader>
@@ -26,6 +26,6 @@ export default function AdminWireframes() {
         
         <WireframeAdmin projectId={projectId} />
       </div>
-    </AppLayout>
+    </AdminLayout>
   );
 }

@@ -1,6 +1,7 @@
 import { memo, useState, useEffect } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { Waves } from '@/components/ui/waves-background';
 import { AgencyPartnershipHeader } from '@/components/ui/agency-partnership-header';
 import { Stats } from '@/components/ui/stats-section-with-text';
@@ -25,15 +26,35 @@ const PartnershipPage = memo(() => {
     restDelta: 0.001
   });
 
-  const handleApplyNow = () => {
-    // Redirect directly to auth with partner context
-    navigate('/auth', { 
-      state: { 
-        userType: 'partner',
-        returnTo: '/dashboard',
-        source: 'partnership-landing-apply-now'
+  const handleApplyNow = async () => {
+    try {
+      // Check if user is already authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // User is already logged in, redirect to partner dashboard
+        navigate('/partner/dashboard');
+      } else {
+        // User is not logged in, redirect to partner login page
+        navigate('/auth/login', { 
+          state: { 
+            userType: 'partner',
+            returnTo: '/partner/dashboard',
+            source: 'partnership-landing-apply-now'
+          }
+        });
       }
-    });
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+      // Fallback to login page if there's an error
+      navigate('/auth/login', { 
+        state: { 
+          userType: 'partner',
+          returnTo: '/partner/dashboard',
+          source: 'partnership-landing-apply-now'
+        }
+      });
+    }
   };
 
   // Navigation sections for the sticky nav - OPTIMIZED ORDER for better UX flow
@@ -110,9 +131,9 @@ const PartnershipPage = memo(() => {
       </div>
 
       {/* Waves Animation - Matching Main Landing Page HeroSection */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-10">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
         <Waves 
-          lineColor="rgba(255, 87, 34, 0.2)"
+          lineColor="rgba(251, 146, 60, 0.3)"
           backgroundColor="transparent"
           waveSpeedX={0.018}
           waveSpeedY={0.015}
@@ -123,13 +144,14 @@ const PartnershipPage = memo(() => {
           maxCursorMove={180}
           xGap={22}
           yGap={55}
+          className="-z-10"
         />
       </div>
 
       <div className="relative z-30">
         {/* Hero Section - Full Screen */}
         <section id="hero" className="min-h-screen flex items-center justify-center">
-          <AgencyPartnershipHeader />
+          <AgencyPartnershipHeader onApplyNow={handleApplyNow} />
         </section>
 
 

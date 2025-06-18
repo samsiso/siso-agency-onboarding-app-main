@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { AffiliateLayout } from '@/components/dashboard/AffiliateLayout';
+import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -121,7 +121,7 @@ const EducationHub: React.FC = () => {
   const overallProgress = Math.round(mockModules.reduce((sum, module) => sum + module.progress, 0) / mockModules.length);
 
   return (
-    <AffiliateLayout
+    <PartnershipLayout
       title="Education Hub"
       subtitle="Enhance your skills and earn certifications to boost your success"
     >
@@ -466,7 +466,7 @@ const EducationHub: React.FC = () => {
           </Tabs>
         </motion.div>
       </div>
-    </AffiliateLayout>
+    </PartnershipLayout>
   );
 };
 

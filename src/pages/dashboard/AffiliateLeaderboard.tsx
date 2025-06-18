@@ -1,58 +1,159 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AffiliateLayout } from '@/components/dashboard/AffiliateLayout';
-import { PartnerLeaderboard } from '@/components/dashboard/PartnerLeaderboard';
+import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
+import { LeaderboardTemplate, LeaderboardEntry } from '@/components/ui/leaderboard-template';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { 
   Trophy, 
-  Medal, 
-  Crown, 
   Star,
   TrendingUp,
   Users,
-  Target,
-  Award
+  Target
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AffiliateLeaderboard = () => {
-  const topPerformers = [
-    { rank: 1, name: 'Sarah Johnson', referrals: 24, earnings: 12450, growth: '+18%', tier: 'Gold' },
-    { rank: 2, name: 'Mike Chen', referrals: 18, earnings: 9890, growth: '+12%', tier: 'Silver' },
-    { rank: 3, name: 'Emma Davis', referrals: 15, earnings: 8750, growth: '+8%', tier: 'Silver' },
-    { rank: 4, name: 'James Wilson', referrals: 12, earnings: 6200, growth: '+5%', tier: 'Bronze' },
-    { rank: 5, name: 'Lisa Brown', referrals: 10, earnings: 5100, growth: '+15%', tier: 'Bronze' },
+  const navigate = useNavigate();
+  
+  // Convert partner data to leaderboard format
+  const leaderboardEntries: LeaderboardEntry[] = [
+    {
+      id: 'partner-1',
+      name: 'Sarah Johnson',
+      email: 'sarah@example.com',
+      points: 2450,
+      rank: 'Gold Partner',
+      spending: 12450,
+      contributions: 24,
+      referrals: 24,
+      tokens: 15000,
+      lastActive: '2024-01-15T10:30:00Z',
+      trend: { direction: 'up', value: 18 },
+      achievements: ['Top Performer', 'Gold Tier'],
+      tier: 'gold',
+      bio: 'Leading partner'
+    },
+    {
+      id: 'partner-2', 
+      name: 'Mike Chen',
+      email: 'mike@example.com',
+      points: 1890,
+      rank: 'Silver Partner',
+      spending: 9890,
+      contributions: 18,
+      referrals: 18,
+      tokens: 12000,
+      lastActive: '2024-01-14T15:20:00Z',
+      trend: { direction: 'up', value: 12 },
+      achievements: ['Consistent Growth'],
+      tier: 'silver',
+      bio: 'Growth focused'
+    },
+    {
+      id: 'partner-3',
+      name: 'Emma Davis', 
+      email: 'emma@example.com',
+      points: 1650,
+      rank: 'Silver Partner',
+      spending: 8750,
+      contributions: 15,
+      referrals: 15,
+      tokens: 10500,
+      lastActive: '2024-01-13T09:15:00Z',
+      trend: { direction: 'up', value: 8 },
+      achievements: ['Quality Referrals'],
+      tier: 'silver',
+      bio: 'Quality partner'
+    },
+    {
+      id: 'partner-4',
+      name: 'James Wilson',
+      email: 'james@example.com', 
+      points: 1200,
+      rank: 'Bronze Partner',
+      spending: 6200,
+      contributions: 12,
+      referrals: 12,
+      tokens: 8000,
+      lastActive: '2024-01-12T14:45:00Z',
+      trend: { direction: 'up', value: 5 },
+      achievements: ['Steady Growth'],
+      tier: 'bronze',
+      bio: 'Reliable partner'
+    },
+    {
+      id: 'partner-5',
+      name: 'Lisa Brown',
+      email: 'lisa@example.com',
+      points: 1050,
+      rank: 'Bronze Partner', 
+      spending: 5100,
+      contributions: 10,
+      referrals: 10,
+      tokens: 6500,
+      lastActive: '2024-01-11T11:30:00Z',
+      trend: { direction: 'up', value: 15 },
+      achievements: ['Rising Star'],
+      tier: 'bronze',
+      bio: 'Fast growing'
+    },
+    {
+      id: 'partner-6',
+      name: 'David Miller',
+      email: 'david@example.com',
+      points: 890,
+      rank: 'Bronze Partner',
+      spending: 4200,
+      contributions: 8,
+      referrals: 8,
+      tokens: 5000,
+      lastActive: '2024-01-10T16:20:00Z',
+      trend: { direction: 'down', value: 2 },
+      achievements: ['New Partner'],
+      tier: 'bronze',
+      bio: 'Getting started'
+    },
+    {
+      id: 'partner-7',
+      name: 'Current User (You)',
+      email: 'you@example.com',
+      points: 750,
+      rank: 'Bronze Partner',
+      spending: 3450,
+      contributions: 7,
+      referrals: 7,
+      tokens: 4200,
+      lastActive: '2024-01-16T08:00:00Z',
+      trend: { direction: 'up', value: 22 },
+      achievements: ['Monthly Growth'],
+      tier: 'bronze',
+      bio: 'Your progress'
+    },
+    {
+      id: 'partner-8',
+      name: 'Anna Thompson',
+      email: 'anna@example.com',
+      points: 650,
+      rank: 'Bronze Partner',
+      spending: 2800,
+      contributions: 5,
+      referrals: 5,
+      tokens: 3500,
+      lastActive: '2024-01-09T13:45:00Z',
+      trend: { direction: 'down', value: 1 },
+      achievements: ['First Steps'],
+      tier: 'bronze'
+    }
   ];
 
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return <Crown className="w-6 h-6 text-yellow-400" />;
-      case 2:
-        return <Medal className="w-6 h-6 text-gray-300" />;
-      case 3:
-        return <Medal className="w-6 h-6 text-amber-600" />;
-      default:
-        return <Trophy className="w-6 h-6 text-gray-500" />;
-    }
-  };
-
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'Gold':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'Silver':
-        return 'bg-gray-300/20 text-gray-300 border-gray-300/30';
-      case 'Bronze':
-        return 'bg-amber-600/20 text-amber-600 border-amber-600/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
-    }
+  const handlePartnerClick = (partner: LeaderboardEntry) => {
+    // Navigate to partner details or profile
+    navigate(`/partner/profile/${partner.id}`);
   };
 
   return (
-    <AffiliateLayout
+    <PartnershipLayout
       title="Affiliate Leaderboard"
       subtitle="See how you stack up against other partners"
       actions={
@@ -76,8 +177,8 @@ const AffiliateLeaderboard = () => {
               <Trophy className="h-4 w-4 text-orange-400" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">#8</div>
-              <p className="text-xs text-gray-400 mt-1">Out of 127 partners</p>
+              <div className="text-2xl font-bold text-white">#7</div>
+              <p className="text-xs text-gray-400 mt-1">Out of {leaderboardEntries.length} partners</p>
             </CardContent>
           </Card>
 
@@ -115,78 +216,32 @@ const AffiliateLeaderboard = () => {
           </Card>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Top Performers */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-2"
-          >
-            <Card className="bg-black border-orange-500/20">
-              <CardHeader>
-                <CardTitle className="text-xl text-white flex items-center">
-                  <Award className="h-6 w-6 mr-2 text-orange-500" />
-                  Top Performers This Month
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {topPerformers.map((performer, index) => (
-                    <motion.div
-                      key={performer.rank}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                      className="flex items-center justify-between p-4 bg-gray-900 border border-orange-500/20 rounded-lg hover:bg-orange-500/10 transition-colors"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center justify-center w-12 h-12 bg-gray-800 rounded-lg">
-                          {getRankIcon(performer.rank)}
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-white">{performer.name}</h4>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <Badge className={getTierColor(performer.tier)}>
-                              {performer.tier}
-                            </Badge>
-                            <span className="text-sm text-gray-400">
-                              {performer.referrals} referrals
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-white">
-                          £{performer.earnings.toLocaleString()}
-                        </div>
-                        <div className="text-sm text-orange-400">
-                          {performer.growth}
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Monthly Leaderboard Widget */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-1"
-          >
-            <PartnerLeaderboard />
-          </motion.div>
-        </div>
+        {/* Main Leaderboard */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <LeaderboardTemplate
+            title="Partnership Leaderboard"
+            subtitle="Rankings based on referrals, earnings, and overall performance"
+            entries={leaderboardEntries}
+            onUserClick={handlePartnerClick}
+            showSearch={true}
+            showFilters={true}
+            showRankBadges={true}
+            currencySymbol="£"
+            tokenSymbol="PARTNER"
+            searchPlaceholder="Search partners..."
+            maxEntries={50}
+          />
+        </motion.div>
 
         {/* Achievement Goals */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Card className="bg-black border-orange-500/20">
             <CardHeader>
@@ -201,8 +256,8 @@ const AffiliateLeaderboard = () => {
                   <div className="w-16 h-16 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Trophy className="w-8 h-8 text-orange-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Silver Tier</h3>
-                  <p className="text-sm text-gray-400">Achieved this month! 🎉</p>
+                  <h3 className="text-lg font-bold text-white mb-2">Bronze Tier</h3>
+                  <p className="text-sm text-gray-400">Current status - Growing strong! 🎯</p>
                 </div>
                 
                 <div className="text-center p-6 bg-gray-900 border border-orange-500/20 rounded-lg">
@@ -225,7 +280,7 @@ const AffiliateLeaderboard = () => {
           </Card>
         </motion.div>
       </div>
-    </AffiliateLayout>
+    </PartnershipLayout>
   );
 };
 

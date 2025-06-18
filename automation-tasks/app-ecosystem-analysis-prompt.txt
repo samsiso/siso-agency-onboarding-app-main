@@ -1,0 +1,128 @@
+As a senior business analyst and technical architect, conduct a comprehensive analysis of the SISO Agency platform ecosystem. This is a critical strategic analysis to understand the complete app architecture and identify opportunities for optimization and growth.
+
+## BUSINESS CONTEXT
+
+SISO Agency operates a central database-driven platform with three core user types:
+
+1. **PARTNERSHIP PROGRAM** (Goal: 100,000 affiliates → millions of clients)
+   - Affiliate recruitment and onboarding
+   - Commission tracking and payments
+   - Training hub and resources
+   - Performance analytics and leaderboards
+
+2. **ADMIN/INTERNAL OPERATIONS** (CEO/Executive dashboard)
+   - Client management and oversight
+   - Partnership program administration
+   - Team management and productivity
+   - Financial tracking and reporting
+
+3. **CLIENT DELIVERY PIPELINE** (From lead to delivered app)
+   - Comprehensive client onboarding
+   - Automated research (social scraping, competitor analysis)
+   - Custom app plan generation
+   - Development tracking and client dashboards
+
+## ANALYSIS REQUIREMENTS
+
+### 1. COMPREHENSIVE CODEBASE AUDIT
+Please analyze the entire codebase structure:
+- Review all React components and their purposes
+- Examine the Supabase database schema (70+ tables)
+- Map out the current user journeys and workflows
+- Identify existing integrations and API endpoints
+- Assess the current state of each user type's functionality
+
+### 2. DATABASE ARCHITECTURE DEEP DIVE
+- Analyze the relationship between all database tables
+- Identify potential bottlenecks for scaling to millions of records
+- Assess data privacy and security compliance
+- Evaluate query performance and optimization opportunities
+- Map data flow between different user types
+
+### 3. FEATURE COMPLETENESS ASSESSMENT
+For each user type, evaluate:
+- What features are fully implemented vs. placeholder/coming soon
+- Integration points between user types
+- Automation opportunities currently missed
+- User experience gaps and pain points
+- Missing critical functionality for business goals
+
+### 4. SCALABILITY & PERFORMANCE ANALYSIS
+- Infrastructure requirements for 100K+ affiliates
+- Database optimization strategies needed
+- API rate limiting and performance considerations
+- Cost projections for scaling
+- Security and compliance requirements
+
+### 5. STRATEGIC RECOMMENDATIONS
+Provide actionable insights on:
+- Priority development roadmap (quick wins vs. long-term)
+- Missing integrations (payment processing, social scraping, etc.)
+- Automation opportunities to reduce manual work
+- Technology stack improvements
+- Resource allocation suggestions
+
+## SPECIFIC INVESTIGATION AREAS
+
+### Partnership Program Analysis
+- Commission calculation accuracy and automation
+- Affiliate onboarding and training systems
+- Performance tracking granularity
+- Payment processing integration status
+- Support and communication workflows
+
+### Client Journey Optimization
+- Onboarding funnel completion optimization
+- Research automation capabilities (social/web scraping)
+- App plan generation accuracy and customization
+- Client communication and approval workflows
+- Progress visibility and transparency
+
+### Admin Operational Efficiency
+- Client management workflow optimization
+- Team productivity and task management
+- Financial reporting and analytics automation
+- Quality control and review processes
+- Template and prompt management systems
+
+## DELIVERABLES REQUIRED
+
+1. **Executive Summary** (2-3 pages)
+   - Current platform capabilities overview
+   - Critical gaps and opportunities identified
+   - Priority recommendations with impact assessment
+
+2. **Technical Architecture Report** (5-10 pages)
+   - Database schema analysis and optimization suggestions
+   - User journey mapping with pain points
+   - Integration opportunities and requirements
+   - Performance and scalability recommendations
+
+3. **Strategic Roadmap** (3-5 pages)
+   - Quick wins (0-30 days) with effort estimates
+   - Medium-term initiatives (1-6 months)
+   - Long-term strategic projects (6+ months)
+   - Resource allocation and cost-benefit analysis
+
+4. **Implementation Priority Matrix**
+   - High-impact, low-effort opportunities
+   - Critical missing features for business goals
+   - Technical debt items requiring attention
+   - Innovation opportunities for competitive advantage
+
+## TOOLS AVAILABLE
+- Full codebase access for analysis
+- Database schema examination
+- Documentation review
+- Component and API endpoint mapping
+- Performance and security assessment capabilities
+
+## SUCCESS CRITERIA
+- Complete understanding of current platform state
+- Clear identification of gaps preventing scale to 100K+ affiliates
+- Actionable roadmap with realistic timelines and resource requirements
+- Strategic insights for business growth and operational efficiency
+
+Please conduct this analysis systematically, examining each component of the platform in detail, and provide comprehensive strategic recommendations that will enable SISO Agency to scale effectively while maintaining operational excellence.
+
+Focus on practical, implementable solutions that address the immediate needs for CEO-level management while building toward the long-term goal of supporting millions of clients through the affiliate network.

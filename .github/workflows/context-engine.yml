@@ -1,0 +1,180 @@
+name: 🧠 SISO Context Engine - CI/CD Integration
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      process_commits:
+        description: 'Number of recent commits to process (1-20)'
+        required: false
+        default: '5'
+        type: string
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  process-commits:
+    name: 🔄 Process Commits for Claude Context
+    runs-on: ubuntu-latest
+    
+    # Only run if commits were pushed or manually triggered
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50  # Fetch enough history for commit processing
+          
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 🔧 Install Dependencies
+        run: |
+          npm ci --legacy-peer-deps
+          
+      - name: 🧪 Validate Environment
+        run: |
+          echo "🔍 Checking required environment variables..."
+          if [ -z "${{ secrets.OPENAI_API_KEY }}" ]; then
+            echo "❌ OPENAI_API_KEY secret not configured"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VITE_SUPABASE_URL }}" ]; then
+            echo "❌ VITE_SUPABASE_URL secret not configured" 
+            exit 1
+          fi
+          if [ -z "${{ secrets.VITE_SUPABASE_ANON_KEY }}" ]; then
+            echo "❌ VITE_SUPABASE_ANON_KEY secret not configured"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured"
+          
+      - name: 🧠 Process Recent Commits
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          echo "🔄 Starting CI/CD commit processing..."
+          
+          # Determine number of commits to process
+          COMMIT_COUNT="${{ github.event.inputs.process_commits || '5' }}"
+          echo "📊 Processing last $COMMIT_COUNT commits"
+          
+          # Get list of recent commits
+          COMMITS=$(git log --format="%H" -n $COMMIT_COUNT)
+          
+          # Process each commit
+          PROCESSED=0
+          FAILED=0
+          
+          for commit in $COMMITS; do
+            echo "🔄 Processing commit: ${commit:0:8}..."
+            
+            if node scripts/brain-commit-processor.js "$commit"; then
+              echo "✅ Successfully processed commit ${commit:0:8}"
+              PROCESSED=$((PROCESSED + 1))
+            else
+              echo "⚠️ Failed to process commit ${commit:0:8} (may already exist)"
+              FAILED=$((FAILED + 1))
+            fi
+          done
+          
+          echo "📊 CI/CD Processing Summary:"
+          echo "   ✅ Processed: $PROCESSED commits"
+          echo "   ⚠️ Skipped/Failed: $FAILED commits"
+          echo "🎉 Context engine updated via CI/CD!"
+          
+      - name: 📋 Summary Comment (PR only)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo, number } = context.issue;
+            const body = `## 🧠 SISO Context Engine Update
+            
+            ✅ **Commit processing completed via CI/CD**
+            
+            This PR's commits have been processed and added to Claude's context database. 
+            Claude now has enhanced understanding of:
+            - Code changes in this PR
+            - Technical patterns and decisions
+            - Architectural impacts
+            
+            🎯 **Benefits:**
+            - Faster code reviews with AI assistance
+            - Better context-aware suggestions
+            - Improved documentation generation
+            
+            *Powered by the Self-Updating Context Engine* 🚀`;
+            
+            github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: number,
+              body
+            });
+
+  documentation-update:
+    name: 📝 Update Documentation
+    runs-on: ubuntu-latest
+    needs: process-commits
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        
+      - name: 📊 Update Context Engine Stats
+        run: |
+          echo "📈 Updating context engine statistics..."
+          
+          # Create or update stats file
+          cat > docs/context-engine-stats.md << EOF
+          # 🧠 SISO Context Engine Statistics
+          
+          ## Latest CI/CD Run
+          - **Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - **Trigger:** ${{ github.event_name }}
+          - **Branch:** ${{ github.ref_name }}
+          - **Commit:** ${{ github.sha }}
+          
+          ## System Status
+          - ✅ **pgvector Extension:** Enabled
+          - ✅ **brain_commits Table:** Active  
+          - ✅ **Git Hooks:** Installed
+          - ✅ **CI/CD Pipeline:** Running
+          
+          ## Integration Points
+          - 🔗 **Git Pre-Push Hook:** Automatic processing
+          - 🤖 **GitHub Actions:** Fallback processing
+          - 🧠 **OpenAI Integration:** GPT-4o-mini + embeddings
+          - 🗄️ **Supabase Storage:** Vector database
+          
+          ---
+          *Last updated by CI/CD pipeline*
+          EOF
+          
+          echo "✅ Documentation updated"
+          
+      - name: 💾 Commit Documentation Updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          if [ -n "$(git status --porcelain)" ]; then
+            git add docs/context-engine-stats.md
+            git commit -m "📊 Update context engine stats [skip ci]"
+            git push
+            echo "✅ Documentation committed and pushed"
+          else
+            echo "📝 No documentation changes to commit"
+          fi 

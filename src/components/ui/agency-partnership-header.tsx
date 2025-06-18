@@ -223,10 +223,12 @@ const ButtonColorful: React.FC<ButtonColorfulProps> = ({
 // Main Agency Partnership Header component
 interface AgencyPartnershipHeaderProps {
   className?: string
+  onApplyNow?: () => void
 }
 
 const AgencyPartnershipHeader: React.FC<AgencyPartnershipHeaderProps> = ({
-  className = ""
+  className = "",
+  onApplyNow
 }) => {
   const [titleNumber, setTitleNumber] = useState(0);
   
@@ -316,16 +318,16 @@ const AgencyPartnershipHeader: React.FC<AgencyPartnershipHeaderProps> = ({
       </div>
 
       {/* Wave Animation Background */}
-      <div className="fixed inset-0 z-10 opacity-80 w-screen h-screen pointer-events-none">
+      <div className="fixed inset-0 -z-10 opacity-80 w-screen h-screen pointer-events-none">
         <Waves 
-          lineColor="rgba(251, 146, 60, 0.4)"
+          lineColor="rgba(251, 146, 60, 0.3)"
           waveSpeedX={0.01}
           waveSpeedY={0.005}
           waveAmpX={25}
           waveAmpY={15}
           xGap={8}
           yGap={30}
-          className="w-full h-full"
+          className="w-full h-full -z-10"
         />
       </div>
 
@@ -358,7 +360,7 @@ const AgencyPartnershipHeader: React.FC<AgencyPartnershipHeaderProps> = ({
                   <motion.span
                     key={index}
                     className="absolute text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold bg-gradient-to-r from-siso-red to-siso-orange bg-clip-text text-transparent whitespace-nowrap"
-                    initial={{ opacity: 0, y: "-100" }}
+                    initial={{ opacity: 0, y: -100 }}
                     transition={{ type: "spring", stiffness: 50 }}
                     animate={
                       titleNumber === index
@@ -415,11 +417,13 @@ const AgencyPartnershipHeader: React.FC<AgencyPartnershipHeaderProps> = ({
             <ButtonColorful 
               label="Start Earning Today"
               className="text-lg px-8 py-4 h-14"
+              onClick={onApplyNow}
             />
             
             <Button 
               variant="outline" 
               size="lg"
+              onClick={onApplyNow}
               className="h-14 px-8 text-lg font-bold tracking-tight
                 bg-black/30 backdrop-blur-sm
                 border-2 border-orange-500/60 hover:border-orange-400/80
