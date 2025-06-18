@@ -522,82 +522,166 @@ const PartnerDashboard = () => {
       {/* Enhanced Feature Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         
-        {/* Training Hub - Rich Interactive Card */}
+        {/* Training Hub - Premium Learning Experience Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          <Card className="bg-black/60 backdrop-blur-xl border-green-500/20 shadow-2xl hover:border-green-500/40 transition-all">
-            <CardContent className="p-6 space-y-4">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500">
-                    <GraduationCap className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Training Hub</h3>
-                    <p className="text-sm text-gray-400">Master partnership skills</p>
-                  </div>
+          <Card className="bg-black/60 backdrop-blur-xl border-green-500/20 shadow-2xl hover:border-green-500/40 transition-all overflow-hidden">
+            <div className="relative">
+              {/* Hero Image Header */}
+              <div className="relative h-32 bg-gradient-to-br from-green-600/30 via-emerald-500/20 to-teal-500/30 overflow-hidden">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,197,94,0.3),transparent_50%)]"></div>
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-green-500/30 text-green-300 border-green-500/40 backdrop-blur-sm">
+                    🎓 Learning Hub
+                  </Badge>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.location.href = '/partner/training-hub'}
-                  className="border-green-500/30 text-green-400 hover:bg-green-500/10"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View All
-                </Button>
-              </div>
-
-              {/* Progress Stats */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                  <div className="text-xl font-bold text-green-400">8</div>
-                  <div className="text-xs text-gray-400">Completed</div>
-                </div>
-                <div className="text-center p-3 bg-gray-900/50 border border-gray-700/30 rounded-lg">
-                  <div className="text-xl font-bold text-white">3</div>
-                  <div className="text-xs text-gray-400">In Progress</div>
-                </div>
-                <div className="text-center p-3 bg-gray-900/50 border border-gray-700/30 rounded-lg">
-                  <div className="text-xl font-bold text-orange-400">5</div>
-                  <div className="text-xs text-gray-400">New</div>
-                </div>
-              </div>
-
-              {/* Recent Courses */}
-              <div className="space-y-2">
-                <p className="text-xs text-gray-400 font-medium">Recent Courses:</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg hover:bg-green-500/10 transition-colors cursor-pointer">
-                    <div className="flex items-center gap-2">
-                      <Video className="h-4 w-4 text-green-400" />
-                      <span className="text-sm text-white">Partnership Fundamentals</span>
+                <div className="absolute bottom-4 left-4">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-green-500/20 backdrop-blur-sm border border-green-500/30">
+                      <GraduationCap className="h-5 w-5 text-green-300" />
                     </div>
-                    <Badge className="bg-green-500/20 text-green-400 text-xs">100%</Badge>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg hover:bg-green-500/10 transition-colors cursor-pointer">
-                    <div className="flex items-center gap-2">
-                      <Play className="h-4 w-4 text-orange-400" />
-                      <span className="text-sm text-white">Advanced Sales Techniques</span>
+                    <div>
+                      <h3 className="text-lg font-bold text-white">Training & Development</h3>
+                      <p className="text-sm text-green-200">Partner Success Mastery</p>
                     </div>
-                    <Badge className="bg-orange-500/20 text-orange-400 text-xs">60%</Badge>
                   </div>
                 </div>
               </div>
 
-              {/* Action Button */}
-              <Button 
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-                onClick={() => window.location.href = '/partner/training-hub'}
-              >
-                <BookOpen className="h-4 w-4 mr-2" />
-                Continue Learning
-              </Button>
-            </CardContent>
+              <CardContent className="p-6 space-y-4">
+                {/* Featured Learning Path Preview */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-yellow-400" />
+                      <span className="text-sm font-medium text-yellow-400">Recommended Path</span>
+                    </div>
+                    <span className="text-xs text-gray-400">60% Complete</span>
+                  </div>
+                  
+                  <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg p-3">
+                    <h4 className="text-white font-medium mb-2">🚀 Partner Success Mastery</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <CheckCircle className="h-3 w-3 text-green-400" />
+                        <span className="text-green-300">Referral Strategies</span>
+                        <Badge className="bg-green-500/20 text-green-400 text-xs ml-auto">✅</Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Play className="h-3 w-3 text-orange-400" />
+                        <span className="text-orange-300">Client Communication</span>
+                        <Badge className="bg-orange-500/20 text-orange-400 text-xs ml-auto">📚</Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="h-3 w-3 text-gray-400" />
+                        <span className="text-gray-400">Closing Techniques</span>
+                        <Badge className="bg-gray-500/20 text-gray-400 text-xs ml-auto">🔒</Badge>
+                      </div>
+                    </div>
+                    <Progress value={60} className="h-2 mt-3" />
+                  </div>
+                </div>
+
+                {/* Course Categories Preview */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-300">Course Categories</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.location.href = '/partner/training-hub'}
+                      className="text-green-400 hover:bg-green-500/10 h-6 px-2"
+                    >
+                      <ExternalLink className="h-3 w-3 mr-1" />
+                      View All
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg hover:bg-orange-500/20 transition-colors cursor-pointer group">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Target className="h-4 w-4 text-orange-400" />
+                        <span className="text-sm font-medium text-white group-hover:text-orange-100">Sales & Marketing</span>
+                      </div>
+                      <div className="text-xs text-gray-400">8 courses</div>
+                    </div>
+                    
+                    <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg hover:bg-blue-500/20 transition-colors cursor-pointer group">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Zap className="h-4 w-4 text-blue-400" />
+                        <span className="text-sm font-medium text-white group-hover:text-blue-100">Technical Skills</span>
+                      </div>
+                      <div className="text-xs text-gray-400">12 courses</div>
+                    </div>
+                    
+                    <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg hover:bg-purple-500/20 transition-colors cursor-pointer group">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Users className="h-4 w-4 text-purple-400" />
+                        <span className="text-sm font-medium text-white group-hover:text-purple-100">Client Relations</span>
+                      </div>
+                      <div className="text-xs text-gray-400">5 courses</div>
+                    </div>
+                    
+                    <div className="p-3 bg-cyan-500/10 border border-cyan-500/20 rounded-lg hover:bg-cyan-500/20 transition-colors cursor-pointer group">
+                      <div className="flex items-center gap-2 mb-1">
+                        <BookOpen className="h-4 w-4 text-cyan-400" />
+                        <span className="text-sm font-medium text-white group-hover:text-cyan-100">Tools & Resources</span>
+                      </div>
+                      <div className="text-xs text-gray-400">15 courses</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Learning Stats */}
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="text-center p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                    <div className="text-lg font-bold text-green-400">12</div>
+                    <div className="text-xs text-gray-400">Completed</div>
+                  </div>
+                  <div className="text-center p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                    <div className="text-lg font-bold text-orange-400">48</div>
+                    <div className="text-xs text-gray-400">Hours</div>
+                  </div>
+                  <div className="text-center p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                    <div className="text-lg font-bold text-purple-400">3</div>
+                    <div className="text-xs text-gray-400">Certificates</div>
+                  </div>
+                </div>
+
+                {/* Upcoming Webinar Preview */}
+                <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="h-4 w-4 text-yellow-400" />
+                    <span className="text-sm font-medium text-yellow-400">Next Live Session</span>
+                    <Badge className="bg-red-500/20 text-red-400 text-xs ml-auto">🔴 LIVE</Badge>
+                  </div>
+                  <div className="text-sm text-white font-medium">Advanced Referral Strategies</div>
+                  <div className="text-xs text-gray-400">Jan 28 • 2:00 PM • Sarah Johnson</div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => window.location.href = '/partner/training-hub'}
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    Continue Learning
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="border-green-500/30 text-green-400 hover:bg-green-500/10"
+                    onClick={() => window.location.href = '/partner/training-hub'}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Resources
+                  </Button>
+                </div>
+              </CardContent>
+            </div>
           </Card>
         </motion.div>
 
