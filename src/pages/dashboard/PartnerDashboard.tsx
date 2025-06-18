@@ -265,40 +265,175 @@ const PartnerDashboard = () => {
         </Card>
       </motion.div>
 
-      {/* Tier Progress */}
+      {/* Premium Partner Advancement & Leaderboard Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
       >
-        <Card className="bg-black border-orange-500/20">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl text-white flex items-center">
-              <Target className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
-              Progress to Gold Partner
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-              <span className="text-sm text-gray-400">Current Progress</span>
-              <span className="text-sm font-medium text-white">{stats.nextTierProgress}% Complete</span>
+        <Card className="bg-black/60 backdrop-blur-xl border-yellow-500/20 shadow-2xl hover:border-yellow-500/40 transition-all overflow-hidden cursor-pointer"
+              onClick={() => window.location.href = '/partner/leaderboard'}>
+          <div className="relative">
+            {/* Hero Header with Trophy Theme */}
+            <div className="relative h-32 bg-gradient-to-br from-yellow-600/30 via-amber-500/20 to-orange-500/30 overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.3),transparent_50%)]"></div>
+              <div className="absolute top-4 right-4">
+                <Badge className="bg-yellow-500/30 text-yellow-300 border-yellow-500/40 backdrop-blur-sm">
+                  🏆 Leaderboard
+                </Badge>
+              </div>
+              <div className="absolute bottom-4 left-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-yellow-500/20 backdrop-blur-sm border border-yellow-500/30">
+                    <Award className="h-5 w-5 text-yellow-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Partner Advancement</h3>
+                    <p className="text-sm text-yellow-200">Progress to Gold Tier</p>
+                  </div>
+                </div>
+              </div>
+              {/* Floating rank indicator */}
+              <div className="absolute top-4 left-4">
+                <div className="flex items-center gap-2 bg-black/30 backdrop-blur-sm rounded-full px-3 py-1 border border-white/20">
+                  <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
+                    #5
+                  </div>
+                  <span className="text-white text-sm font-medium">Current Rank</span>
+                </div>
+              </div>
             </div>
-            <Progress value={stats.nextTierProgress} className="h-2 sm:h-3" />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-              <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
-                <div className="text-lg sm:text-xl font-bold text-white">{stats.completedReferrals}</div>
-                <div className="text-xs sm:text-sm text-gray-400">Completed</div>
+
+            <CardContent className="p-6 space-y-4">
+              {/* Current Tier Status */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-silver-400" />
+                    <span className="text-sm font-medium text-gray-300">Current Tier: Silver Partner</span>
+                  </div>
+                  <span className="text-xs text-gray-400">{stats.nextTierProgress}% to Gold</span>
+                </div>
+                
+                <div className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-yellow-400">Progress to Gold Partner</span>
+                    <span className="text-sm font-bold text-white">{stats.nextTierProgress}%</span>
+                  </div>
+                  <Progress value={stats.nextTierProgress} className="h-3 mb-3" />
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-400">{stats.completedReferrals}</div>
+                      <div className="text-xs text-gray-400">Completed</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-orange-400">3</div>
+                      <div className="text-xs text-gray-400">Needed</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-yellow-400">£500</div>
+                      <div className="text-xs text-gray-400">Bonus</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
-                <div className="text-lg sm:text-xl font-bold text-orange-400">3</div>
-                <div className="text-xs sm:text-sm text-gray-400">Needed</div>
+
+              {/* Mini Leaderboard Preview */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-300">Top Performers</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-yellow-400 hover:bg-yellow-500/10 h-6 px-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.location.href = '/partner/leaderboard';
+                    }}
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    View All
+                  </Button>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center text-xs font-bold text-black">1</div>
+                      <span className="text-sm text-white">Sarah Johnson</span>
+                      <Badge className="bg-purple-500/20 text-purple-400 text-xs ml-1">Platinum</Badge>
+                    </div>
+                    <span className="text-sm text-green-400 font-medium">£15,420</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 bg-gray-400 rounded-full flex items-center justify-center text-xs font-bold text-black">2</div>
+                      <span className="text-sm text-white">Michael Chen</span>
+                      <Badge className="bg-yellow-500/20 text-yellow-400 text-xs ml-1">Gold</Badge>
+                    </div>
+                    <span className="text-sm text-green-400">£12,350</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-2 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold text-white">5</div>
+                      <span className="text-sm text-orange-400 font-medium">You</span>
+                      <Badge className="bg-gray-500/20 text-gray-400 text-xs ml-1">Silver</Badge>
+                    </div>
+                    <span className="text-sm text-green-400">£8,750</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
-                <div className="text-lg sm:text-xl font-bold text-orange-400">£500</div>
-                <div className="text-xs sm:text-sm text-gray-400">Bonus</div>
+
+              {/* Tier Benefits Preview */}
+              <div className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="h-4 w-4 text-yellow-400" />
+                  <span className="text-sm font-medium text-yellow-400">Gold Tier Benefits</span>
+                </div>
+                <div className="space-y-1 text-xs text-gray-300">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-3 w-3 text-green-400" />
+                    <span>15% commission rate (vs 12% Silver)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-3 w-3 text-green-400" />
+                    <span>Priority support & dedicated account manager</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-3 w-3 text-green-400" />
+                    <span>Access to exclusive Gold partner events</span>
+                  </div>
+                </div>
               </div>
-            </div>
-          </CardContent>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.location.href = '/partner/leaderboard';
+                  }}
+                >
+                  <Trophy className="h-4 w-4 mr-2" />
+                  View Rankings
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.location.href = '/partner/referrals';
+                  }}
+                >
+                  <Target className="h-4 w-4 mr-2" />
+                  Add Referral
+                </Button>
+              </div>
+            </CardContent>
+          </div>
         </Card>
       </motion.div>
 
@@ -468,75 +603,6 @@ const PartnerDashboard = () => {
           </Card>
         </motion.div>
 
-        {/* Leaderboard Preview - Rich Data Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          <Card className="bg-black/60 backdrop-blur-xl border-purple-500/20 shadow-2xl hover:border-purple-500/40 transition-all">
-            <CardContent className="p-6 space-y-4">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-violet-500">
-                    <Trophy className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white">Leaderboard</h3>
-                    <p className="text-sm text-gray-400">Your position: #5 of 8</p>
-                  </div>
-                </div>
-                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                  Silver Tier
-                </Badge>
-              </div>
-
-              {/* Mini Leaderboard */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between p-2 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center text-xs font-bold text-black">1</div>
-                    <span className="text-sm text-white">Sarah Johnson</span>
-                  </div>
-                  <span className="text-sm text-green-400">£15,420</span>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-gray-900/50 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-xs font-bold text-black">2</div>
-                    <span className="text-sm text-white">Michael Chen</span>
-                  </div>
-                  <span className="text-sm text-green-400">£12,350</span>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-orange-500/10 border border-orange-500/20 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center text-xs font-bold text-white">5</div>
-                    <span className="text-sm text-orange-400 font-medium">You</span>
-                  </div>
-                  <span className="text-sm text-green-400">£8,750</span>
-                </div>
-              </div>
-
-              {/* Progress to Next Tier */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Progress to Gold</span>
-                  <span className="text-white">£1,250 more needed</span>
-                </div>
-                <Progress value={65} className="h-2" />
-              </div>
-
-              {/* Action Button */}
-              <Button 
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                onClick={() => window.location.href = '/partner/leaderboard'}
-              >
-                <Trophy className="h-4 w-4 mr-2" />
-                View Full Rankings
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
 
         {/* Client Management - Rich Data Card */}
         <motion.div
