@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
 import { PartnershipReferralsTable } from '@/components/partnership/PartnershipReferralsTable';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 
 export default function Clients() {
   const navigate = useNavigate();
@@ -92,61 +93,22 @@ export default function Clients() {
   };
 
   return (
-    <PartnershipLayout
-      title=""
-      subtitle=""
-    >
+    <PartnershipLayout>
       <div className="space-y-8">
-        {/* Enhanced Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative overflow-hidden bg-gradient-to-br from-orange-600/20 via-orange-500/10 to-amber-500/20 border border-orange-500/30 rounded-xl p-8"
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl"></div>
-          
-          <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-6 lg:space-y-0">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center border border-orange-500/30">
-                  <Users className="h-6 w-6 text-orange-400" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-white">Client Management Hub</h1>
-                  <p className="text-gray-300 text-lg">Your partnership revenue engine</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-4 text-sm">
-                <div className="flex items-center text-orange-300">
-                  <Target className="h-4 w-4 mr-2" />
-                  Track referrals & commissions
-                </div>
-                <div className="flex items-center text-orange-300">
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  Monitor pipeline value
-                </div>
-                <div className="flex items-center text-orange-300">
-                  <Network className="h-4 w-4 mr-2" />
-                  Access SOPs & resources
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
-              <div className="text-right">
-                <div className="text-2xl font-bold text-white">£{quickStats.totalCommission.toLocaleString()}</div>
-                <div className="text-sm text-gray-300">Total Commission Earned</div>
-              </div>
-              <Button className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2 font-medium">
-                <Plus className="h-4 w-4 mr-2" />
-                Add New Client
-              </Button>
-            </div>
-          </div>
-        </motion.div>
+        {/* Smart Dashboard Greeting Card - New Header */}
+        <DashboardGreetingCard 
+          pageTitle="Client Management Hub"
+          pageSubtitle="Your partnership revenue engine - track referrals & commissions"
+          showDate={true}
+          pageContext={{
+            pageType: 'clients',
+            keyMetrics: {
+              primary: { value: '12', label: 'Active Clients', trend: '+2' },
+              secondary: { value: '89%', label: 'Satisfaction Rate' }
+            },
+            urgentItems: 3
+          }}
+        />
         {/* Quick Stats Bar - Most Important Metrics */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

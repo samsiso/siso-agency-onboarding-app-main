@@ -162,18 +162,18 @@ export const PartnershipSidebar = () => {
             />
           </AnimatePresence>
           
-          {/* Spacer to push content to bottom */}
+          {/* Spacer to push commission card and footer to bottom */}
           <div className="flex-1"></div>
           
-          {/* Commission Stats Box - Pinned to bottom */}
-          <div className="px-3 pb-4 mt-auto">
+          {/* Commission Stats Box - Above profile */}
+          <div className="px-3 pb-3">
             <AnimatePresence>
               {!isExpanded ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex justify-center mb-2"
+                  className="flex justify-center"
                 >
                   <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
                     <DollarSign className="h-4 w-4 text-white" />
@@ -184,7 +184,7 @@ export const PartnershipSidebar = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-500/30 rounded-lg p-3 mb-2"
+                  className="bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-500/30 rounded-lg p-3"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-gray-300 text-sm font-medium">Total Commission</span>

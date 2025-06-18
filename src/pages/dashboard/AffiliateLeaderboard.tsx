@@ -4,6 +4,7 @@ import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
 import { LeaderboardTemplate, LeaderboardEntry } from '@/components/ui/leaderboard-template';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 import { 
   Trophy, 
   Star,
@@ -153,17 +154,22 @@ const AffiliateLeaderboard = () => {
   };
 
   return (
-    <PartnershipLayout
-      title="Affiliate Leaderboard"
-      subtitle="See how you stack up against other partners"
-      actions={
-        <Button className="bg-orange-600 hover:bg-orange-700">
-          <Star className="w-4 h-4 mr-2" />
-          View My Stats
-        </Button>
-      }
-    >
+    <PartnershipLayout>
       <div className="space-y-6">
+      
+        {/* Smart Dashboard Greeting Card - New Header */}
+        <DashboardGreetingCard 
+          pageTitle="Partner Leaderboard"
+          pageSubtitle="See how you stack up against other partners"
+          showDate={true}
+          pageContext={{
+            pageType: 'leaderboard',
+            keyMetrics: {
+              primary: { value: '#18', label: 'Current Rank', trend: 'Up 5 positions' },
+              secondary: { value: '£3,247', label: 'Monthly Revenue' }
+            }
+          }}
+        />
         {/* Performance Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

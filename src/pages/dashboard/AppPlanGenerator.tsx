@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 import { Waves } from '@/components/ui/waves-background';
 import { FloatingOrbs } from '@/components/effects/FloatingOrbs';
 import { VercelV0Chat } from '@/components/ui/v0-ai-chat';
@@ -129,39 +130,20 @@ const AppPlanGeneratorPage = () => {
       </div>
 
       <div className="relative min-h-screen">
-        {/* Header */}
+        {/* Smart Dashboard Greeting Card - New Header */}
         <div className="relative z-10 px-6 pt-8 pb-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center space-y-4"
-          >
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="p-3 rounded-full bg-gradient-to-r from-orange-500 to-amber-500">
-                <Brain className="h-8 w-8 text-white" />
-              </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">
-                AI App Plan Generator
-              </h1>
-            </div>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Describe your app idea and let AI create a comprehensive development plan with features, timeline, and budget estimates.
-            </p>
-            <div className="flex items-center justify-center gap-4 pt-2">
-              <Badge variant="outline" className="border-orange-500/30 text-orange-400">
-                <Sparkles className="h-3 w-3 mr-1" />
-                AI-Powered
-              </Badge>
-              <Badge variant="outline" className="border-orange-500/30 text-orange-400">
-                <Rocket className="h-3 w-3 mr-1" />
-                Instant Results
-              </Badge>
-              <Badge variant="outline" className="border-orange-500/30 text-orange-400">
-                <Star className="h-3 w-3 mr-1" />
-                Professional Grade
-              </Badge>
-            </div>
-          </motion.div>
+          <DashboardGreetingCard 
+            pageTitle="AI App Plan Generator"
+            pageSubtitle="Describe your app idea and let AI create a comprehensive development plan with features, timeline, and budget estimates"
+            showDate={true}
+            pageContext={{
+              pageType: 'app-plan-generator',
+              keyMetrics: {
+                primary: { value: '23', label: 'Plans Generated', trend: '+5 this week' },
+                secondary: { value: '76%', label: 'Success Rate' }
+              }
+            }}
+          />
         </div>
 
         {/* Main Content */}

@@ -28,6 +28,7 @@ import {
   LifeBuoy
 } from 'lucide-react';
 import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 import { ResourcesHelpTemplate } from '@/components/ui/dashboard-templates';
 import type { FeaturedArticle, QuickHelpCard, HelpCenterCard, HelpCategory } from '@/components/ui/dashboard-templates';
 import { AIChatAssistant } from '@/components/support/AIChatAssistant';
@@ -61,30 +62,22 @@ export default function Support() {
 
   return (
     <>
-      <PartnershipLayout
-        title="Partnership Support Center"
-        subtitle="Get help, find resources, and connect with our team"
-        actions={
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setIsTicketFormOpen(true)}
-              className="bg-orange-600 hover:bg-orange-700 text-white"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Ticket
-            </Button>
-            <Button
-              onClick={() => setIsChatOpen(true)}
-              variant="outline"
-              className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
-            >
-              <Bot className="h-4 w-4 mr-2" />
-              AI Assistant
-            </Button>
-          </div>
-        }
-      >
+      <PartnershipLayout>
         <div className="space-y-12">
+                  {/* Smart Dashboard Greeting Card - New Header */}
+        <DashboardGreetingCard 
+          pageTitle="Partnership Support Center"
+          pageSubtitle="Get help, find resources, and connect with our team"
+          showDate={true}
+          pageContext={{
+            pageType: 'support',
+            keyMetrics: {
+              primary: { value: '<2 min', label: 'Response Time', trend: 'Fast' },
+              secondary: { value: '98%', label: 'Satisfaction' }
+            }
+          }}
+        />
+          
           {/* Enhanced Search Section */}
           <SearchSection
             onSearchClick={() => setIsSearchModalOpen(true)}

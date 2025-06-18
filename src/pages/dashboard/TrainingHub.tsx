@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 import { 
   GraduationCap,
   BookOpen,
@@ -202,11 +203,22 @@ const TrainingHub: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   return (
-    <PartnershipLayout
-      title="Training & Development Hub"
-      subtitle="Master your skills and accelerate your partner success with comprehensive learning resources"
-    >
+    <PartnershipLayout>
       <div className="space-y-8">
+      
+        {/* Smart Dashboard Greeting Card - New Header */}
+        <DashboardGreetingCard 
+          pageTitle="Training & Development Hub"
+          pageSubtitle="Master your skills and accelerate your partner success with comprehensive learning resources"
+          showDate={true}
+          pageContext={{
+            pageType: 'training',
+            keyMetrics: {
+              primary: { value: '67%', label: 'Course Progress', trend: 'On track' },
+              secondary: { value: '8/12', label: 'Modules Complete' }
+            }
+          }}
+        />
         {/* Learning Progress Dashboard */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}

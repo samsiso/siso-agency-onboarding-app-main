@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -243,48 +244,21 @@ const ReferralsManagement = () => {
   };
 
   return (
-    <PartnershipLayout
-      title="Referral Management"
-      subtitle="Track your referrals, manage your pipeline, and optimize your performance"
-    >
+    <PartnershipLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-              Referral Management
-            </h1>
-            <p className="text-gray-400">
-              Track your referrals, manage your pipeline, and optimize your performance
-            </p>
-          </div>
-          
-          <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-            <Select value={selectedTimeframe} onValueChange={setSelectedTimeframe}>
-              <SelectTrigger className="w-32 bg-black border-orange-500/20 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-black border-orange-500/20">
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="quarterly">Quarterly</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button 
-              onClick={() => setShowLinkGenerator(true)}
-              className="bg-orange-600 hover:bg-orange-700 text-white"
-            >
-              <Link2 className="w-4 h-4 mr-2" />
-              Generate Link
-            </Button>
-          </div>
-        </motion.div>
+        {/* Smart Dashboard Greeting Card - New Header */}
+        <DashboardGreetingCard 
+          pageTitle="Referral Management"
+          pageSubtitle="Track your referrals, manage your pipeline, and optimize your performance"
+          showDate={true}
+          pageContext={{
+            pageType: 'referrals',
+            keyMetrics: {
+              primary: { value: '£5,750', label: 'Pipeline Value', trend: '+15%' },
+              secondary: { value: '28', label: 'Active Referrals' }
+            }
+          }}
+        />
 
         {/* Key Metrics Row 1 */}
         <motion.div

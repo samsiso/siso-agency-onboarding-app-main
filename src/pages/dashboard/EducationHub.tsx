@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -121,10 +122,22 @@ const EducationHub: React.FC = () => {
   const overallProgress = Math.round(mockModules.reduce((sum, module) => sum + module.progress, 0) / mockModules.length);
 
   return (
-    <PartnershipLayout
-      title="Education Hub"
-      subtitle="Enhance your skills and earn certifications to boost your success"
-    >
+    <PartnershipLayout>
+      <div className="space-y-8">
+        {/* Smart Dashboard Greeting Card - New Header */}
+        <DashboardGreetingCard 
+          pageTitle="Education Hub"
+          pageSubtitle="Enhance your skills and earn certifications to boost your success"
+          showDate={true}
+          pageContext={{
+            pageType: 'education',
+            keyMetrics: {
+              primary: { value: '87%', label: 'Overall Progress', trend: 'Nearly certified!' },
+              secondary: { value: '3/4', label: 'Certifications' }
+            }
+          }}
+        />
+      </div>
       <div className="space-y-6">
         {/* Progress Overview */}
         <motion.div

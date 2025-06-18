@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
+import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 
 interface SOPSection {
   id: string;
@@ -111,80 +112,27 @@ export function SOPDocumentationPage({ sop, onBack }: SOPDocumentationPageProps)
   };
 
   return (
-    <PartnershipLayout
-      title=""
-      subtitle=""
-    >
+    <PartnershipLayout>
       <div className="space-y-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative overflow-hidden bg-gradient-to-br from-orange-600/20 via-orange-500/10 to-amber-500/20 border border-orange-500/30 rounded-xl p-8"
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl"></div>
-          
-          <div className="relative z-10">
-            <div className="flex items-start justify-between mb-6">
-              <Button 
-                variant="ghost" 
-                onClick={onBack}
-                className="text-gray-400 hover:text-white -ml-2"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Client Management
-              </Button>
-            </div>
-            
-            <div className="flex items-start space-x-4">
-              <div className="w-16 h-16 bg-orange-500/20 rounded-xl flex items-center justify-center border border-orange-500/30">
-                <sop.icon className="h-8 w-8 text-orange-400" />
-              </div>
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-white mb-2">{sop.title}</h1>
-                <p className="text-gray-300 text-lg mb-4">{sop.description}</p>
-                
-                <div className="flex flex-wrap items-center gap-4">
-                  <Badge className={`${
-                    sop.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400' :
-                    sop.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                    'bg-red-500/20 text-red-400'
-                  }`}>
-                    {sop.difficulty}
-                  </Badge>
-                  
-                  <div className="flex items-center text-gray-400">
-                    <Clock className="h-4 w-4 mr-1" />
-                    {sop.timeToRead} read
-                  </div>
-                  
-                  <div className="flex items-center text-gray-400">
-                    <TrendingUp className="h-4 w-4 mr-1" />
-                    {sop.successRate} success rate
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Progress Bar */}
-            <div className="mt-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-400">Reading Progress</span>
-                <span className="text-sm text-orange-400">{Math.round(progressPercentage)}% Complete</span>
-              </div>
-              <div className="w-full bg-gray-800 rounded-full h-2">
-                <motion.div 
-                  className="bg-orange-500 h-2 rounded-full" 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercentage}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        {/* Dashboard Greeting Card - New Header */}
+        <DashboardGreetingCard 
+          welcomeMessage="Good Night, ubahcrypto"
+          pageTitle={sop.title}
+          pageSubtitle={sop.description}
+          showDate={true}
+        />
+        
+        {/* Back Button */}
+        <div className="flex items-start">
+          <Button 
+            variant="ghost" 
+            onClick={onBack}
+            className="text-gray-400 hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Client Management
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
