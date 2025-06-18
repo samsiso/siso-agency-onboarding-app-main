@@ -514,8 +514,64 @@ const PartnerDashboard = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.7 }}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6"
       >
+        {/* Training Hub */}
+        <Card className="bg-gradient-to-br from-green-600/20 via-green-500/10 to-emerald-500/20 border border-green-500/30 hover:border-green-500/50 transition-all cursor-pointer"
+              onClick={() => window.location.href = '/partner/training-hub'}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-white flex items-center">
+              <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center mr-3">
+                <BookOpen className="h-4 w-4 text-green-400" />
+              </div>
+              Training Hub
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 text-sm mb-4">
+              Master partnership skills with comprehensive training materials and SOPs.
+            </p>
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = '/partner/training-hub';
+              }}
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Browse Courses
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Leaderboard */}
+        <Card className="bg-gradient-to-br from-purple-600/20 via-purple-500/10 to-violet-500/20 border border-purple-500/30 hover:border-purple-500/50 transition-all cursor-pointer"
+              onClick={() => window.location.href = '/partner/leaderboard'}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-white flex items-center">
+              <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center mr-3">
+                <Award className="h-4 w-4 text-purple-400" />
+              </div>
+              Leaderboard
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 text-sm mb-4">
+              View full rankings and compete with other partners for top positions.
+            </p>
+            <Button 
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = '/partner/leaderboard';
+              }}
+            >
+              <Award className="h-4 w-4 mr-2" />
+              View Rankings
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Help Center */}
         <Card className="bg-black border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer"
               onClick={() => window.location.href = '/partner/support'}>
@@ -524,7 +580,7 @@ const PartnerDashboard = () => {
               <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
                 <HelpCircle className="h-4 w-4 text-orange-400" />
               </div>
-              Help Center
+              Support
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -545,6 +601,34 @@ const PartnerDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Clients Management */}
+        <Card className="bg-gradient-to-br from-blue-600/20 via-blue-500/10 to-cyan-500/20 border border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer"
+              onClick={() => window.location.href = '/partner/clients'}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg text-white flex items-center">
+              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3">
+                <Users className="h-4 w-4 text-blue-400" />
+              </div>
+              Clients
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-300 text-sm mb-4">
+              Manage your client relationships and track engagement.
+            </p>
+            <Button 
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.location.href = '/partner/clients';
+              }}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              View Clients
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* New Client Referral */}
         <Card className="bg-black border-orange-500/20 hover:border-orange-500/40 transition-all cursor-pointer"
               onClick={() => window.location.href = '/partner/referrals'}>
@@ -553,7 +637,7 @@ const PartnerDashboard = () => {
               <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
                 <Plus className="h-4 w-4 text-orange-400" />
               </div>
-              New Client
+              New Referral
             </CardTitle>
           </CardHeader>
           <CardContent>
