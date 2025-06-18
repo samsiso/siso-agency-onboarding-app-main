@@ -81,55 +81,7 @@ const PartnerDashboard = () => {
     nextTierProgress: 65
   });
 
-  // Define leaderboard data
-  const leaderboardData = [
-    { rank: 1, name: 'Sarah Johnson', tier: 'Platinum', referrals: 28, earnings: 15420, badges: ['🎯', '🏆', '💎'] },
-    { rank: 2, name: 'Michael Chen', tier: 'Gold', referrals: 22, earnings: 12350, badges: ['🎯', '🏆'] },
-    { rank: 3, name: 'Emma Rodriguez', tier: 'Gold', referrals: 19, earnings: 11200, badges: ['🎯', '💎'] },
-    { rank: 4, name: 'James Wilson', tier: 'Gold', referrals: 18, earnings: 10980, badges: ['🎯', '🏆', '💎'] },
-    { rank: 5, name: 'You', tier: 'Silver', referrals: 15, earnings: 8750, badges: ['🎯', '🏆'], isCurrentUser: true },
-    { rank: 6, name: 'David Kim', tier: 'Silver', referrals: 13, earnings: 7890, badges: ['🎯', '🏆'] },
-    { rank: 7, name: 'Anna Martinez', tier: 'Silver', referrals: 11, earnings: 6750, badges: ['🎯', '🏆'] },
-    { rank: 8, name: 'Lisa Thompson', tier: 'Bronze', referrals: 8, earnings: 4560, badges: ['🎯'] }
-  ];
 
-  // Move recentActivity useState to top to fix hooks order
-  const [recentActivity] = useState<RecentActivity[]>([
-    {
-      id: '1',
-      type: 'payment_received',
-      title: 'Payment Received',
-      description: 'Commission for TechCorp referral',
-      amount: 500,
-      timestamp: '2 hours ago',
-      status: 'success'
-    },
-    {
-      id: '2',
-      type: 'referral_approved',
-      title: 'Referral Approved',
-      description: 'StartupXYZ project approved',
-      amount: 750,
-      timestamp: '1 day ago',
-      status: 'success'
-    },
-    {
-      id: '3',
-      type: 'referral_submitted',
-      title: 'New Referral Submitted',
-      description: 'LocalBiz consultation request',
-      timestamp: '2 days ago',
-      status: 'pending'
-    },
-    {
-      id: '4',
-      type: 'tier_upgraded',
-      title: 'Tier Upgrade',
-      description: 'Promoted to Silver Partner',
-      timestamp: '1 week ago',
-      status: 'success'
-    }
-  ]);
 
   // Check if partner has completed onboarding
   useEffect(() => {
@@ -224,33 +176,6 @@ const PartnerDashboard = () => {
     );
   }
 
-  const getActivityIcon = (type: RecentActivity['type']) => {
-    switch (type) {
-      case 'payment_received':
-        return <DollarSign className="w-4 h-4" />;
-      case 'referral_approved':
-        return <CheckCircle className="w-4 h-4" />;
-      case 'referral_submitted':
-        return <Clock className="w-4 h-4" />;
-      case 'tier_upgraded':
-        return <Award className="w-4 h-4" />;
-      default:
-        return <AlertCircle className="w-4 h-4" />;
-    }
-  };
-
-  const getStatusColor = (status: RecentActivity['status']) => {
-    switch (status) {
-      case 'success':
-        return 'text-green-400';
-      case 'pending':
-        return 'text-yellow-400';
-      case 'warning':
-        return 'text-red-400';
-      default:
-        return 'text-gray-400';
-    }
-  };
 
   return (
     <PartnershipLayout 
@@ -340,184 +265,42 @@ const PartnerDashboard = () => {
         </Card>
       </motion.div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-        {/* Left Column - Recent Activity & Progress */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Recent Activity */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            <Card className="bg-black border-orange-500/20">
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl text-white flex items-center">
-                  <Clock className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
-                  Recent Activity
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {recentActivity.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-orange-500/10 transition-colors">
-                    <div className={cn(
-                      'w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0',
-                      getStatusColor(activity.status)
-                    )}>
-                      {getActivityIcon(activity.type)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                        <h4 className="text-sm sm:text-base font-medium text-white truncate">
-                          {activity.title}
-                        </h4>
-                        {activity.amount && (
-                          <span className="text-sm font-bold text-green-400 mt-1 sm:mt-0">
-                            +£{activity.amount}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs sm:text-sm text-gray-400 mt-1">
-                        {activity.description}
-                      </p>
-                      <span className="text-xs text-gray-500 mt-1 block">
-                        {activity.timestamp}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Tier Progress */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <Card className="bg-black border-orange-500/20">
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl text-white flex items-center">
-                  <Target className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
-                  Progress to Gold Partner
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                  <span className="text-sm text-gray-400">Current Progress</span>
-                  <span className="text-sm font-medium text-white">{stats.nextTierProgress}% Complete</span>
-                </div>
-                <Progress value={stats.nextTierProgress} className="h-2 sm:h-3" />
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                  <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-white">{stats.completedReferrals}</div>
-                    <div className="text-xs sm:text-sm text-gray-400">Completed</div>
-                  </div>
-                  <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-orange-400">3</div>
-                    <div className="text-xs sm:text-sm text-gray-400">Needed</div>
-                  </div>
-                  <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
-                    <div className="text-lg sm:text-xl font-bold text-orange-400">£500</div>
-                    <div className="text-xs sm:text-sm text-gray-400">Bonus</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Right Column - Leaderboard */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="lg:col-span-1"
-        >
-          <Card className="bg-black border-orange-500/20">
-            <CardHeader>
-              <CardTitle className="text-lg text-white flex items-center justify-between">
-                <div className="flex items-center">
-                  <Award className="h-5 w-5 mr-2 text-orange-500" />
-                  Partner Leaderboard
-                </div>
-                <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
-                  #5
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center mb-4">
-                <div className="text-center">
-                  <div className="text-lg font-bold text-orange-400">#5</div>
-                  <div className="text-xs text-gray-400">Your Rank</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-white">8</div>
-                  <div className="text-xs text-gray-400">Total Partners</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-orange-400">Silver</div>
-                  <div className="text-xs text-gray-400">Your Tier</div>
-                </div>
+      {/* Tier Progress */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Card className="bg-black border-orange-500/20">
+          <CardHeader>
+            <CardTitle className="text-lg sm:text-xl text-white flex items-center">
+              <Target className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-orange-500" />
+              Progress to Gold Partner
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
+              <span className="text-sm text-gray-400">Current Progress</span>
+              <span className="text-sm font-medium text-white">{stats.nextTierProgress}% Complete</span>
+            </div>
+            <Progress value={stats.nextTierProgress} className="h-2 sm:h-3" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+              <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
+                <div className="text-lg sm:text-xl font-bold text-white">{stats.completedReferrals}</div>
+                <div className="text-xs sm:text-sm text-gray-400">Completed</div>
               </div>
-              
-              <div className="space-y-3">
-                {leaderboardData.slice(0, 5).map((partner) => (
-                  <div 
-                    key={partner.rank} 
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border transition-colors",
-                      partner.isCurrentUser 
-                        ? "bg-orange-500/10 border-orange-500/30" 
-                        : "bg-gray-900/50 border-gray-700/30 hover:bg-gray-800/50"
-                    )}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <div className={cn(
-                        "text-sm font-bold flex items-center justify-center w-6 h-6 rounded-full",
-                        partner.rank <= 3 ? "bg-orange-500 text-white" : "bg-gray-700 text-gray-300"
-                      )}>
-                        #{partner.rank}
-                      </div>
-                      <div>
-                        <div className={cn(
-                          "text-sm font-medium",
-                          partner.isCurrentUser ? "text-orange-400" : "text-white"
-                        )}>
-                          {partner.name}
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          {partner.tier} • {partner.referrals} referrals
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-green-400">
-                        £{partner.earnings.toLocaleString()}
-                      </div>
-                      <div className="flex space-x-1">
-                        {partner.badges.map((badge, idx) => (
-                          <span key={idx} className="text-xs">{badge}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
+                <div className="text-lg sm:text-xl font-bold text-orange-400">3</div>
+                <div className="text-xs sm:text-sm text-gray-400">Needed</div>
               </div>
-              
-              <Button 
-                variant="outline" 
-                className="w-full mt-4 border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
-                onClick={() => window.location.href = '/partner/leaderboard'}
-              >
-                View Full Rankings
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+              <div className="text-center p-3 bg-gray-900 border border-orange-500/20 rounded-lg">
+                <div className="text-lg sm:text-xl font-bold text-orange-400">£500</div>
+                <div className="text-xs sm:text-sm text-gray-400">Bonus</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Enhanced Feature Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
