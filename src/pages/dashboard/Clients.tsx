@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { PartnershipLayout } from '@/components/partnership/PartnershipLayout';
 import { PartnershipReferralsTable } from '@/components/partnership/PartnershipReferralsTable';
+import { AirtablePartnersTable } from '@/components/partnership/AirtablePartnersTable';
 import { DashboardGreetingCard } from '@/components/ui/dashboard-templates';
 
 export default function Clients() {
@@ -159,7 +160,7 @@ export default function Clients() {
           </Card>
         </motion.div>
 
-        {/* Client Referrals Table - Primary Focus */}
+        {/* Partner Projects Table - Primary Focus */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -169,14 +170,14 @@ export default function Clients() {
             <CardHeader>
               <CardTitle className="text-xl text-white flex items-center">
                 <Users className="h-6 w-6 mr-2 text-orange-500" />
-                Client Referrals
+                Partner Projects Portfolio
               </CardTitle>
               <p className="text-gray-400 text-sm">
-                Manage your client referrals and track commission opportunities
+                Track and manage your partner projects with Airtable-style interface
               </p>
             </CardHeader>
             <CardContent className="p-0">
-              <PartnershipReferralsTable />
+              <AirtablePartnersTable />
             </CardContent>
           </Card>
         </motion.div>
