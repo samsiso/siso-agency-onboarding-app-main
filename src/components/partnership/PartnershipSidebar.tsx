@@ -153,7 +153,7 @@ export const PartnershipSidebar = () => {
         />
         
         <div className="flex-1 flex flex-col min-h-0 relative">
-          <div className="flex-1 overflow-y-auto pb-20">
+          <div className="flex-1 overflow-y-auto pb-32">
             <AnimatePresence mode="wait">
               <PartnershipSidebarNavigation 
                 collapsed={!isExpanded} 
@@ -164,15 +164,15 @@ export const PartnershipSidebar = () => {
             </AnimatePresence>
           </div>
           
-          {/* Commission Stats Box - Fixed above footer */}
-          <div className="absolute bottom-16 left-0 right-0 px-3 py-2">
+          {/* Commission Stats Box - Fixed above footer with proper clearance */}
+          <div className="absolute bottom-24 left-0 right-0 px-3 py-3">
             <AnimatePresence>
               {!isExpanded ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="flex justify-center"
+                  className="flex justify-center mb-2"
                 >
                   <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center shadow-lg">
                     <DollarSign className="h-4 w-4 text-white" />
@@ -183,7 +183,7 @@ export const PartnershipSidebar = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-500/30 rounded-lg p-3 shadow-lg"
+                  className="bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-500/30 rounded-lg p-4 shadow-lg mb-2"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-gray-300 text-sm font-medium">Total Commission</span>
