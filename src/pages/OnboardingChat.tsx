@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Bot, User, X, ArrowLeft, Send, Mic, Phone, MessageSquare, MicOff, CheckCircle, Search, Zap, ExternalLink, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { saveAppPlan, type AppPlanData, type SavedAppPlan } from '@/services/appPlanService';
+import { saveNewAppPlan, convertGeneratedAppPlanToSaveable, type NewAppPlanData } from '@/services/newAppPlanService';
 
 interface Message {
   id: string;
@@ -50,8 +51,13 @@ const OnboardingChat = () => {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { userId, isLoading: authLoading } = useOnboardingAuth();
   const { toast } = useToast();
+  
+  // Check if coming from app plan generator
+  const fromAppPlanGenerator = location.state?.fromAppPlanGenerator || false;
+  const initialAppConcept = location.state?.appConcept || '';
 
   // Initialize the chat with welcome message
   useEffect(() => {
@@ -59,39 +65,69 @@ const OnboardingChat = () => {
     
     setTimeout(() => {
       setShowTypingIndicator(false);
-      const welcomeMessage = {
-        id: '1',
-        role: 'assistant' as const,
-        content: "Hi! I'm SISO, your AI assistant. I'll help you create a custom app plan by researching your business and industry. This will only take a few minutes.",
-        actionComponent: (
-          <div className="mt-4 space-y-3">
-            <p className="text-sm text-gray-300 mb-3">How would you like to communicate?</p>
-            <Button
-              onClick={() => handleCommunicationChoice('chat')}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-            >
-              <MessageSquare className="h-4 w-4" />
-              Chat with me (type responses)
-            </Button>
-            <Button
-              onClick={() => handleCommunicationChoice('voice')}
-              className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
-            >
-              <Mic className="h-4 w-4" />
-              Voice chat (speak responses)
-            </Button>
-            <Button
-              onClick={() => handleCommunicationChoice('phone')}
-              className="w-full bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-2"
-            >
-              <Phone className="h-4 w-4" />
-              Schedule a phone call
-            </Button>
-          </div>
-        )
-      };
       
-      setMessages([welcomeMessage]);
+      // If coming from app plan generator with a concept, skip communication choice
+      if (fromAppPlanGenerator && initialAppConcept) {
+        const welcomeMessage = {
+          id: '1',
+          role: 'assistant' as const,
+          content: `Hi! I see you want to build: "${initialAppConcept}". I'll help you create a comprehensive app plan. First, I need to know more about your business to tailor the plan specifically for you.`,
+        };
+        
+        const conceptMessage = {
+          id: '2',
+          role: 'user' as const,
+          content: initialAppConcept
+        };
+        
+        const followUpMessage = {
+          id: '3',
+          role: 'assistant' as const,
+          content: "Great idea! What's your company name?",
+          requiresAction: true
+        };
+        
+        setMessages([welcomeMessage, conceptMessage, followUpMessage]);
+        setCommunicationMethod('chat');
+        setCurrentStep('company');
+        setWaitingForUserInput(true);
+        // Store the app concept in form data
+        setFormData(prev => ({ ...prev, description: initialAppConcept }));
+      } else {
+        const welcomeMessage = {
+          id: '1',
+          role: 'assistant' as const,
+          content: "Hi! I'm SISO, your AI assistant. I'll help you create a custom app plan by researching your business and industry. This will only take a few minutes.",
+          actionComponent: (
+            <div className="mt-4 space-y-3">
+              <p className="text-sm text-gray-300 mb-3">How would you like to communicate?</p>
+              <Button
+                onClick={() => handleCommunicationChoice('chat')}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+              >
+                <MessageSquare className="h-4 w-4" />
+                Chat with me (type responses)
+              </Button>
+              <Button
+                onClick={() => handleCommunicationChoice('voice')}
+                className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+              >
+                <Mic className="h-4 w-4" />
+                Voice chat (speak responses)
+              </Button>
+              <Button
+                onClick={() => handleCommunicationChoice('phone')}
+                className="w-full bg-orange-600 hover:bg-orange-700 text-white flex items-center gap-2"
+              >
+                <Phone className="h-4 w-4" />
+                Schedule a phone call
+              </Button>
+            </div>
+          )
+        };
+        
+        setMessages([welcomeMessage]);
+      }
     }, 1000);
   }, []);
 
@@ -278,6 +314,32 @@ const OnboardingChat = () => {
           });
           
           console.log('App plan saved with research data:', savedPlan);
+          
+          // Also save to new app_plans table if we have a generated plan
+          if (savedPlan?.features) {
+            try {
+              const newAppPlanData: NewAppPlanData = {
+                title: `${formData.company} App Plan`,
+                description: formData.description,
+                business_type: formData.industry,
+                app_concept: formData.description,
+                features: savedPlan.features.map((feature: any) => ({ name: feature })),
+                timeline: '12-16 weeks',
+                budget_range: '£25,000 - £50,000',
+                market_analysis: savedPlan.research_results?.marketAnalysis || '',
+                metadata: {
+                  originalPlanId: savedPlan.id,
+                  researchResults: savedPlan.research_results
+                }
+              };
+              
+              const newSavedPlan = await saveNewAppPlan(newAppPlanData);
+              console.log('Also saved to new app_plans table:', newSavedPlan);
+            } catch (newTableError) {
+              console.error('Failed to save to new app_plans table:', newTableError);
+              // Don't fail the whole process if new table save fails
+            }
+          }
           
           // Add completion message with enhanced research info and clear action button
           const completionMessage: Message = {
