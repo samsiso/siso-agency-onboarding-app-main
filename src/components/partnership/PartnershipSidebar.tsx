@@ -130,7 +130,7 @@ export const PartnershipSidebar = () => {
         }
         variants={sidebarVariants}
         className={`
-          fixed top-0 h-screen overflow-y-auto
+          fixed top-0 h-screen overflow-hidden
           bg-gradient-to-b from-siso-bg via-siso-bg to-siso-bg-alt backdrop-blur-sm
           border-r border-siso-border shadow-xl
           flex flex-col
@@ -152,21 +152,20 @@ export const PartnershipSidebar = () => {
           navigationMode={navigationMode}
         />
         
-        <div className="flex-1 flex flex-col min-h-0">
-          <AnimatePresence mode="wait">
-            <PartnershipSidebarNavigation 
-              collapsed={!isExpanded} 
-              onItemClick={handleItemClick}
-              visible={showNavigation}
-              navigationMode={navigationMode}
-            />
-          </AnimatePresence>
+        <div className="flex-1 flex flex-col min-h-0 relative">
+          <div className="flex-1 overflow-y-auto pb-20">
+            <AnimatePresence mode="wait">
+              <PartnershipSidebarNavigation 
+                collapsed={!isExpanded} 
+                onItemClick={handleItemClick}
+                visible={showNavigation}
+                navigationMode={navigationMode}
+              />
+            </AnimatePresence>
+          </div>
           
-          {/* Spacer to push commission card and footer to bottom */}
-          <div className="flex-1"></div>
-          
-          {/* Commission Stats Box - Above profile */}
-          <div className="px-3 pb-3">
+          {/* Commission Stats Box - Fixed above footer */}
+          <div className="absolute bottom-16 left-0 right-0 px-3 py-2">
             <AnimatePresence>
               {!isExpanded ? (
                 <motion.div
@@ -175,7 +174,7 @@ export const PartnershipSidebar = () => {
                   exit={{ opacity: 0 }}
                   className="flex justify-center"
                 >
-                  <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center">
+                  <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center shadow-lg">
                     <DollarSign className="h-4 w-4 text-white" />
                   </div>
                 </motion.div>
@@ -184,7 +183,7 @@ export const PartnershipSidebar = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
-                  className="bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-500/30 rounded-lg p-3"
+                  className="bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-500/30 rounded-lg p-3 shadow-lg"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-gray-300 text-sm font-medium">Total Commission</span>

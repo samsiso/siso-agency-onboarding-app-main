@@ -44,7 +44,10 @@ export class TokenUsageTracker {
   };
 
   constructor() {
-    this.loadUsageFromDatabase();
+    // Load usage asynchronously, don't block initialization
+    this.loadUsageFromDatabase().catch(error => {
+      console.warn('Token usage history table not available, running in memory mode:', error.message);
+    });
     this.startDailyReset();
   }
 
@@ -500,7 +503,8 @@ export class TokenUsageTracker {
    */
   private async saveUsageToDatabase(usage: TokenUsage): Promise<void> {
     try {
-      const { error } = await supabase
+      // Skip database operations if table doesn't exist
+      const { error } = await (supabase as any)
         .from('token_usage_history')
         .insert([{
           id: usage.id,
@@ -514,6 +518,10 @@ export class TokenUsageTracker {
         }]);
 
       if (error) {
+        // Silently handle missing table
+        if (error.code === 'PGRST116' || error.message?.includes('relation')) {
+          return; // Table doesn't exist, skip
+        }
         console.error('Failed to save token usage:', error);
       }
     } catch (error) {
@@ -528,14 +536,20 @@ export class TokenUsageTracker {
     try {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       
-      const { data, error } = await supabase
+      // Skip database operations if table doesn't exist
+      const { data, error } = await (supabase as any)
         .from('token_usage_history')
         .select('*')
         .gte('timestamp', sevenDaysAgo.toISOString())
         .order('timestamp', { ascending: false });
 
       if (error) {
-        console.error('Failed to load token usage:', error);
+        // Silently handle missing table - it's optional for development
+        if (error.code === 'PGRST116' || error.message?.includes('relation') || error.message?.includes('404')) {
+          console.log('📊 Token usage history table not available - running in memory mode');
+        } else {
+          console.error('Failed to load token usage:', error);
+        }
         return;
       }
 

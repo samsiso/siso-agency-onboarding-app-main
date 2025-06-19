@@ -43,7 +43,8 @@ import {
   TrendingUp,
   Calendar,
   Activity,
-  BarChart3
+  BarChart3,
+  CheckCircle
 } from "lucide-react";
 import { useClientsList } from "@/hooks/client";
 import {
