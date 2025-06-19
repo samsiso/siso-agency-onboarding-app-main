@@ -1,0 +1,37 @@
+{
+  "name": "ubahcrypt-auto-prompter",
+  "version": "1.0.0",
+  "description": "Automated prompt processing system for Cursor IDE with Supabase integration",
+  "main": "supabase-client.js",
+  "scripts": {
+    "start": "./run-prompt-cycle.sh",
+    "setup": "./setup-env.sh",
+    "status": "node supabase-client.js status",
+    "reset": "node supabase-client.js reset",
+    "test": "node supabase-client.js get"
+  },
+  "keywords": [
+    "automation",
+    "cursor",
+    "supabase",
+    "prompt",
+    "ai",
+    "development"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ubahcrypt-auto-prompter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ubahcrypt-auto-prompter/issues"
+  },
+  "homepage": "https://github.com/yourusername/ubahcrypt-auto-prompter#readme"
+} 

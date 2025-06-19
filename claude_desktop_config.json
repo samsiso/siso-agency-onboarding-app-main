@@ -1,0 +1,246 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "YOUR_SUPABASE_ACCESS_TOKEN"
+      ]
+    },
+    "Sequential Thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "Puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ]
+    },
+    "Github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery-ai/github",
+        "--config",
+        "{\"githubPersonalAccessToken\":\"YOUR_GITHUB_TOKEN\"}"
+      ]
+    },
+    "Knowledge Graph Memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery-ai/memory",
+        "--config",
+        "{}"
+      ]
+    },
+    "Fetch": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery-ai/fetch",
+        "--config",
+        "{}"
+      ]
+    },
+    "Docker": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "docker-mcp",
+        "--config",
+        "{}"
+      ]
+    },
+    "wcgw": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "wcgw",
+        "--config",
+        "{}"
+      ]
+    },
+    "playwright-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@microsoft/playwright-mcp",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194"
+      ]
+    },
+    "magic-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@21st-dev/magic-mcp",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194",
+        "--profile",
+        "uptight-shrimp-cihkh2"
+      ]
+    },
+    "desktop-commander": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@wonderwhy-er/desktop-commander",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194"
+      ]
+    },
+    "context7-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@upstash/context7-mcp",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194"
+      ]
+    },
+    "mcp-shrimp-task-manager": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@cjo4m06/mcp-shrimp-task-manager",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194",
+        "--profile",
+        "uptight-shrimp-cihkh2"
+      ]
+    },
+    "clear-thought": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@waldzellai/clear-thought",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194"
+      ]
+    },
+    "exa": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "exa",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194"
+      ]
+    },
+    "mem0-memory-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@mem0ai/mem0-memory-mcp",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194",
+        "--profile",
+        "uptight-shrimp-cihkh2"
+      ]
+    },
+    "toolbox": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery/toolbox",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194",
+        "--profile",
+        "uptight-shrimp-cihkh2"
+      ]
+    },
+    "think-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@PhillipRt/think-mcp-server",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194"
+      ]
+    },
+    "supabase-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@alexander-zuev/supabase-mcp-server",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194",
+        "--profile",
+        "uptight-shrimp-cihkh2"
+      ]
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@smithery-ai/github",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194",
+        "--profile",
+        "uptight-shrimp-cihkh2"
+      ]
+    },
+    "mcp-taskmanager": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@kazuph/mcp-taskmanager",
+        "--key",
+        "fc116b13-27b7-41a5-875b-b9673902c194"
+      ]
+    },
+    "@21st-dev/magic": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@21st-dev/magic@latest",
+        "API_KEY=\"YOUR_MAGIC_API_KEY\""
+      ]
+    }
+  },
+  "globalShortcut": "Cmd+Shift+Space"
+}

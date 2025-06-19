@@ -1,0 +1,141 @@
+{
+  "permissions": {
+    "allow": [
+      "ReadFile",
+      "Edit",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git status)",
+      "Bash(mv:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run dev:*)",
+      "Bash(npm test:*)",
+      "Bash(cp:*)",
+      "Bash(true)",
+      "Bash(chmod:*)",
+      "Bash(pkill:*)",
+      "WebFetch(domain:21st.dev)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "WebFetch(domain:supabase.com)",
+      "WebFetch(domain:github.com)",
+      "mcp_supabase_list_projects",
+      "mcp_supabase_get_project",
+      "mcp_supabase_list_tables",
+      "mcp_supabase_execute_sql",
+      "mcp_supabase_apply_migration",
+      "mcp_supabase_generate_typescript_types",
+      "mcp_supabase_get_project_url",
+      "mcp_supabase_get_anon_key",
+      "mcp_desktop-commander_read_file",
+      "mcp_desktop-commander_write_file",
+      "mcp_desktop-commander_list_directory",
+      "mcp_desktop-commander_search_files",
+      "mcp_desktop-commander_search_code",
+      "mcp_desktop-commander_get_file_info",
+      "mcp_desktop-commander_edit_block",
+      "mcp_desktop-commander_execute_command",
+      "mcp_21st-devmagic_21st_magic_component_builder",
+      "mcp_21st-devmagic_logo_search",
+      "mcp_Sequential_Thinking_sequentialthinking",
+      "mcp_mcp-taskmanager_request_planning",
+      "mcp_mcp-taskmanager_get_next_task",
+      "mcp_mcp-taskmanager_mark_task_done",
+      "mcp_context7-mcp_resolve-library-id",
+      "mcp_context7-mcp_get-library-docs"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(sudo:*)",
+      "Bash(su:*)",
+      "Bash(chmod 777:*)",
+      "mcp_desktop-commander_kill_process",
+      "mcp_desktop-commander_force_terminate"
+    ]
+  },
+  "automation": {
+    "headless_mode": {
+      "enabled": true,
+      "safe_tools": [
+        "ReadFile",
+        "Bash(git log:*)",
+        "Bash(find:*)",
+        "Bash(ls:*)",
+        "Bash(grep:*)",
+        "mcp_desktop-commander_read_file",
+        "mcp_desktop-commander_list_directory",
+        "mcp_desktop-commander_search_files",
+        "mcp_desktop-commander_search_code"
+      ],
+      "development_tools": [
+        "Edit",
+        "Bash(npm run lint)",
+        "Bash(npm run build)",
+        "Bash(git add:*)",
+        "mcp_desktop-commander_write_file",
+        "mcp_desktop-commander_edit_block"
+      ],
+      "deployment_tools": [
+        "Bash(git commit:*)",
+        "Bash(git push:*)",
+        "mcp_supabase_execute_sql",
+        "mcp_supabase_apply_migration"
+      ]
+    },
+    "api_keys": {
+      "supabase_access_token": "YOUR_SUPABASE_ACCESS_TOKEN",
+      "github_token": "YOUR_GITHUB_TOKEN",
+      "smithery_key": "fc116b13-27b7-41a5-875b-b9673902c194",
+      "magic_api_key": "YOUR_MAGIC_API_KEY"
+    },
+    "workflows": {
+      "feature_development": {
+        "enabled": true,
+        "tools": [
+          "ReadFile", "Edit", "Bash(git add:*)", "Bash(git commit:*)",
+          "Bash(npm run lint)", "Bash(npm run build)",
+          "mcp_supabase_generate_typescript_types",
+          "mcp_21st-devmagic_21st_magic_component_builder"
+        ]
+      },
+      "bug_fixing": {
+        "enabled": true,
+        "tools": [
+          "ReadFile", "Edit", "Bash(npm run lint)", "Bash(npm run build)",
+          "Bash(git add:*)", "Bash(git commit:*)"
+        ]
+      },
+      "code_review": {
+        "enabled": true,
+        "tools": [
+          "ReadFile", "Bash(git diff:*)", "Bash(git log:*)",
+          "mcp_desktop-commander_search_code"
+        ]
+      }
+    }
+  },
+  "security": {
+    "require_approval_for": [
+      "Bash(rm:*)",
+      "mcp_supabase_execute_sql",
+      "Bash(git push:*)"
+    ],
+    "never_auto_approve": [
+      "Bash(sudo:*)",
+      "Bash(rm -rf:*)",
+      "mcp_desktop-commander_kill_process"
+    ],
+    "container_only": [
+      "--dangerously-skip-permissions"
+    ]
+  }
+}
