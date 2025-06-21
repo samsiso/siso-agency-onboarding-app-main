@@ -17,6 +17,40 @@ console.log('🚀 SISO Telegram Webhook Server Starting...');
 console.log('📱 Authorized Chat ID:', CHAT_ID);
 console.log('🔧 Port:', PORT);
 
+// Keep-alive system to prevent Render from spinning down
+const KEEP_ALIVE_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+let keepAliveInterval;
+
+function startKeepAlive() {
+  // Only start keep-alive if we're on Render (has RENDER_EXTERNAL_URL)
+  if (process.env.RENDER_EXTERNAL_URL) {
+    console.log('🔄 Starting keep-alive system...');
+    console.log('📍 Keep-alive URL:', KEEP_ALIVE_URL);
+    
+    // Ping every 14 minutes (840 seconds) to prevent 15-minute timeout
+    keepAliveInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`${KEEP_ALIVE_URL}/health`);
+        const data = await response.json();
+        console.log(`💓 Keep-alive ping successful: ${new Date().toISOString()}`);
+      } catch (error) {
+        console.error('❌ Keep-alive ping failed:', error.message);
+      }
+    }, 14 * 60 * 1000); // 14 minutes
+    
+    console.log('✅ Keep-alive system started (14-minute intervals)');
+  } else {
+    console.log('⏭️ Keep-alive disabled (not on Render)');
+  }
+}
+
+function stopKeepAlive() {
+  if (keepAliveInterval) {
+    clearInterval(keepAliveInterval);
+    console.log('🛑 Keep-alive system stopped');
+  }
+}
+
 // Health check endpoint
 app.get('/', (req, res) => {
   res.json({ 
@@ -357,6 +391,22 @@ app.listen(PORT, () => {
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`🔗 Webhook endpoint: http://localhost:${PORT}/webhook/telegram`);
   console.log(`📱 Authorized for chat ID: ${CHAT_ID}`);
+  
+  // Start keep-alive system after server is running
+  startKeepAlive();
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\n🛑 Shutting down server...');
+  stopKeepAlive();
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n🛑 Shutting down server...');
+  stopKeepAlive();
+  process.exit(0);
 });
 
 module.exports = app;
