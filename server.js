@@ -124,6 +124,7 @@ app.post('/webhook/telegram', async (req, res) => {
 
   } catch (error) {
     console.error('❌ Webhook error:', error);
+    console.error('❌ Error stack:', error.stack);
     
     try {
       await sendTelegramMessage(
@@ -131,7 +132,11 @@ app.post('/webhook/telegram', async (req, res) => {
         `❌ Error processing message: ${error.message}`
       );
     } catch (e) {
-      console.error('Failed to send error message:', e);
+      console.error('❌ Failed to send error message:', e.message);
+      console.error('🔍 Environment check:');
+      console.error('  - TELEGRAM_TOKEN exists:', !!TELEGRAM_TOKEN);
+      console.error('  - GROQ_API_KEY exists:', !!GROQ_API_KEY);
+      console.error('  - GITHUB_TOKEN exists:', !!GITHUB_TOKEN);
     }
     
     res.status(200).json({ ok: true });
@@ -372,7 +377,13 @@ function buildConfirmationMessage(feedback, originalMessage, actionResult) {
 
 async function sendTelegramMessage(chatId, text) {
   try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+    console.log(`📤 Sending message to ${chatId}: ${text.substring(0, 50)}...`);
+    
+    if (!TELEGRAM_TOKEN) {
+      throw new Error('TELEGRAM_TOKEN environment variable is not set');
+    }
+    
+    const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -381,8 +392,20 @@ async function sendTelegramMessage(chatId, text) {
         parse_mode: 'Markdown'
       })
     });
+
+    const result = await response.json();
+    
+    if (!response.ok) {
+      console.error('❌ Telegram API error:', result);
+      throw new Error(`Telegram API error: ${result.description || 'Unknown error'}`);
+    }
+    
+    console.log('✅ Message sent successfully');
+    return result;
   } catch (error) {
-    console.error('Failed to send message:', error);
+    console.error('❌ Failed to send message:', error.message);
+    console.error('🔍 TELEGRAM_TOKEN exists:', !!TELEGRAM_TOKEN);
+    throw error;
   }
 }
 
