@@ -1,21 +1,9 @@
-
-// WhatsApp Integration
-const WhatsAppClient = require('./whatsapp-web-client');
-const unifiedHandler = require('./unified-message-handler');
 const express = require('express');
 const fetch = require('node-fetch');
 const FormData = require('form-data');
 const { TelegramPromptEngine } = require('./telegram-dynamic-prompt-engine.js');
 const { VoiceResponseSystem, NotionTaskManager } = require('./telegram-enhanced-features.js');
 const { MultiRepoGitHubManager } = require('./telegram-repository-config.js');
-
-// 🤖 Claude Code Integration
-let ClaudeWorkflowManager;
-try {
-  ClaudeWorkflowManager = require('./src/lib/claude-workflow-manager').ClaudeWorkflowManager;
-} catch (error) {
-  console.log('⚠️ Claude integration not available:', error.message);
-}
 
 const app = express();
 app.use(express.json());
@@ -25,17 +13,6 @@ const promptEngine = new TelegramPromptEngine();
 const voiceSystem = new VoiceResponseSystem();
 const notionManager = new NotionTaskManager();
 const multiRepoManager = new MultiRepoGitHubManager(process.env.GITHUB_TOKEN);
-
-// 🤖 Initialize Claude Code Assistant
-let claudeManager;
-if (ClaudeWorkflowManager) {
-  try {
-    claudeManager = new ClaudeWorkflowManager();
-    console.log('🤖 Claude Code Assistant initialized');
-  } catch (error) {
-    console.error('❌ Failed to initialize Claude:', error.message);
-  }
-}
 
 // Environment variables - MUST be set in hosting platform
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
@@ -845,43 +822,6 @@ async function sendTelegramMessage(chatId, text, keyboard = null) {
     throw error;
   }
 }
-
-
-// Initialize WhatsApp Client
-let whatsappClient = null;
-
-if (process.env.WHATSAPP_ENABLED === 'true') {
-    whatsappClient = new WhatsAppClient();
-    unifiedHandler.registerPlatform('whatsapp', whatsappClient);
-    
-    // Initialize WhatsApp
-    whatsappClient.initialize().catch(console.error);
-}
-
-
-// WhatsApp status endpoint
-app.get('/whatsapp/status', (req, res) => {
-    if (!whatsappClient) {
-        return res.json({ status: 'disabled', message: 'WhatsApp not enabled' });
-    }
-    
-    res.json({
-        status: whatsappClient.getStatus(),
-        timestamp: new Date().toISOString()
-    });
-});
-
-// Multi-platform health check
-app.get('/health', (req, res) => {
-    const health = {
-        server: 'running',
-        telegram: 'active',
-        whatsapp: whatsappClient ? whatsappClient.getStatus() : { status: 'disabled' },
-        timestamp: new Date().toISOString()
-    };
-    
-    res.json(health);
-});
 
 app.listen(PORT, () => {
   console.log(`🚀 SISO Telegram Webhook Server running on port ${PORT}`);

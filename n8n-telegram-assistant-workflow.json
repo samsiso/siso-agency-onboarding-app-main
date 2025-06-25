@@ -1,0 +1,323 @@
+{
+  "name": "Telegram AI Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "edited_message",
+          "channel_post",
+          "edited_channel_post",
+          "callback_query"
+        ]
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "telegram-assistant-webhook",
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.message.voice}}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "check-voice",
+      "name": "Is Voice Message?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.telegram.org/bot7569885071:AAH3l0ZcKdOTjh8oJ_flYTs0YFKyL_hN0fk/getFile",
+        "options": {},
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file_id",
+              "value": "={{$json.message.voice.file_id}}"
+            }
+          ]
+        }
+      },
+      "id": "get-voice-file",
+      "name": "Get Voice File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot7569885071:AAH3l0ZcKdOTjh8oJ_flYTs0YFKyL_hN0fk/{{$json.result.file_path}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-voice",
+      "name": "Download Voice",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "value": "={{$binary.data}}"
+            },
+            {
+              "name": "model",
+              "value": "whisper-large-v3"
+            }
+          ]
+        }
+      },
+      "id": "transcribe-voice",
+      "name": "Transcribe Voice (Groq)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1050, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2",
+          "name": "Groq API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract text from either voice transcription or text message\nconst isVoice = $input.first().json.message?.voice !== undefined;\nlet messageText = '';\nlet chatId = $input.first().json.message.chat.id;\nlet messageId = $input.first().json.message.message_id;\n\nif (isVoice) {\n  // From voice transcription\n  messageText = $input.first().json.text || $input.first().json.transcription;\n} else {\n  // From text message\n  messageText = $input.first().json.message.text;\n}\n\nreturn {\n  text: messageText,\n  chatId: chatId,\n  messageId: messageId,\n  isVoice: isVoice,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "extract-text",
+      "name": "Extract Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "model": "mixtral-8x7b-32768",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a development assistant that parses feedback into actionable tasks. Extract specific issues, categorize by component/page, and format for development. Identify: bugs, feature requests, UI improvements, and technical debt.\n\nReturn a JSON object with this structure:\n{\n  \"tasks\": [\n    {\n      \"type\": \"bug|feature|ui|technical\",\n      \"priority\": \"high|medium|low\",\n      \"title\": \"Brief title\",\n      \"description\": \"Detailed description\",\n      \"component\": \"Component or page name\",\n      \"action\": \"github|todo|claude|feedback\"\n    }\n  ],\n  \"summary\": \"Brief summary of all tasks\"\n}"
+            },
+            {
+              "role": "user",
+              "content": "={{$json.text}}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "responseFormat": {
+            "type": "json_object"
+          }
+        }
+      },
+      "id": "parse-with-ai",
+      "name": "Parse with AI (Groq)",
+      "type": "@n8n/n8n-nodes-groq.groq",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and prepare tasks\nconst aiResponse = JSON.parse($input.first().json.content);\nconst tasks = aiResponse.tasks || [];\nconst summary = aiResponse.summary || 'No tasks identified';\n\n// Prepare response message\nlet responseText = `📋 **Parsed ${tasks.length} task(s)**\\n\\n`;\nresponseText += `📝 Summary: ${summary}\\n\\n`;\n\ntasks.forEach((task, index) => {\n  const emoji = {\n    'bug': '🐛',\n    'feature': '✨',\n    'ui': '🎨',\n    'technical': '🔧'\n  }[task.type] || '📌';\n  \n  const priority = {\n    'high': '🔴',\n    'medium': '🟡',\n    'low': '🟢'\n  }[task.priority] || '';\n  \n  responseText += `${emoji} **${task.title}** ${priority}\\n`;\n  responseText += `   ${task.description}\\n`;\n  responseText += `   📁 ${task.component} | 🎯 ${task.action}\\n\\n`;\n});\n\nreturn {\n  tasks: tasks,\n  summary: summary,\n  responseText: responseText,\n  chatId: $input.all()[0].json.chatId,\n  messageId: $input.all()[0].json.messageId\n};"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "={{$json.responseText}}",
+        "replyToMessageId": "={{$json.messageId}}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "send-response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1850, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$json.tasks}}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "github",
+              "output": 0,
+              "operation": "contains"
+            },
+            {
+              "value2": "todo",
+              "output": 1,
+              "operation": "contains"
+            },
+            {
+              "value2": "claude",
+              "output": 2,
+              "operation": "contains"
+            }
+          ]
+        }
+      },
+      "id": "route-tasks",
+      "name": "Route Tasks",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [2050, 300]
+    }
+  ],
+  "connections": {
+    "telegram-trigger": {
+      "main": [
+        [
+          {
+            "node": "check-voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-voice": {
+      "main": [
+        [
+          {
+            "node": "get-voice-file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "extract-text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-voice-file": {
+      "main": [
+        [
+          {
+            "node": "download-voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "download-voice": {
+      "main": [
+        [
+          {
+            "node": "transcribe-voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "transcribe-voice": {
+      "main": [
+        [
+          {
+            "node": "extract-text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extract-text": {
+      "main": [
+        [
+          {
+            "node": "parse-with-ai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse-with-ai": {
+      "main": [
+        [
+          {
+            "node": "format-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format-response": {
+      "main": [
+        [
+          {
+            "node": "send-response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "route-tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "version": 1
+  }
+}

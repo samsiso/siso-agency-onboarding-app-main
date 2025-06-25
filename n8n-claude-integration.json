@@ -1,0 +1,144 @@
+{
+  "name": "Claude Code Task Dispatcher",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Filter tasks for Claude Code\nconst tasks = $input.first().json.tasks || [];\nconst claudeTasks = tasks.filter(task => \n  task.action === 'claude' || \n  task.type === 'feature' ||\n  (task.type === 'ui' && task.priority === 'high')\n);\n\n// Group related tasks\nconst groupedTasks = {};\nclaudeTasks.forEach(task => {\n  const key = task.component || 'general';\n  if (!groupedTasks[key]) {\n    groupedTasks[key] = [];\n  }\n  groupedTasks[key].push(task);\n});\n\nreturn Object.entries(groupedTasks).map(([component, tasks]) => ({\n  component: component,\n  tasks: tasks,\n  chatId: $input.first().json.chatId,\n  timestamp: new Date().toISOString()\n}));"
+      },
+      "id": "prepare-claude-tasks",
+      "name": "Prepare Claude Tasks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format tasks into Claude Code prompt\nconst data = $input.first().json;\nconst tasks = data.tasks;\n\nlet prompt = `# Development Tasks for ${data.component}\n\n`;\nprompt += `Generated: ${data.timestamp}\n\n`;\n\ntasks.forEach((task, index) => {\n  prompt += `## Task ${index + 1}: ${task.title}\n\n`;\n  prompt += `**Type**: ${task.type}\\n`;\n  prompt += `**Priority**: ${task.priority}\\n\\n`;\n  prompt += `### Description\\n${task.description}\\n\\n`;\n  \n  // Add implementation hints based on type\n  if (task.type === 'bug') {\n    prompt += `### Debugging Steps\\n`;\n    prompt += `1. Locate the ${task.component} component\\n`;\n    prompt += `2. Identify the issue described\\n`;\n    prompt += `3. Fix and test the solution\\n\\n`;\n  } else if (task.type === 'feature') {\n    prompt += `### Implementation Requirements\\n`;\n    prompt += `1. Add to ${task.component}\\n`;\n    prompt += `2. Follow existing patterns\\n`;\n    prompt += `3. Add necessary types and validation\\n\\n`;\n  } else if (task.type === 'ui') {\n    prompt += `### UI Requirements\\n`;\n    prompt += `1. Update ${task.component} styling\\n`;\n    prompt += `2. Ensure responsive design\\n`;\n    prompt += `3. Follow SISO brand guidelines (orange/yellow theme)\\n\\n`;\n  }\n});\n\nprompt += `### Instructions\\n`;\nprompt += `1. Implement all tasks listed above\\n`;\nprompt += `2. Run lint and build checks\\n`;\nprompt += `3. Test thoroughly\\n`;\nprompt += `4. Commit with descriptive message\\n`;\n\nreturn {\n  filename: `claude-tasks-${data.component}-${Date.now()}.md`,\n  content: prompt,\n  chatId: data.chatId,\n  taskCount: tasks.length,\n  component: data.component\n};"
+      },
+      "id": "format-claude-prompt",
+      "name": "Format Claude Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{$json.filename}}",
+        "filePath": "/path/to/claude-tasks/",
+        "options": {
+          "encoding": "utf8"
+        },
+        "dataPropertyName": "content"
+      },
+      "id": "save-claude-file",
+      "name": "Save Claude File",
+      "type": "n8n-nodes-base.fileSystem",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:8080/claude-code-webhook",
+        "options": {
+          "timeout": 5000
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "filename",
+              "value": "={{$json.filename}}"
+            },
+            {
+              "name": "component",
+              "value": "={{$json.component}}"
+            },
+            {
+              "name": "taskCount",
+              "value": "={{$json.taskCount}}"
+            }
+          ]
+        }
+      },
+      "id": "trigger-claude",
+      "name": "Trigger Claude Code",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 500],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "🤖 Claude Code Task Created!\n\n📁 File: `{{$json.filename}}`\n📦 Component: {{$json.component}}\n📋 Tasks: {{$json.taskCount}}\n\n✅ Tasks saved and ready for development.\n{{$node[\"trigger-claude\"].json.success ? \"🚀 Claude Code triggered successfully!\" : \"📝 Saved for manual processing.\"}}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "notify-claude-success",
+      "name": "Notify Success",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "prepare-claude-tasks": {
+      "main": [
+        [
+          {
+            "node": "format-claude-prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format-claude-prompt": {
+      "main": [
+        [
+          {
+            "node": "save-claude-file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "trigger-claude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save-claude-file": {
+      "main": [
+        [
+          {
+            "node": "notify-claude-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "trigger-claude": {
+      "main": [
+        [
+          {
+            "node": "notify-claude-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

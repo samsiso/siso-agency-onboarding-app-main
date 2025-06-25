@@ -1,0 +1,80 @@
+{
+  "name": "Simple Telegram Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "options": {}
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "telegram-assistant-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simple response to any message\nconst message = $input.first().json.message;\nconst chatId = message.chat.id;\nconst messageId = message.message_id;\n\nlet responseText = '';\nlet messageType = '';\n\nif (message.voice) {\n  messageType = 'voice note';\n  responseText = `🎤 **Voice Note Received!**\\n\\n✅ Duration: ${message.voice.duration} seconds\\n📊 File size: ${Math.round(message.voice.file_size/1024)}KB\\n\\n🤖 **I understand you sent a voice message!**\\n\\nHere's what I would do:\\n1. 🎯 Transcribe your audio\\n2. 🧠 Analyze content with AI\\n3. 📋 Extract actionable tasks\\n4. 🚀 Route to GitHub/Notion/Claude\\n\\n_Full AI processing coming soon!_`;\n} else if (message.text) {\n  messageType = 'text message';\n  const text = message.text;\n  responseText = `💬 **Text Message Received!**\\n\\n✅ **Your message:** \"${text.substring(0, 100)}${text.length > 100 ? '...' : ''}\"\\n\\n🤖 **I understand your request!**\\n\\nHere's what I would do:\\n1. 🧠 Analyze your message\\n2. 📋 Extract tasks and bugs\\n3. 🎯 Categorize by priority\\n4. 🚀 Route to appropriate systems\\n\\n_Full AI processing coming soon!_`;\n} else {\n  return null; // Skip other message types\n}\n\nreturn {\n  chatId: chatId,\n  messageId: messageId,\n  responseText: responseText,\n  messageType: messageType\n};"
+      },
+      "id": "process-message",
+      "name": "Process Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "={{$json.responseText}}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_to_message_id": "={{$json.messageId}}"
+        }
+      },
+      "id": "send-response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.1,
+      "position": [680, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "telegram-bot-creds",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "telegram-trigger": {
+      "main": [
+        [
+          {
+            "node": "process-message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process-message": {
+      "main": [
+        [
+          {
+            "node": "send-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1"
+}

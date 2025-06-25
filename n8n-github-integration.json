@@ -1,0 +1,109 @@
+{
+  "name": "GitHub Issues Creator",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Filter tasks that need GitHub issues\nconst tasks = $input.first().json.tasks || [];\nconst githubTasks = tasks.filter(task => \n  task.action === 'github' || \n  task.type === 'bug' || \n  (task.priority === 'high' && task.type !== 'feedback')\n);\n\nreturn githubTasks.map(task => ({\n  task: task,\n  chatId: $input.first().json.chatId\n}));"
+      },
+      "id": "filter-github-tasks",
+      "name": "Filter GitHub Tasks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resource": "issue",
+        "operation": "create",
+        "owner": "YOUR_GITHUB_USERNAME",
+        "repository": "siso-agency-onboarding-app",
+        "title": "={{$json.task.title}}",
+        "body": "## Description\n{{$json.task.description}}\n\n### Details\n- **Type**: {{$json.task.type}}\n- **Priority**: {{$json.task.priority}}\n- **Component**: {{$json.task.component}}\n- **Source**: Telegram Assistant\n- **Created**: {{$now.toISO()}}\n\n### Acceptance Criteria\n- [ ] Issue is resolved\n- [ ] Tests are passing\n- [ ] Code is reviewed\n\n---\n*Created automatically via Telegram Assistant*",
+        "assignees": ["YOUR_GITHUB_USERNAME"],
+        "labels": [
+          "={{$json.task.type}}",
+          "priority:{{$json.task.priority}}",
+          "component:{{$json.task.component}}",
+          "telegram-created"
+        ]
+      },
+      "id": "create-issue",
+      "name": "Create GitHub Issue",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "githubApi": {
+          "id": "3",
+          "name": "GitHub Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format success message\nconst issue = $input.first().json;\nconst task = $input.all()[0].json.task;\n\nreturn {\n  chatId: $input.all()[0].json.chatId,\n  message: `✅ GitHub Issue Created!\n\n**${task.title}**\nIssue #${issue.number}: ${issue.html_url}\n\nLabels: ${issue.labels.map(l => l.name).join(', ')}`,\n  issueUrl: issue.html_url,\n  issueNumber: issue.number\n};"
+      },
+      "id": "format-success",
+      "name": "Format Success Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "={{$json.message}}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "disable_web_page_preview": false
+        }
+      },
+      "id": "notify-success",
+      "name": "Notify Success",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "filter-github-tasks": {
+      "main": [
+        [
+          {
+            "node": "create-issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create-issue": {
+      "main": [
+        [
+          {
+            "node": "format-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format-success": {
+      "main": [
+        [
+          {
+            "node": "notify-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

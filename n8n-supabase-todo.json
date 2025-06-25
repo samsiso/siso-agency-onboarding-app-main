@@ -1,0 +1,149 @@
+{
+  "name": "Supabase Todo Creator",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Filter tasks for todo list\nconst tasks = $input.first().json.tasks || [];\nconst todoTasks = tasks.filter(task => \n  task.action === 'todo' || \n  task.action === 'feedback'\n);\n\n// Map to Supabase task format\nreturn todoTasks.map(task => ({\n  title: task.title,\n  description: task.description,\n  priority: task.priority,\n  category: 'telegram_feedback',\n  status: 'pending',\n  user_id: 'YOUR_USER_ID', // Replace with actual user ID\n  tags: [task.type, task.component],\n  metadata: {\n    source: 'telegram',\n    component: task.component,\n    type: task.type,\n    created_via: 'ai_assistant'\n  },\n  chatId: $input.first().json.chatId\n}));"
+      },
+      "id": "prepare-todos",
+      "name": "Prepare Todos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR_SUPABASE_URL.supabase.co/rest/v1/tasks",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{$json.title}}"
+            },
+            {
+              "name": "description",
+              "value": "={{$json.description}}"
+            },
+            {
+              "name": "priority",
+              "value": "={{$json.priority}}"
+            },
+            {
+              "name": "category",
+              "value": "={{$json.category}}"
+            },
+            {
+              "name": "status",
+              "value": "={{$json.status}}"
+            },
+            {
+              "name": "user_id",
+              "value": "={{$json.user_id}}"
+            },
+            {
+              "name": "tags",
+              "value": "={{$json.tags}}"
+            },
+            {
+              "name": "metadata",
+              "value": "={{$json.metadata}}"
+            }
+          ]
+        }
+      },
+      "id": "create-task",
+      "name": "Create Supabase Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4",
+          "name": "Supabase API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format success message\nconst task = $input.first().json;\nconst originalData = $input.all()[0].json;\n\nreturn {\n  chatId: originalData.chatId,\n  message: `📝 Task Added to Todo List!\n\n**${originalData.title}**\nPriority: ${originalData.priority}\nStatus: ${task.status}\nID: ${task.id}\n\nView in your dashboard to manage this task.`\n};"
+      },
+      "id": "format-todo-success",
+      "name": "Format Success",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "={{$json.message}}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "notify-todo-success",
+      "name": "Notify Success",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "prepare-todos": {
+      "main": [
+        [
+          {
+            "node": "create-task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create-task": {
+      "main": [
+        [
+          {
+            "node": "format-todo-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format-todo-success": {
+      "main": [
+        [
+          {
+            "node": "notify-todo-success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

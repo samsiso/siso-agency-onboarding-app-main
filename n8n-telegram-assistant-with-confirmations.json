@@ -1,0 +1,365 @@
+{
+  "name": "Telegram AI Assistant with Confirmations",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ]
+      },
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "telegram-assistant-webhook",
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.message.chat.id}}",
+        "text": "📨 Message received! Let me process that for you...",
+        "additionalFields": {
+          "reply_to_message_id": "={{$json.message.message_id}}"
+        }
+      },
+      "id": "acknowledge-receipt",
+      "name": "Acknowledge Receipt",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.message.voice}}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "check-voice",
+      "name": "Is Voice Message?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.message.chat.id}}",
+        "text": "🎤 Voice message detected! Transcribing your audio...",
+        "additionalFields": {}
+      },
+      "id": "voice-status",
+      "name": "Voice Transcription Status",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [850, 200],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.telegram.org/bot7569885071:AAH3l0ZcKdOTjh8oJ_flYTs0YFKyL_hN0fk/getFile",
+        "options": {},
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file_id",
+              "value": "={{$json.message.voice.file_id}}"
+            }
+          ]
+        }
+      },
+      "id": "get-voice-file",
+      "name": "Get Voice File",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.telegram.org/file/bot7569885071:AAH3l0ZcKdOTjh8oJ_flYTs0YFKyL_hN0fk/{{$json.result.file_path}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-voice",
+      "name": "Download Voice",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract text from either voice transcription or text message\nconst isVoice = $input.first().json.message?.voice !== undefined;\nlet messageText = '';\nlet chatId = $input.first().json.message.chat.id;\nlet messageId = $input.first().json.message.message_id;\n\nif (isVoice) {\n  // From voice transcription (this would come from Groq)\n  messageText = 'Voice transcription would go here';\n} else {\n  // From text message\n  messageText = $input.first().json.message.text;\n}\n\nreturn {\n  text: messageText,\n  chatId: chatId,\n  messageId: messageId,\n  isVoice: isVoice,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "extract-text",
+      "name": "Extract Text",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "=🤖 Analyzing your message with AI...\n\n📝 Your message: \"{{$json.text.substring(0, 100)}}{{$json.text.length > 100 ? '...' : ''}}\"\n\n⏳ Extracting tasks and categorizing...",
+        "additionalFields": {}
+      },
+      "id": "ai-processing-status",
+      "name": "AI Processing Status",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1650, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"llama3-8b-8192\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a development assistant that parses feedback into actionable tasks. Extract specific issues, categorize by component/page, and format for development. Identify: bugs, feature requests, UI improvements, and technical debt.\\n\\nReturn a JSON object with this structure:\\n{\\n  \\\"tasks\\\": [\\n    {\\n      \\\"type\\\": \\\"bug|feature|ui|technical\\\",\\n      \\\"priority\\\": \\\"high|medium|low\\\",\\n      \\\"title\\\": \\\"Brief title\\\",\\n      \\\"description\\\": \\\"Detailed description\\\",\\n      \\\"component\\\": \\\"Component or page name\\\",\\n      \\\"action\\\": \\\"github|todo|claude|feedback\\\"\\n    }\\n  ],\\n  \\\"summary\\\": \\\"Brief summary of all tasks\\\"\\n}\\n\\nRules:\\n- If message mentions 'github' or 'issue', set action to 'github'\\n- Bugs are high priority by default\\n- Parse the user's intent carefully\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{$json.text}}\"\n    }\n  ],\n  \"temperature\": 0.3,\n  \"response_format\": { \"type\": \"json_object\" }\n}",
+        "options": {}
+      },
+      "id": "parse-with-ai",
+      "name": "Parse with Groq AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1850, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2",
+          "name": "Groq API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI response and prepare confirmation\nlet aiResponse;\ntry {\n  aiResponse = JSON.parse($json.choices[0].message.content);\n} catch (e) {\n  return {\n    error: true,\n    message: 'Failed to parse AI response',\n    chatId: $input.all()[0].json.chatId\n  };\n}\n\nconst tasks = aiResponse.tasks || [];\nconst summary = aiResponse.summary || 'No tasks identified';\n\n// Build detailed confirmation message\nlet confirmationText = `✅ **I understood your request!**\\n\\n`;\nconfirmationText += `📋 **Summary:** ${summary}\\n\\n`;\n\nif (tasks.length === 0) {\n  confirmationText += `❓ No specific tasks identified. Please provide more details.`;\n} else {\n  confirmationText += `🎯 **I found ${tasks.length} task(s):**\\n\\n`;\n  \n  tasks.forEach((task, index) => {\n    const emoji = {\n      'bug': '🐛',\n      'feature': '✨',\n      'ui': '🎨',\n      'technical': '🔧'\n    }[task.type] || '📌';\n    \n    const priority = {\n      'high': '🔴 HIGH',\n      'medium': '🟡 MEDIUM',\n      'low': '🟢 LOW'\n    }[task.priority] || '';\n    \n    const actionEmoji = {\n      'github': '🐙',\n      'todo': '📝',\n      'claude': '🤖',\n      'feedback': '💬'\n    }[task.action] || '📋';\n    \n    const actionText = {\n      'github': 'Create GitHub Issue',\n      'todo': 'Add to Todo List',\n      'claude': 'Send to Claude Code',\n      'feedback': 'Log as Feedback'\n    }[task.action] || task.action;\n    \n    confirmationText += `**${index + 1}.** ${emoji} **${task.title}**\\n`;\n    confirmationText += `   Priority: ${priority}\\n`;\n    confirmationText += `   Component: 📁 ${task.component}\\n`;\n    confirmationText += `   Action: ${actionEmoji} ${actionText}\\n`;\n    confirmationText += `   _${task.description}_\\n\\n`;\n  });\n  \n  confirmationText += `\\n🚀 **Next Steps:**\\n`;\n  confirmationText += `I'll now process these tasks and send them to the appropriate systems.\\n`;\n  confirmationText += `You'll receive confirmation as each task is completed!`;\n}\n\nreturn {\n  tasks: tasks,\n  summary: summary,\n  confirmationText: confirmationText,\n  chatId: $input.all()[0].json.chatId,\n  messageId: $input.all()[0].json.messageId,\n  hasError: false\n};"
+      },
+      "id": "format-confirmation",
+      "name": "Format Confirmation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "={{$json.confirmationText}}",
+        "additionalFields": {
+          "parse_mode": "Markdown",
+          "reply_to_message_id": "={{$json.messageId}}"
+        }
+      },
+      "id": "send-confirmation",
+      "name": "Send Confirmation",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [2250, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{$json.tasks}}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "github",
+              "output": 0,
+              "operation": "contains"
+            },
+            {
+              "value2": "todo",
+              "output": 1,
+              "operation": "contains"
+            },
+            {
+              "value2": "claude",
+              "output": 2,
+              "operation": "contains"
+            }
+          ]
+        },
+        "fallbackOutput": 3
+      },
+      "id": "route-tasks",
+      "name": "Route Tasks",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [2450, 300]
+    }
+  ],
+  "connections": {
+    "telegram-trigger": {
+      "main": [
+        [
+          {
+            "node": "acknowledge-receipt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "acknowledge-receipt": {
+      "main": [
+        [
+          {
+            "node": "check-voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-voice": {
+      "main": [
+        [
+          {
+            "node": "voice-status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "extract-text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "voice-status": {
+      "main": [
+        [
+          {
+            "node": "get-voice-file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-voice-file": {
+      "main": [
+        [
+          {
+            "node": "download-voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "download-voice": {
+      "main": [
+        [
+          {
+            "node": "extract-text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extract-text": {
+      "main": [
+        [
+          {
+            "node": "ai-processing-status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ai-processing-status": {
+      "main": [
+        [
+          {
+            "node": "parse-with-ai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse-with-ai": {
+      "main": [
+        [
+          {
+            "node": "format-confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format-confirmation": {
+      "main": [
+        [
+          {
+            "node": "send-confirmation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "route-tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

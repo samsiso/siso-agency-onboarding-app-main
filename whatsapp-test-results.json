@@ -1,0 +1,138 @@
+{
+  "timestamp": "2025-06-22T04:06:21.855Z",
+  "duration": 303,
+  "summary": {
+    "passed": 20,
+    "failed": 0,
+    "warnings": 0,
+    "skipped": 1
+  },
+  "results": [
+    {
+      "icon": "✅",
+      "test": "Core module: fs",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Core module: path",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Core module: events",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "WhatsApp module: whatsapp-web.js",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "WhatsApp module: qrcode-terminal",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Config file: package.json",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Config file: .env",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Config file: server.js",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "ℹ️",
+      "test": "Config file: whatsapp-config.json",
+      "status": "SKIP",
+      "details": "Optional file not found"
+    },
+    {
+      "icon": "✅",
+      "test": "Config file: whatsapp-web-client.js",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Config file: unified-message-handler.js",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "WhatsApp Client: initialize method",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "WhatsApp Client: sendMessage method",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "WhatsApp Client: getStatus method",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Unified Handler: processMessage method",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Unified Handler: registerPlatform method",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Unified Handler: Platform registration",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Unified Handler: Stats generation",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Message format: whatsapp",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Message format: telegram",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "icon": "✅",
+      "test": "Conversation: Multi-platform support",
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}

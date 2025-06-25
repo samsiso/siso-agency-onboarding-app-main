@@ -1,0 +1,65 @@
+{
+  "name": "Telegram Confirmation Nodes",
+  "nodes": [
+    {
+      "parameters": {
+        "chatId": "={{$json.message.chat.id}}",
+        "text": "🎤 Voice message received! Transcribing...",
+        "additionalFields": {
+          "reply_to_message_id": "={{$json.message.message_id}}"
+        }
+      },
+      "id": "confirm-voice-received",
+      "name": "Confirm Voice Received",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [550, 100],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.message.chat.id}}",
+        "text": "💬 Message received! Processing your request...",
+        "additionalFields": {
+          "reply_to_message_id": "={{$json.message.message_id}}"
+        }
+      },
+      "id": "confirm-text-received",
+      "name": "Confirm Text Received",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [550, 400],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$json.chatId}}",
+        "text": "🔄 Processing: \"{{$json.text.substring(0, 50)}}{{$json.text.length > 50 ? '...' : ''}}\"\n\n🤖 Analyzing with AI to extract tasks...",
+        "additionalFields": {
+          "reply_to_message_id": "={{$json.messageId}}"
+        }
+      },
+      "id": "confirm-processing",
+      "name": "Confirm Processing",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [1350, 300],
+      "credentials": {
+        "telegramApi": {
+          "id": "1",
+          "name": "Telegram Bot"
+        }
+      }
+    }
+  ]
+}

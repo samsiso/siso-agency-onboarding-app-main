@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: siso-telegram-webhook
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node railway-server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TELEGRAM_TOKEN
+        value: 7569885071:AAH3l0ZcKdOTjh8oJ_flYTs0YFKyL_hN0fk
+      - key: GROQ_API_KEY
+        value: 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
+      - key: GITHUB_TOKEN
+        value: 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
+      - key: GITHUB_REPO
+        value: samsiso/siso-agency-onboarding-app-main 

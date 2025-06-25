@@ -1,0 +1,24 @@
+{
+  "enabled": true,
+  "authStrategy": "local",
+  "clientId": "siso-assistant",
+  "puppeteerOptions": {
+    "headless": true,
+    "args": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process",
+      "--disable-gpu"
+    ]
+  },
+  "features": {
+    "voiceProcessing": true,
+    "imageProcessing": false,
+    "documentProcessing": false,
+    "groupMessages": false
+  }
+}

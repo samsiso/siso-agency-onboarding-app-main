@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc"; // Using plugin-react-swc which is already in the project
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 
 // [Analysis] Implementing granular code splitting for optimal chunk sizes
 // [Plan] Monitor performance impact and adjust splits if needed
@@ -10,10 +9,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [
-    react(),
-    mode === 'development' && componentTagger(),
-  ].filter(Boolean),
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -132,6 +128,16 @@ export default defineConfig(({ mode }) => ({
       },
     },
     sourcemap: mode === 'development',
+    commonjsOptions: {
+      include: [
+        /node_modules/,
+        'src/components/ui/sonner.tsx',
+        'clsx',
+        'tailwind-merge',
+        'lucide-react',
+      ],
+      exclude: ['moralis']
+    }
   },
   
   optimizeDeps: {
@@ -144,7 +150,7 @@ export default defineConfig(({ mode }) => ({
       '@radix-ui/react-tabs',
       'clsx',
       'tailwind-merge',
-      'lucide-react'
+      'lucide-react',
     ],
     exclude: ['moralis']
   },
