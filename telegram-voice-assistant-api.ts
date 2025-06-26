@@ -7,8 +7,8 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY!
 );
 
-const TELEGRAM_TOKEN = '7569885071:AAH3l0ZcKdOTjh8oJ_flYTs0YFKyL_hN0fk';
-const GROQ_API_KEY = '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';
+const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
 const NOTION_API_KEY = process.env.NOTION_API_KEY!;
 const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID!;

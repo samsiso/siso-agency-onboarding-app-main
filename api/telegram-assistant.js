@@ -1,7 +1,7 @@
 // Environment variables
-const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN || '7569885071:AAH3l0ZcKdOTjh8oJ_flYTs0YFKyL_hN0fk';
-const GROQ_API_KEY = process.env.GROQ_API_KEY || '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';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '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';
+const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_REPO = process.env.GITHUB_REPO || 'samsiso/siso-agency-onboarding-app-main';
 const CHAT_ID = 7643203581;
 

@@ -7,9 +7,9 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const TELEGRAM_TOKEN = Deno.env.get('TELEGRAM_TOKEN') || '7569885071:AAH3l0ZcKdOTjh8oJ_flYTs0YFKyL_hN0fk';
-const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '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';
-const GITHUB_TOKEN = Deno.env.get('GITHUB_TOKEN') || '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';
+const TELEGRAM_TOKEN = Deno.env.get('TELEGRAM_TOKEN');
+const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY');
+const GITHUB_TOKEN = Deno.env.get('GITHUB_TOKEN');
 const GITHUB_REPO = Deno.env.get('GITHUB_REPO') || 'samsiso/siso-agency-onboarding-app-main';
 const CHAT_ID = 7643203581;
 
