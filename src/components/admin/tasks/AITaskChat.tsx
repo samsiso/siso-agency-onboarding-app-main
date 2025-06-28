@@ -1,29 +1,18 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 import { grokTaskService } from '@/services/grokTaskService';
-import { 
-  Brain, 
-  Zap, 
-  BarChart3, 
-  Target, 
-  Clock,
-  TrendingUp,
-  CheckCircle2,
-  Lightbulb
-} from 'lucide-react';
+import { Brain } from 'lucide-react';
 
 // Simple types to avoid import issues
 interface Task {
   id: string;
   title: string;
   completed: boolean;
-  status: string;
-  priority: string;
+  status: 'overdue' | 'due-today' | 'upcoming' | 'in-progress' | 'blocked' | 'not-started' | 'started' | 'done';
+  priority: 'high' | 'medium' | 'low';
   assignee?: string;
   dueDate?: string;
-  category: string;
+  category: 'development' | 'design' | 'marketing' | 'client' | 'admin';
   tags?: string[];
   estimatedHours?: number;
 }
@@ -42,37 +31,6 @@ interface AITaskChatProps {
   onChatUpdate: (messages: ChatMessage[]) => void;
 }
 
-const quickActions = [
-  {
-    id: 'analyze',
-    label: 'Analyze Workload',
-    icon: BarChart3,
-    prompt: 'Analyze my current workload and provide insights on productivity and priorities',
-    color: 'bg-blue-500/20 text-blue-400 border-blue-500/40'
-  },
-  {
-    id: 'prioritize',
-    label: 'Prioritize Tasks',
-    icon: Target,
-    prompt: 'Help me prioritize my tasks based on deadlines and importance',
-    color: 'bg-orange-500/20 text-orange-400 border-orange-500/40'
-  },
-  {
-    id: 'plan',
-    label: 'Create Project',
-    icon: Lightbulb,
-    prompt: 'Help me create a new project plan with multiple tasks',
-    color: 'bg-green-500/20 text-green-400 border-green-500/40'
-  },
-  {
-    id: 'optimize',
-    label: 'Optimize Schedule',
-    icon: Clock,
-    prompt: 'Suggest ways to optimize my schedule and improve productivity',
-    color: 'bg-purple-500/20 text-purple-400 border-purple-500/40'
-  }
-];
-
 export const AITaskChat: React.FC<AITaskChatProps> = ({
   tasks,
   chatMessages,
@@ -80,7 +38,6 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
   onChatUpdate
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedQuickAction, setSelectedQuickAction] = useState<string | null>(null);
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -137,75 +94,6 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
     }
   };
 
-  const handleQuickAction = async (action: typeof quickActions[0]) => {
-    setSelectedQuickAction(action.id);
-    setIsLoading(true);
-
-    // Add user message
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      content: action.prompt,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    onChatUpdate([...chatMessages, userMessage]);
-
-    try {
-      let response;
-      
-      // Use specialized methods for better AI responses
-      switch (action.id) {
-        case 'analyze':
-          response = await grokTaskService.analyzeWorkload(tasks);
-          break;
-        case 'prioritize':
-          response = await grokTaskService.suggestTaskPriorities(tasks);
-          break;
-        case 'optimize':
-          response = await grokTaskService.optimizeSchedule(tasks);
-          break;
-        default:
-          response = await grokTaskService.chatWithGrok({
-            message: action.prompt,
-            tasks,
-            action: action.id as any
-          });
-      }
-
-      // Create AI response message
-      const aiMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        content: response.message,
-        sender: 'assistant',
-        timestamp: new Date()
-      };
-
-      onChatUpdate([...chatMessages, userMessage, aiMessage]);
-
-      // If the AI response includes new tasks, add them to the task list
-      if (response.tasks && response.tasks.length > 0) {
-        const newTasks = [...tasks, ...response.tasks];
-        onTasksUpdate(newTasks);
-      }
-
-    } catch (error) {
-      console.error('AI Quick Action Error:', error);
-      
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        content: "I encountered an error while processing that action. Please try again.",
-        sender: 'assistant',
-        timestamp: new Date()
-      };
-
-      onChatUpdate([...chatMessages, userMessage, errorMessage]);
-    } finally {
-      setIsLoading(false);
-      setSelectedQuickAction(null);
-    }
-  };
-
   const activeTasks = tasks.filter(t => !t.completed);
   const completedTasks = tasks.filter(t => t.completed);
 
@@ -229,54 +117,27 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
               {/* AI Status Indicator */}
               <div className="mb-6">
                 {grokTaskService.isReady() ? (
-                  <Badge className="bg-green-500/20 text-green-300 border-green-500/40">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/40 rounded-full text-sm">
                     🤖 AI Ready - Groq API Connected
-                  </Badge>
+                  </div>
                 ) : (
-                  <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/40">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-500/20 text-orange-300 border border-orange-500/40 rounded-full text-sm">
                     ⚠️ Demo Mode - Configure VITE_GROQ_API_KEY
-                  </Badge>
-                )}</div>
+                  </div>
+                )}
+              </div>
               
               {/* Task Stats */}
               <div className="flex items-center justify-center gap-4 mb-8">
-                <Badge className="bg-orange-500/20 text-orange-300 border-orange-500/40">
+                <div className="px-3 py-1 bg-orange-500/20 text-orange-300 border border-orange-500/40 rounded-full text-sm">
                   {activeTasks.length} Active
-                </Badge>
-                <Badge className="bg-green-500/20 text-green-300 border-green-500/40">
+                </div>
+                <div className="px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/40 rounded-full text-sm">
                   {completedTasks.length} Completed
-                </Badge>
-                <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/40">
+                </div>
+                <div className="px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-500/40 rounded-full text-sm">
                   {tasks.filter(t => t.status === 'overdue').length} Overdue
-                </Badge>
-              </div>
-            </div>
-            
-            {/* Quick Actions */}
-            <div className="w-full max-w-md">
-              <h3 className="text-sm font-medium text-gray-400 mb-4 text-center">Quick Actions</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {quickActions.map((action) => {
-                  const Icon = action.icon;
-                  const isActionLoading = selectedQuickAction === action.id;
-                  
-                  return (
-                    <Button
-                      key={action.id}
-                      variant="outline"
-                      onClick={() => handleQuickAction(action)}
-                      disabled={isLoading || isActionLoading}
-                      className={`${action.color} border p-4 h-auto flex flex-col items-center gap-2 hover:opacity-80 transition-opacity`}
-                    >
-                      {isActionLoading ? (
-                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Icon className="w-5 h-5" />
-                      )}
-                      <span className="text-xs font-medium">{action.label}</span>
-                    </Button>
-                  );
-                })}
+                </div>
               </div>
             </div>
           </div>
