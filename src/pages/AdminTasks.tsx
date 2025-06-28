@@ -280,7 +280,7 @@ const AdminTasks: React.FC = () => {
       <div className="h-screen text-white overflow-hidden" style={{ backgroundColor: '#121212' }}>
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {/* Left Panel - AI Task Assistant */}
-          <ResizablePanel defaultSize={40} minSize={25} maxSize={60}>
+          <ResizablePanel defaultSize={40} minSize={25} maxSize={60} style={{ backgroundColor: '#252525' }}>
             {isAIEnabled ? (
               <AITaskChat
                 tasks={tasks}
