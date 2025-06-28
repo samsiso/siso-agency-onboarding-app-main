@@ -16,7 +16,7 @@ import {
   Plus
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks, startOfMonth, endOfMonth, addMonths, subMonths, getYear } from 'date-fns';
+import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks, startOfMonth, endOfMonth, addMonths, subMonths, getYear, eachWeekOfInterval, getWeek } from 'date-fns';
 
 interface TaskCard {
   id: string;
@@ -75,11 +75,25 @@ const AdminLifeLock: React.FC = () => {
   const weekDays = eachDayOfInterval({ start: weekStart, end: weekEnd });
   const weekCards = weekDays.map(generateSampleTasks);
 
-  // Get month's tasks
+  // Get month's tasks organized in calendar format
   const monthStart = startOfMonth(selectedMonth);
   const monthEnd = endOfMonth(selectedMonth);
-  const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-  const monthCards = monthDays.map(generateSampleTasks);
+  
+  // Get the first Monday before or at the start of the month
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+  // Get the last Sunday after or at the end of the month
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  
+  // Get all days in the calendar view (including previous/next month days)
+  const calendarDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+  
+  // Organize into weeks (rows) with 7 days each (columns)
+  const calendarWeeks = [];
+  for (let i = 0; i < calendarDays.length; i += 7) {
+    calendarWeeks.push(calendarDays.slice(i, i + 7));
+  }
+  
+  const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   const handleCardClick = (card: TaskCard) => {
     // Navigate to notion-like page for this day
@@ -106,7 +120,7 @@ const AdminLifeLock: React.FC = () => {
     setSelectedMonth(newDate);
   };
 
-  const TaskCardComponent = ({ card, size = 'medium' }: { card: TaskCard; size?: 'small' | 'medium' | 'large' }) => {
+  const TaskCardComponent = ({ card, size = 'medium', isCurrentMonth = true }: { card: TaskCard; size?: 'small' | 'medium' | 'large'; isCurrentMonth?: boolean }) => {
     const isToday = isSameDay(card.date, new Date());
     const isPast = card.date < new Date() && !isToday;
     const completedTasks = card.tasks.filter(task => task.completed).length;
@@ -132,6 +146,7 @@ const AdminLifeLock: React.FC = () => {
             card.completed ? 'border-green-500 bg-gray-800 border-green-400' : 
             'bg-gray-800 border-gray-600'}
           ${isToday ? 'ring-2 ring-orange-500 border-orange-500' : ''}
+          ${!isCurrentMonth ? 'opacity-30' : ''}
           hover:shadow-lg transition-all duration-200 text-white cursor-pointer
         `}>
           <CardHeader className="pb-2">
@@ -311,10 +326,36 @@ const AdminLifeLock: React.FC = () => {
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-10 gap-2">
-            {monthCards.map((card) => (
-              <TaskCardComponent key={card.id} card={card} size="small" />
-            ))}
+          {/* Calendar Grid */}
+          <div className="bg-gray-800/50 rounded-lg p-4">
+            {/* Day Headers */}
+            <div className="grid grid-cols-7 gap-2 mb-4">
+              {dayLabels.map((day) => (
+                <div key={day} className="text-center text-sm font-semibold text-orange-300 py-2">
+                  {day}
+                </div>
+              ))}
+            </div>
+            
+            {/* Calendar Weeks */}
+            <div className="space-y-2">
+              {calendarWeeks.map((week, weekIndex) => (
+                <div key={weekIndex} className="grid grid-cols-7 gap-2">
+                  {week.map((day) => {
+                    const card = generateSampleTasks(day);
+                    const isCurrentMonth = day.getMonth() === selectedMonth.getMonth();
+                    return (
+                      <TaskCardComponent 
+                        key={card.id} 
+                        card={card} 
+                        size="small" 
+                        isCurrentMonth={isCurrentMonth}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 

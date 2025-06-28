@@ -13,6 +13,12 @@ interface Task {
   category: 'development' | 'design' | 'marketing' | 'client' | 'admin';
   tags?: string[];
   estimatedHours?: number;
+  description?: string;
+  subtasks?: Array<{
+    id: string;
+    title: string;
+    completed: boolean;
+  }>;
 }
 
 interface GrokTaskRequest {
@@ -66,7 +72,7 @@ export class GrokTaskService {
         ],
         model: "llama3-8b-8192",
         temperature: 0.7,
-        max_tokens: 1000,
+        max_tokens: 1500,
       });
 
       const response = completion.choices[0]?.message?.content || "No response generated";
@@ -83,7 +89,7 @@ export class GrokTaskService {
 
   private buildSystemPrompt(request: GrokTaskRequest): string {
     return `You are an AI task management assistant for SISO Agency. You help with:
-1. Creating tasks from natural language
+1. Creating tasks from natural language descriptions
 2. Analyzing workloads and productivity
 3. Prioritizing tasks based on deadlines and importance
 4. Creating project plans with multiple tasks
@@ -98,14 +104,53 @@ Available categories: development, design, marketing, client, admin
 Available priorities: high, medium, low
 Available statuses: not-started, in-progress, blocked, done, overdue, due-today, upcoming
 
-When creating tasks, respond with a JSON object containing:
+TASK CREATION GUIDELINES:
+- When users ask to create tasks, ALWAYS respond with properly formatted JSON
+- Break down complex requests into multiple specific tasks
+- Assign appropriate categories based on task content
+- Set realistic priorities and due dates
+- Include descriptions and subtasks when helpful
+- Generate unique IDs using timestamp + random
+
+JSON RESPONSE FORMAT for creating tasks:
 {
-  "message": "Your helpful response",
-  "tasks": [array of new task objects if creating tasks],
-  "analysis": {analysis object if analyzing workload}
+  "message": "I've created [X] tasks for you:",
+  "tasks": [
+    {
+      "id": "task-[timestamp]-[random]",
+      "title": "Clear, actionable task title",
+      "completed": false,
+      "status": "not-started",
+      "priority": "high|medium|low",
+      "category": "development|design|marketing|client|admin",
+      "description": "Detailed description of what needs to be done",
+      "estimatedHours": [number],
+      "dueDate": "YYYY-MM-DD" (if mentioned or can be inferred),
+      "tags": ["relevant", "tags"],
+      "subtasks": [
+        {
+          "id": "subtask-[timestamp]-[random]",
+          "title": "Specific subtask",
+          "completed": false
+        }
+      ]
+    }
+  ]
 }
 
-Be helpful, concise, and actionable in your responses.`;
+INTELLIGENT CATEGORIZATION:
+- "development", "coding", "programming", "bug", "feature" → development
+- "design", "ui", "ux", "mockup", "wireframe", "logo" → design  
+- "marketing", "social media", "content", "seo", "campaign" → marketing
+- "client", "meeting", "call", "presentation", "proposal" → client
+- "admin", "documentation", "planning", "organization" → admin
+
+PRIORITY ASSIGNMENT:
+- high: urgent, deadline soon, critical, important, asap
+- medium: normal timeline, moderate importance
+- low: nice-to-have, future, when time permits
+
+Always be helpful, specific, and create actionable tasks that move projects forward.`;
   }
 
   private buildUserPrompt(request: GrokTaskRequest): string {
@@ -118,19 +163,45 @@ Be helpful, concise, and actionable in your responses.`;
     if (request.tasks.length > 0) {
       prompt += `\n\nCurrent tasks:\n`;
       request.tasks.slice(0, 5).forEach(task => {
-        prompt += `- ${task.title} (${task.status}, ${task.priority} priority)\n`;
+        prompt += `- ${task.title} (${task.status}, ${task.priority} priority, ${task.category})\n`;
       });
+      
+      if (request.tasks.length > 5) {
+        prompt += `... and ${request.tasks.length - 5} more tasks\n`;
+      }
+    }
+
+    // Add context about task creation patterns
+    if (this.isTaskCreationRequest(request.message)) {
+      prompt += `\n\nThis appears to be a task creation request. Please create specific, actionable tasks with proper categorization and respond in JSON format.`;
     }
 
     return prompt;
   }
 
+  private isTaskCreationRequest(message: string): boolean {
+    const creationKeywords = [
+      'create', 'add', 'make', 'build', 'develop', 'design', 'implement',
+      'task', 'todo', 'need to', 'should', 'must', 'have to',
+      'project', 'feature', 'fix', 'update', 'improve'
+    ];
+    
+    const lowerMessage = message.toLowerCase();
+    return creationKeywords.some(keyword => lowerMessage.includes(keyword));
+  }
+
   private parseGrokResponse(response: string, request: GrokTaskRequest): GrokResponse {
     try {
-      // Try to parse JSON response
+      // Try to parse JSON response first
       const jsonMatch = response.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
+        
+        // Validate and enhance task objects
+        if (parsed.tasks && Array.isArray(parsed.tasks)) {
+          parsed.tasks = parsed.tasks.map((task: any) => this.validateAndEnhanceTask(task));
+        }
+        
         return {
           message: parsed.message || response,
           tasks: parsed.tasks || undefined,
@@ -138,11 +209,11 @@ Be helpful, concise, and actionable in your responses.`;
         };
       }
     } catch (e) {
-      // If JSON parsing fails, fall back to text response
+      console.warn('JSON parsing failed, falling back to text extraction:', e);
     }
 
-    // Handle text responses and extract potential tasks
-    const tasks = this.extractTasksFromText(response);
+    // Enhanced text parsing for task extraction
+    const tasks = this.extractTasksFromText(response, request.message);
     
     return {
       message: response,
@@ -150,32 +221,110 @@ Be helpful, concise, and actionable in your responses.`;
     };
   }
 
-  private extractTasksFromText(text: string): Task[] {
+  private validateAndEnhanceTask(task: any): Task {
+    const now = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    
+    return {
+      id: task.id || `task-${now}-${randomSuffix}`,
+      title: task.title || 'Untitled Task',
+      completed: false,
+      status: task.status || 'not-started',
+      priority: task.priority || 'medium',
+      category: task.category || this.inferCategory(task.title || ''),
+      description: task.description || '',
+      estimatedHours: task.estimatedHours || undefined,
+      dueDate: task.dueDate || undefined,
+      tags: task.tags || [],
+      subtasks: task.subtasks || []
+    };
+  }
+
+  private inferCategory(title: string): Task['category'] {
+    const lowerTitle = title.toLowerCase();
+    
+    if (lowerTitle.match(/\b(code|coding|program|develop|bug|feature|api|database|frontend|backend)\b/)) {
+      return 'development';
+    }
+    if (lowerTitle.match(/\b(design|ui|ux|mockup|wireframe|logo|brand|visual)\b/)) {
+      return 'design';
+    }
+    if (lowerTitle.match(/\b(marketing|social|content|seo|campaign|promotion|ads)\b/)) {
+      return 'marketing';
+    }
+    if (lowerTitle.match(/\b(client|meeting|call|presentation|proposal|demo)\b/)) {
+      return 'client';
+    }
+    
+    return 'admin';
+  }
+
+  private extractTasksFromText(text: string, originalMessage: string): Task[] {
     const tasks: Task[] = [];
     const lines = text.split('\n');
     
     lines.forEach((line, index) => {
-      // Look for task-like patterns (bullet points, numbered lists, etc.)
-      const taskMatch = line.match(/^[\s]*[-*•]\s*(.+)$/) || 
-                       line.match(/^[\s]*\d+[\.)]\s*(.+)$/) ||
-                       line.match(/^[\s]*Task:\s*(.+)$/i);
+      // Enhanced pattern matching for tasks
+      const taskPatterns = [
+        /^[\s]*[-*•]\s*(.+)$/,           // Bullet points
+        /^[\s]*\d+[\.)]\s*(.+)$/,       // Numbered lists
+        /^[\s]*Task:\s*(.+)$/i,         // "Task:" prefix
+        /^[\s]*TODO:\s*(.+)$/i,         // "TODO:" prefix
+        /^[\s]*-\s*\[[ x]\]\s*(.+)$/,   // Checkbox format
+      ];
       
-      if (taskMatch && taskMatch[1]) {
-        const title = taskMatch[1].trim();
-        if (title.length > 5 && title.length < 100) { // Reasonable task title length
-          tasks.push({
-            id: `generated-${Date.now()}-${index}`,
-            title: title,
-            completed: false,
-            status: 'not-started',
-            priority: 'medium',
-            category: 'admin' // Default category
-          });
+      for (const pattern of taskPatterns) {
+        const match = line.match(pattern);
+        if (match && match[1]) {
+          const title = match[1].trim();
+          if (title.length > 3 && title.length < 150) {
+            const now = Date.now();
+            const randomSuffix = Math.random().toString(36).substring(2, 8);
+            
+            tasks.push({
+              id: `extracted-${now}-${index}-${randomSuffix}`,
+              title: title,
+              completed: false,
+              status: 'not-started',
+              priority: this.inferPriority(title, originalMessage),
+              category: this.inferCategory(title),
+              description: `Extracted from: "${originalMessage}"`,
+              tags: this.extractTags(title)
+            });
+            break; // Only match first pattern per line
+          }
         }
       }
     });
 
     return tasks;
+  }
+
+  private inferPriority(title: string, context: string): Task['priority'] {
+    const combined = `${title} ${context}`.toLowerCase();
+    
+    if (combined.match(/\b(urgent|critical|asap|immediately|high|important|priority)\b/)) {
+      return 'high';
+    }
+    if (combined.match(/\b(low|later|someday|nice|optional|when time)\b/)) {
+      return 'low';
+    }
+    
+    return 'medium';
+  }
+
+  private extractTags(title: string): string[] {
+    const tags: string[] = [];
+    const lowerTitle = title.toLowerCase();
+    
+    // Technology tags
+    if (lowerTitle.includes('react')) tags.push('react');
+    if (lowerTitle.includes('ui') || lowerTitle.includes('interface')) tags.push('ui');
+    if (lowerTitle.includes('api')) tags.push('api');
+    if (lowerTitle.includes('mobile')) tags.push('mobile');
+    if (lowerTitle.includes('web')) tags.push('web');
+    
+    return tags;
   }
 
   // Specialized methods for different AI actions
@@ -197,7 +346,7 @@ Be helpful, concise, and actionable in your responses.`;
 
   async createProjectPlan(projectDescription: string, tasks: Task[]): Promise<GrokResponse> {
     return this.chatWithGrok({
-      message: `Create a project plan for: ${projectDescription}. Break it down into specific tasks with priorities and estimated timelines.`,
+      message: `Create a detailed project plan for: ${projectDescription}. Break it down into specific, actionable tasks with priorities, categories, and estimated timelines.`,
       tasks,
       action: 'plan'
     });
@@ -208,6 +357,15 @@ Be helpful, concise, and actionable in your responses.`;
       message: "Analyze my current tasks and suggest ways to optimize my schedule for better productivity and time management.",
       tasks,
       action: 'optimize'
+    });
+  }
+
+  // New method for intelligent task creation
+  async createTasksFromDescription(description: string, tasks: Task[]): Promise<GrokResponse> {
+    return this.chatWithGrok({
+      message: `Create specific, actionable tasks for: ${description}. Include proper categorization, priorities, and break down complex work into manageable tasks.`,
+      tasks,
+      action: 'create'
     });
   }
 
