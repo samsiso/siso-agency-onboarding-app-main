@@ -2,7 +2,8 @@ import {
   LayoutDashboard, Users, MessageSquare, UserCheck,
   ListTodo, CalendarClock, CreditCard,
   ClipboardList, Building2, UserCog, FileText,
-  ScrollText, Zap, Bot, Database, FolderOpen
+  ScrollText, Zap, Bot, Database, FolderOpen,
+  Lock, Settings
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -89,6 +90,11 @@ export const getAdminMenuSections = (): MenuSection[] => {
           label: 'Daily Planner',
         },
         {
+          href: '/admin/life-lock',
+          icon: Lock,
+          label: 'Life Lock',
+        },
+        {
           href: '/admin/payments',
           icon: CreditCard,
           label: 'Financials',
@@ -98,7 +104,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
     {
       type: 'section',
       title: 'System',
-      icon: ClipboardList,
+      icon: Settings,
       items: [
         {
           href: '/changelog',

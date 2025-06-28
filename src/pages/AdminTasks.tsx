@@ -9,6 +9,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 import { AITaskChat } from '@/components/admin/tasks/AITaskChat';
 import { EnhancedTaskItem } from '@/components/admin/tasks/EnhancedTaskItem';
+import { AdminTaskDetailModal } from '@/components/admin/tasks/AdminTaskDetailModal';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import {
   Calendar,
   Clock,
@@ -51,6 +53,7 @@ interface Task {
   estimatedHours?: number;
   subtasks?: Subtask[];
   progress?: number;
+  description?: string;
 }
 
 interface ChatMessage {
@@ -69,6 +72,8 @@ const AdminTasks: React.FC = () => {
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showDisplayDropdown, setShowDisplayDropdown] = useState(false);
+  const [selectedTaskForModal, setSelectedTaskForModal] = useState<Task | null>(null);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
@@ -81,6 +86,7 @@ const AdminTasks: React.FC = () => {
       category: 'design',
       tags: ['ui', 'portfolio'],
       estimatedHours: 12,
+      description: 'Create a modern, responsive landing page that showcases our portfolio work with smooth animations and interactive elements. The design should be mobile-first and align with our brand guidelines.',
       subtasks: [
         { id: '1.1', title: 'Create wireframes for landing page', completed: true },
         { id: '1.2', title: 'Design hero section with animations', completed: true },
@@ -99,6 +105,7 @@ const AdminTasks: React.FC = () => {
       category: 'development',
       tags: ['react', 'showcase'],
       estimatedHours: 8,
+      description: 'Build an interactive portfolio showcase with image galleries, filtering capabilities, and lightbox functionality. Use React components with smooth animations and ensure mobile responsiveness.',
       subtasks: [
         { id: '2.1', title: 'Set up React component structure', completed: true },
         { id: '2.2', title: 'Implement image gallery with lightbox', completed: false },
@@ -116,6 +123,7 @@ const AdminTasks: React.FC = () => {
       category: 'development',
       tags: ['api', 'forms'],
       estimatedHours: 16,
+      description: 'Create a comprehensive system for collecting and managing client specifications including forms, validation, database storage, and automated email notifications. Include proper API documentation and testing.',
       subtasks: [
         { id: '3.1', title: 'Design database schema for specifications', completed: false },
         { id: '3.2', title: 'Create REST API endpoints', completed: false },
@@ -204,8 +212,21 @@ const AdminTasks: React.FC = () => {
   };
 
   const openEditTask = (task: Task) => {
-    setEditingTask(task);
-    setSelectedTaskForEdit(task.id);
+    setSelectedTaskForModal(task);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleTaskModalSave = (updatedTask: Task) => {
+    setTasks(tasks.map(task => 
+      task.id === updatedTask.id ? updatedTask : task
+    ));
+    setIsTaskModalOpen(false);
+    setSelectedTaskForModal(null);
+  };
+
+  const handleTaskModalClose = () => {
+    setIsTaskModalOpen(false);
+    setSelectedTaskForModal(null);
   };
 
   // Helper functions
@@ -256,57 +277,64 @@ const AdminTasks: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="h-screen text-white flex overflow-hidden" style={{ backgroundColor: '#121212' }}>
-        {/* Left Side - AI Task Assistant */}
-        {isAIEnabled ? (
-          <AITaskChat
-            tasks={tasks}
-            chatMessages={chatMessages}
-            onTasksUpdate={setTasks}
-            onChatUpdate={setChatMessages}
-          />
-        ) : (
-          <div className="flex-1 flex flex-col max-w-2xl" style={{ backgroundColor: '#252525' }}>
-            {/* Chat Area */}
-            <div className="flex-1 flex flex-col items-center justify-center">
-              {chatMessages.length === 0 ? (
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-                    <div className="w-12 h-12 border-2 border-gray-600 rounded-lg flex items-center justify-center">
-                      <div className="w-6 h-6 border-l-2 border-t-2 border-gray-400 transform rotate-45"></div>
-                    </div>
-                  </div>
-                  <h2 className="text-xl text-white mb-8">What can I help with?</h2>
-                </div>
-              ) : (
-                <div className="flex-1 w-full max-w-2xl mx-auto p-6 overflow-y-auto">
-                  <div className="space-y-4">
-                    {chatMessages.map((message) => (
-                      <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] p-4 rounded-lg ${
-                          message.sender === 'user' 
-                            ? 'bg-orange-600 text-white' 
-                            : 'bg-gray-800 text-gray-100'
-                        }`}>
-                          <p className="text-sm">{message.content}</p>
+      <div className="h-screen text-white overflow-hidden" style={{ backgroundColor: '#121212' }}>
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          {/* Left Panel - AI Task Assistant */}
+          <ResizablePanel defaultSize={40} minSize={25} maxSize={60}>
+            {isAIEnabled ? (
+              <AITaskChat
+                tasks={tasks}
+                chatMessages={chatMessages}
+                onTasksUpdate={setTasks}
+                onChatUpdate={setChatMessages}
+              />
+            ) : (
+              <div className="flex flex-col h-full" style={{ backgroundColor: '#252525' }}>
+                {/* Chat Area */}
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  {chatMessages.length === 0 ? (
+                    <div className="text-center">
+                      <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+                        <div className="w-12 h-12 border-2 border-gray-600 rounded-lg flex items-center justify-center">
+                          <div className="w-6 h-6 border-l-2 border-t-2 border-gray-400 transform rotate-45"></div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                      <h2 className="text-xl text-white mb-8">What can I help with?</h2>
+                    </div>
+                  ) : (
+                    <div className="flex-1 w-full max-w-2xl mx-auto p-6 overflow-y-auto">
+                      <div className="space-y-4">
+                        {chatMessages.map((message) => (
+                          <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[80%] p-4 rounded-lg ${
+                              message.sender === 'user' 
+                                ? 'bg-orange-600 text-white' 
+                                : 'bg-gray-800 text-gray-100'
+                            }`}>
+                              <p className="text-sm">{message.content}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            
-            {/* Chat Input */}
-            <div className="p-4 border-t border-white/20">
-              <PromptInputBox onSend={(message, files) => sendMessage(message)} placeholder="Message SISO..." />
-            </div>
-          </div>
-        )}
+                
+                {/* Chat Input */}
+                <div className="p-4 border-t border-white/20">
+                  <PromptInputBox onSend={(message, files) => sendMessage(message)} placeholder="Message SISO..." />
+                </div>
+              </div>
+            )}
+          </ResizablePanel>
 
-        {/* Right Side - Tasks Section */}
-        <div className="flex-1 p-4 flex items-center justify-center" style={{ backgroundColor: '#121212' }}>
-          <div className="bg-white rounded-3xl shadow-lg overflow-hidden flex flex-col w-full max-w-2xl h-[calc(100vh-8rem)]">
+          {/* Resizable Handle */}
+          <ResizableHandle withHandle className="bg-gray-700 hover:bg-orange-500 transition-colors duration-200" />
+
+          {/* Right Panel - Tasks Section */}
+          <ResizablePanel defaultSize={60} minSize={40} maxSize={75}>
+            <div className="h-full p-4 flex items-center justify-center" style={{ backgroundColor: '#121212' }}>
+              <div className="bg-white rounded-3xl shadow-lg overflow-hidden flex flex-col w-full max-w-4xl h-[calc(100vh-2rem)] mx-4">
             {/* Header */}
             <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-gray-200">
               <div className="flex items-center gap-4">
@@ -399,7 +427,7 @@ const AdminTasks: React.FC = () => {
 
             {/* Tasks List */}
             <div className="flex-1 overflow-y-auto min-h-0" style={{ backgroundColor: '#252525' }}>
-              <div className="">
+              <div className="p-4">
                 {currentView === 'list' && activeTasks.map((task, index) => (
                   <EnhancedTaskItem
                     key={task.id}
@@ -477,8 +505,19 @@ const AdminTasks: React.FC = () => {
                 <span className="text-xs text-gray-500">SISO Agency Task Manager v2.0</span>
               </div>
             </div>
-          </div>
-        </div>
+              </div>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+
+        {/* Task Detail Modal */}
+        <AdminTaskDetailModal
+          task={selectedTaskForModal}
+          isOpen={isTaskModalOpen}
+          onClose={handleTaskModalClose}
+          onSave={handleTaskModalSave}
+          onSubtaskToggle={toggleSubtask}
+        />
       </div>
     </AdminLayout>
   );
