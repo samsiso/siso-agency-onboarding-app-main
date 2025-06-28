@@ -277,7 +277,7 @@ const AdminTasks: React.FC = () => {
 
   return (
     <AdminLayout>
-      <div className="fixed inset-0 z-10 text-white overflow-hidden" style={{ backgroundColor: '#121212' }}>
+      <div className="h-screen text-white overflow-hidden" style={{ backgroundColor: '#252525' }}>
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {/* Left Panel - AI Task Assistant */}
           <ResizablePanel defaultSize={40} minSize={25} maxSize={60} style={{ backgroundColor: '#252525' }}>
