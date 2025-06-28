@@ -81,7 +81,7 @@ export const SidebarFooter = ({ collapsed, onProfileOpen }: SidebarFooterProps) 
   return (
     <motion.div
       className={cn(
-        'border-t border-siso-border p-4 absolute bottom-0 left-0 right-0 bg-siso-bg/95',
+        'border-t border-siso-border p-4 bg-siso-bg/95 flex-shrink-0',
         collapsed && 'p-2'
       )}
       animate={{ opacity: 1, y: 0 }}

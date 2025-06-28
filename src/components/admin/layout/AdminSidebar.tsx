@@ -123,9 +123,10 @@ export const Sidebar = () => {
         }
         variants={sidebarVariants}
         className={`
-          fixed top-0 h-screen overflow-y-auto
+          fixed top-0 h-screen
           bg-gradient-to-b from-siso-bg via-siso-bg to-siso-bg-alt backdrop-blur-sm
           border-r border-siso-border shadow-xl
+          flex flex-col relative
           ${isMobile ? 'left-0 z-40' : ''}
         `}
         onMouseEnter={handleMouseEnter}
@@ -136,13 +137,15 @@ export const Sidebar = () => {
           setCollapsed={() => setIsExpanded(!isExpanded)}
           onLogoClick={() => setShowNavigation(!showNavigation)}
         />
-        <AnimatePresence mode="wait">
-          <AdminSidebarNavigation 
-            collapsed={!isExpanded} 
-            onItemClick={handleItemClick}
-            visible={showNavigation}
-          />
-        </AnimatePresence>
+        <div className="flex-1 overflow-y-auto">
+          <AnimatePresence mode="wait">
+            <AdminSidebarNavigation 
+              collapsed={!isExpanded} 
+              onItemClick={handleItemClick}
+              visible={showNavigation}
+            />
+          </AnimatePresence>
+        </div>
         <SidebarFooter 
           collapsed={!isExpanded} 
           onProfileOpen={(isOpen) => {
