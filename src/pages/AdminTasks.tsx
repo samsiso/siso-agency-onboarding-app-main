@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -291,54 +291,100 @@ const AdminTasks: React.FC = () => {
             ) : (
               <div className="h-full flex flex-col" style={{ backgroundColor: '#252525' }}>
                 {/* Chat Area */}
-                <div className="flex-1 flex flex-col items-center justify-center">
+                <div className="flex-1 flex flex-col">
                   {chatMessages.length === 0 ? (
-                    <div className="text-center">
-                      <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-                        <div className="w-12 h-12 border-2 border-orange-500/40 rounded-lg flex items-center justify-center bg-orange-500/20">
-                          <div className="w-6 h-6 border-l-2 border-t-2 border-orange-400 transform rotate-45"></div>
-                        </div>
-                      </div>
-                      <h2 className="text-xl text-white mb-8 font-semibold">What can I help with?</h2>
+                    <div className="flex-1 flex flex-col items-center justify-center p-6">
+                      <motion.div 
+                        className="text-center"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                      >
+                        <motion.div 
+                          className="w-20 h-20 mx-auto mb-8 flex items-center justify-center"
+                          initial={{ scale: 0.8 }}
+                          animate={{ scale: 1 }}
+                          transition={{ duration: 0.5, delay: 0.2 }}
+                        >
+                          <div className="w-16 h-16 border-2 border-orange-500/30 rounded-2xl flex items-center justify-center bg-gradient-to-br from-orange-500/20 to-orange-600/10 backdrop-blur-sm shadow-lg">
+                            <div className="w-8 h-8 border-l-2 border-t-2 border-orange-400 transform rotate-45"></div>
+                          </div>
+                        </motion.div>
+                        <motion.h2 
+                          className="text-2xl text-white mb-8 font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.4 }}
+                        >
+                          What can I help with?
+                        </motion.h2>
+                      </motion.div>
                     </div>
                   ) : (
-                    <div className="flex-1 p-6 overflow-y-auto">
-                      <div className="space-y-4">
-                        {chatMessages.map((message) => (
-                          <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`flex items-end gap-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                              {/* Avatar/Logo */}
-                              {message.sender === 'user' ? (
-                                <img 
-                                  src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
-                                  alt="SISO" 
-                                  className="w-8 h-8 rounded-lg flex-shrink-0 mb-1" 
-                                />
-                              ) : (
-                                <div className="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-500/40 flex items-center justify-center flex-shrink-0 mb-1">
-                                  <div className="w-4 h-4 border-l-2 border-t-2 border-orange-400 transform rotate-45"></div>
+                    <div className="flex-1 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                      <div className="space-y-6">
+                        <AnimatePresence>
+                          {chatMessages.map((message, index) => (
+                            <motion.div
+                              key={message.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -20 }}
+                              transition={{ duration: 0.3, delay: index * 0.1 }}
+                              className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
+                              <div className={`flex items-end gap-3 max-w-[85%] ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                {/* Avatar/Logo */}
+                                <div className="flex-shrink-0 mb-1">
+                                  {message.sender === 'user' ? (
+                                    <div className="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-orange-500/30 shadow-lg">
+                                      <img 
+                                        src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+                                        alt="SISO" 
+                                        className="w-full h-full object-cover" 
+                                      />
+                                    </div>
+                                  ) : (
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-600/20 border border-orange-500/30 flex items-center justify-center backdrop-blur-sm shadow-lg">
+                                      <div className="w-5 h-5 border-l-2 border-t-2 border-orange-400 transform rotate-45"></div>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                              
-                              {/* Message Bubble */}
-                              <div className={`max-w-[80%] p-4 rounded-lg ${
-                                message.sender === 'user' 
-                                  ? 'bg-orange-500 text-white shadow-sm' 
-                                  : 'bg-gray-800/80 text-gray-100 border border-gray-700/50'
-                              }`}>
-                                <p className="text-sm">{message.content}</p>
+                                
+                                {/* Message Bubble */}
+                                <motion.div 
+                                  className={`relative p-4 rounded-2xl backdrop-blur-sm shadow-lg transition-all duration-200 hover:shadow-xl ${
+                                    message.sender === 'user' 
+                                      ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-orange-500/20' 
+                                      : 'bg-gray-800/80 text-gray-100 border border-gray-700/50 shadow-gray-900/20'
+                                  }`}
+                                  whileHover={{ scale: 1.02 }}
+                                  transition={{ duration: 0.2 }}
+                                >
+                                  <p className="text-sm leading-relaxed font-medium">{message.content}</p>
+                                  <p className="text-xs opacity-70 mt-2 font-medium">
+                                    {message.timestamp.toLocaleTimeString([], { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}
+                                  </p>
+                                </motion.div>
                               </div>
-                            </div>
-                          </div>
-                        ))}
+                            </motion.div>
+                          ))}
+                        </AnimatePresence>
                       </div>
                     </div>
                   )}
                 </div>
                 
-                {/* Chat Input */}
-                <div className="p-4 border-t border-white/20">
-                  <PromptInputBox onSend={(message, files) => sendMessage(message)} placeholder="Message SISO..." />
+                {/* Enhanced Chat Input */}
+                <div className="p-4 border-t border-white/10 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm">
+                  <PromptInputBox 
+                    onSend={(message, files) => sendMessage(message)} 
+                    placeholder="Message SISO..." 
+                    className="bg-gray-800/90 border-gray-600/50 shadow-xl backdrop-blur-sm"
+                  />
                 </div>
               </div>
             )}

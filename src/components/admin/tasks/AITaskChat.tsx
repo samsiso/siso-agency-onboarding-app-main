@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 import { grokTaskService } from '@/services/grokTaskService';
-import { Brain } from 'lucide-react';
+import { Brain, Copy, Check } from 'lucide-react';
 
 // Simple types to avoid import issues
 interface Task {
@@ -38,6 +39,18 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
   onChatUpdate
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -94,6 +107,27 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
     }
   };
 
+  const handleCopyMessage = async (messageId: string, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy message:', err);
+    }
+  };
+
+  // Group consecutive messages from the same sender
+  const groupedMessages = chatMessages.reduce((groups: ChatMessage[][], message, index) => {
+    const prevMessage = chatMessages[index - 1];
+    if (prevMessage && prevMessage.sender === message.sender) {
+      groups[groups.length - 1].push(message);
+    } else {
+      groups.push([message]);
+    }
+    return groups;
+  }, []);
+
   const activeTasks = tasks.filter(t => !t.completed);
   const completedTasks = tasks.filter(t => t.completed);
 
@@ -103,124 +137,230 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
       <div className="flex-1 flex flex-col">
         {chatMessages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-6">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-                <div className="w-12 h-12 border-2 border-orange-500 rounded-lg flex items-center justify-center bg-orange-500/20">
-                  <Brain className="w-6 h-6 text-orange-400" />
+            <motion.div 
+              className="text-center mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <motion.div 
+                className="w-20 h-20 mx-auto mb-8 flex items-center justify-center"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                <div className="w-16 h-16 border-2 border-orange-500/30 rounded-2xl flex items-center justify-center bg-gradient-to-br from-orange-500/20 to-orange-600/10 backdrop-blur-sm shadow-lg">
+                  <Brain className="w-8 h-8 text-orange-400" />
                 </div>
-              </div>
-              <h2 className="text-xl text-white mb-4 font-semibold">AI Task Assistant</h2>
-              <p className="text-gray-300 mb-4 max-w-md">
+              </motion.div>
+              
+              <motion.h2 
+                className="text-2xl text-white mb-4 font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+              >
+                AI Task Assistant
+              </motion.h2>
+              
+              <motion.p 
+                className="text-gray-300 mb-6 max-w-md leading-relaxed"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
                 I can help you create tasks, analyze your workload, suggest priorities, and optimize your productivity.
-              </p>
+              </motion.p>
               
               {/* AI Status Indicator */}
-              <div className="mb-6">
+              <motion.div 
+                className="mb-8"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 }}
+              >
                 {grokTaskService.isReady() ? (
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/40 rounded-full text-sm">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/30 rounded-full text-sm font-medium backdrop-blur-sm shadow-lg">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                     🤖 AI Ready - Groq API Connected
                   </div>
                 ) : (
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-500/20 text-orange-300 border border-orange-500/40 rounded-full text-sm">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-300 border border-orange-500/30 rounded-full text-sm font-medium backdrop-blur-sm shadow-lg">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
                     ⚠️ Demo Mode - Configure VITE_GROQ_API_KEY
                   </div>
                 )}
-              </div>
+              </motion.div>
               
-              {/* Task Stats */}
-              <div className="flex items-center justify-center gap-4 mb-8">
-                <div className="px-3 py-1 bg-orange-500/20 text-orange-300 border border-orange-500/40 rounded-full text-sm font-medium">
-                  {activeTasks.length} Active
+              {/* Enhanced Task Stats */}
+              <motion.div 
+                className="flex items-center justify-center gap-4 mb-8"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.0 }}
+              >
+                <div className="px-4 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-300 border border-orange-500/30 rounded-xl text-sm font-semibold backdrop-blur-sm shadow-lg">
+                  <span className="text-orange-200">{activeTasks.length}</span> Active
                 </div>
-                <div className="px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/40 rounded-full text-sm font-medium">
-                  {completedTasks.length} Completed
+                <div className="px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/30 rounded-xl text-sm font-semibold backdrop-blur-sm shadow-lg">
+                  <span className="text-green-200">{completedTasks.length}</span> Completed
                 </div>
-                <div className="px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-500/40 rounded-full text-sm font-medium">
-                  {tasks.filter(t => t.status === 'overdue').length} Overdue
+                <div className="px-4 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 text-red-300 border border-red-500/30 rounded-xl text-sm font-semibold backdrop-blur-sm shadow-lg">
+                  <span className="text-red-200">{tasks.filter(t => t.status === 'overdue').length}</span> Overdue
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         ) : (
-          <div className="flex-1 p-6 overflow-y-auto">
-            <div className="space-y-4">
-              {chatMessages.map((message) => (
-                <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`flex items-end gap-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                    {/* Avatar/Logo */}
-                    {message.sender === 'user' ? (
-                      <img 
-                        src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
-                        alt="SISO" 
-                        className="w-8 h-8 rounded-lg flex-shrink-0 mb-1" 
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-500/40 flex items-center justify-center flex-shrink-0 mb-1">
-                        <Brain className="w-4 h-4 text-orange-400" />
-                      </div>
-                    )}
-                    
-                    {/* Message Bubble */}
-                    <div className={`max-w-[80%] p-4 rounded-lg ${
-                      message.sender === 'user' 
-                        ? 'bg-orange-500 text-white shadow-sm' 
-                        : 'bg-gray-800/80 text-gray-100 border border-gray-700/50'
-                    }`}>
-                      <div className="flex items-start gap-2 mb-2">
-                        {message.sender === 'assistant' && (
-                          <Brain className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+          <div 
+            ref={chatContainerRef}
+            className="flex-1 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
+          >
+            <div className="space-y-6">
+              <AnimatePresence>
+                {groupedMessages.map((messageGroup, groupIndex) => (
+                  <motion.div
+                    key={`group-${groupIndex}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, delay: groupIndex * 0.1 }}
+                    className={`flex ${messageGroup[0].sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`flex items-end gap-3 max-w-[85%] ${messageGroup[0].sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      {/* Avatar */}
+                      <div className="flex-shrink-0 mb-1">
+                        {messageGroup[0].sender === 'user' ? (
+                          <div className="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-orange-500/30 shadow-lg">
+                            <img 
+                              src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+                              alt="SISO" 
+                              className="w-full h-full object-cover" 
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-600/20 border border-orange-500/30 flex items-center justify-center backdrop-blur-sm shadow-lg">
+                            <Brain className="w-5 h-5 text-orange-400" />
+                          </div>
                         )}
-                        <p className="text-sm whitespace-pre-line">{message.content}</p>
                       </div>
-                      <p className="text-xs opacity-70">
-                        {message.timestamp.toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </p>
+                      
+                      {/* Message Group */}
+                      <div className="space-y-2">
+                        {messageGroup.map((message, messageIndex) => (
+                          <motion.div
+                            key={message.id}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.2, delay: messageIndex * 0.05 }}
+                            className="group relative"
+                          >
+                            <div className={`relative p-4 rounded-2xl backdrop-blur-sm shadow-lg transition-all duration-200 hover:shadow-xl ${
+                              message.sender === 'user' 
+                                ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-orange-500/20' 
+                                : 'bg-gray-800/80 text-gray-100 border border-gray-700/50 shadow-gray-900/20'
+                            }`}>
+                              <div className="flex items-start gap-3">
+                                {message.sender === 'assistant' && (
+                                  <Brain className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                                )}
+                                <div className="flex-1">
+                                  <p className="text-sm leading-relaxed whitespace-pre-line font-medium">
+                                    {message.content}
+                                  </p>
+                                  <div className="flex items-center justify-between mt-3">
+                                    <p className="text-xs opacity-70 font-medium">
+                                      {message.timestamp.toLocaleTimeString([], { 
+                                        hour: '2-digit', 
+                                        minute: '2-digit' 
+                                      })}
+                                    </p>
+                                    
+                                    {/* Copy button */}
+                                    <button
+                                      onClick={() => handleCopyMessage(message.id, message.content)}
+                                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 rounded-md hover:bg-white/10 text-xs"
+                                      title="Copy message"
+                                    >
+                                      {copiedMessageId === message.id ? (
+                                        <Check className="w-3 h-3" />
+                                      ) : (
+                                        <Copy className="w-3 h-3" />
+                                      )}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
               
-              {/* Loading Indicator */}
+              {/* Enhanced Loading Indicator */}
               {isLoading && (
-                <div className="flex justify-start">
-                  <div className="flex items-end gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-500/40 flex items-center justify-center flex-shrink-0 mb-1">
-                      <Brain className="w-4 h-4 text-orange-400" />
+                <motion.div 
+                  className="flex justify-start"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                >
+                  <div className="flex items-end gap-3 max-w-[85%]">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-600/20 border border-orange-500/30 flex items-center justify-center backdrop-blur-sm shadow-lg">
+                      <Brain className="w-5 h-5 text-orange-400 animate-pulse" />
                     </div>
-                    <div className="bg-gray-800/80 text-gray-100 p-4 rounded-lg border border-gray-700/50">
-                      <div className="flex items-center gap-2">
-                        <Brain className="w-4 h-4 text-orange-400 animate-pulse" />
-                        <span className="text-sm text-gray-300">Thinking...</span>
+                    <div className="bg-gray-800/80 text-gray-100 p-4 rounded-2xl border border-gray-700/50 backdrop-blur-sm shadow-lg">
+                      <div className="flex items-center gap-3">
+                        <Brain className="w-4 h-4 text-orange-400" />
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm text-gray-300 font-medium">Thinking</span>
+                          <div className="flex gap-1">
+                            <div className="w-1 h-1 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                            <div className="w-1 h-1 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                            <div className="w-1 h-1 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
+              
+              {/* Scroll anchor */}
+              <div ref={messagesEndRef} />
             </div>
           </div>
         )}
       </div>
       
-      {/* Chat Input */}
-      <div className="p-4 border-t border-white/20">
+      {/* Enhanced Chat Input */}
+      <div className="p-4 border-t border-white/10 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm">
         <PromptInputBox 
           onSend={(message, files) => handleSendMessage(message)} 
           placeholder="Ask me to create tasks, analyze workload, or help with planning..."
           isLoading={isLoading}
+          className="bg-gray-800/90 border-gray-600/50 shadow-xl backdrop-blur-sm"
         />
         
-        {/* Example Prompts */}
+        {/* Enhanced Example Prompts */}
         {chatMessages.length === 0 && (
-          <div className="mt-3 text-xs text-gray-500">
-            <p className="mb-1">💡 Try these examples:</p>
-            <p>• "Create a task to redesign the landing page by next Friday"</p>
-            <p>• "Help me prioritize my tasks for this week"</p>
-            <p>• "Break down the new feature project into smaller tasks"</p>
-            <p>• "What should I focus on to meet my deadlines?"</p>
-          </div>
+          <motion.div 
+            className="mt-4 text-xs text-gray-400"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+          >
+            <p className="mb-2 text-gray-300 font-medium">💡 Try these examples:</p>
+            <div className="space-y-1 text-gray-500">
+              <p>• "Create a task to redesign the landing page by next Friday"</p>
+              <p>• "Help me prioritize my tasks for this week"</p>
+              <p>• "Break down the new feature project into smaller tasks"</p>
+              <p>• "What should I focus on to meet my deadlines?"</p>
+            </div>
+          </motion.div>
         )}
       </div>
     </div>
