@@ -1,10 +1,8 @@
 import { 
   LayoutDashboard, Users, MessageSquare, UserCheck,
-  ListTodo, CalendarClock, CreditCard, Settings,
+  ListTodo, CalendarClock, CreditCard,
   ClipboardList, Building2, UserCog, FileText,
-  ScrollText, Zap, Bot, Database, Handshake,
-  Trophy, BarChart3, Activity, BookOpen, 
-  Workflow, Layers, FolderOpen
+  ScrollText, Zap, Bot, Database, FolderOpen
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -33,38 +31,7 @@ export const getAdminMenuSections = (): MenuSection[] => {
         }
       ]
     },
-    {
-      type: 'section',
-      title: 'Partnership Program',
-      icon: Handshake,
-      items: [
-        {
-          href: '/admin/partnership',
-          icon: LayoutDashboard,
-          label: 'Overview',
-        },
-        {
-          href: '/admin/partnership/leaderboard',
-          icon: Trophy,
-          label: 'Leaderboard',
-        },
-        {
-          href: '/admin/partnership/referrals',
-          icon: Activity,
-          label: 'Referrals',
-        },
-        {
-          href: '/admin/partnership/statistics',
-          icon: BarChart3,
-          label: 'Statistics',
-        },
-        {
-          href: '/admin/partnership/training',
-          icon: BookOpen,
-          label: 'Training Hub',
-        }
-      ]
-    },
+
     {
       type: 'section',
       title: 'Team Operations',
@@ -91,16 +58,6 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/plans/create',
           icon: FileText,
           label: 'Plans',
-        },
-        {
-          href: '/admin/wireframes',
-          icon: Layers,
-          label: 'Wireframes',
-        },
-        {
-          href: '/admin/userflow',
-          icon: Workflow,
-          label: 'User Flows',
         }
       ]
     },
@@ -141,13 +98,8 @@ export const getAdminMenuSections = (): MenuSection[] => {
     {
       type: 'section',
       title: 'System',
-      icon: Settings,
+      icon: ClipboardList,
       items: [
-        {
-          href: '/admin/settings',
-          icon: Settings,
-          label: 'Settings',
-        },
         {
           href: '/changelog',
           icon: ClipboardList,
