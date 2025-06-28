@@ -146,23 +146,39 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
             <div className="space-y-4">
               {chatMessages.map((message) => (
                 <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-4 rounded-lg ${
-                    message.sender === 'user' 
-                      ? 'bg-orange-500 text-white shadow-sm' 
-                      : 'bg-gray-800/80 text-gray-100 border border-gray-700/50'
-                  }`}>
-                    <div className="flex items-start gap-2 mb-2">
-                      {message.sender === 'assistant' && (
-                        <Brain className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
-                      )}
-                      <p className="text-sm whitespace-pre-line">{message.content}</p>
+                  <div className={`flex items-end gap-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    {/* Avatar/Logo */}
+                    {message.sender === 'user' ? (
+                      <img 
+                        src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+                        alt="SISO" 
+                        className="w-8 h-8 rounded-lg flex-shrink-0 mb-1" 
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-500/40 flex items-center justify-center flex-shrink-0 mb-1">
+                        <Brain className="w-4 h-4 text-orange-400" />
+                      </div>
+                    )}
+                    
+                    {/* Message Bubble */}
+                    <div className={`max-w-[80%] p-4 rounded-lg ${
+                      message.sender === 'user' 
+                        ? 'bg-orange-500 text-white shadow-sm' 
+                        : 'bg-gray-800/80 text-gray-100 border border-gray-700/50'
+                    }`}>
+                      <div className="flex items-start gap-2 mb-2">
+                        {message.sender === 'assistant' && (
+                          <Brain className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                        )}
+                        <p className="text-sm whitespace-pre-line">{message.content}</p>
+                      </div>
+                      <p className="text-xs opacity-70">
+                        {message.timestamp.toLocaleTimeString([], { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </p>
                     </div>
-                    <p className="text-xs opacity-70">
-                      {message.timestamp.toLocaleTimeString([], { 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </p>
                   </div>
                 </div>
               ))}
@@ -170,10 +186,15 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
               {/* Loading Indicator */}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-800/80 text-gray-100 p-4 rounded-lg border border-gray-700/50">
-                    <div className="flex items-center gap-2">
-                      <Brain className="w-4 h-4 text-orange-400 animate-pulse" />
-                      <span className="text-sm text-gray-300">Thinking...</span>
+                  <div className="flex items-end gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-500/40 flex items-center justify-center flex-shrink-0 mb-1">
+                      <Brain className="w-4 h-4 text-orange-400" />
+                    </div>
+                    <div className="bg-gray-800/80 text-gray-100 p-4 rounded-lg border border-gray-700/50">
+                      <div className="flex items-center gap-2">
+                        <Brain className="w-4 h-4 text-orange-400 animate-pulse" />
+                        <span className="text-sm text-gray-300">Thinking...</span>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -306,12 +306,28 @@ const AdminTasks: React.FC = () => {
                       <div className="space-y-4">
                         {chatMessages.map((message) => (
                           <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[80%] p-4 rounded-lg ${
-                              message.sender === 'user' 
-                                ? 'bg-orange-500 text-white shadow-sm' 
-                                : 'bg-gray-800/80 text-gray-100 border border-gray-700/50'
-                            }`}>
-                              <p className="text-sm">{message.content}</p>
+                            <div className={`flex items-end gap-2 ${message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                              {/* Avatar/Logo */}
+                              {message.sender === 'user' ? (
+                                <img 
+                                  src="/lovable-uploads/c5921a2f-8856-42f4-bec5-2d08b81c5691.png" 
+                                  alt="SISO" 
+                                  className="w-8 h-8 rounded-lg flex-shrink-0 mb-1" 
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-lg bg-orange-500/20 border border-orange-500/40 flex items-center justify-center flex-shrink-0 mb-1">
+                                  <div className="w-4 h-4 border-l-2 border-t-2 border-orange-400 transform rotate-45"></div>
+                                </div>
+                              )}
+                              
+                              {/* Message Bubble */}
+                              <div className={`max-w-[80%] p-4 rounded-lg ${
+                                message.sender === 'user' 
+                                  ? 'bg-orange-500 text-white shadow-sm' 
+                                  : 'bg-gray-800/80 text-gray-100 border border-gray-700/50'
+                              }`}>
+                                <p className="text-sm">{message.content}</p>
+                              </div>
                             </div>
                           </div>
                         ))}
