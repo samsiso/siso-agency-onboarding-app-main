@@ -98,7 +98,7 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
   const completedTasks = tasks.filter(t => t.completed);
 
   return (
-    <div className="flex-1 flex flex-col max-w-2xl" style={{ backgroundColor: '#252525' }}>
+    <div className="h-full flex flex-col" style={{ backgroundColor: '#252525' }}>
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
         {chatMessages.length === 0 ? (
@@ -109,8 +109,8 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
                   <Brain className="w-6 h-6 text-orange-400" />
                 </div>
               </div>
-              <h2 className="text-xl text-white mb-4">AI Task Assistant</h2>
-              <p className="text-gray-400 mb-4 max-w-md">
+              <h2 className="text-xl text-white mb-4 font-semibold">AI Task Assistant</h2>
+              <p className="text-gray-300 mb-4 max-w-md">
                 I can help you create tasks, analyze your workload, suggest priorities, and optimize your productivity.
               </p>
               
@@ -129,27 +129,27 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
               
               {/* Task Stats */}
               <div className="flex items-center justify-center gap-4 mb-8">
-                <div className="px-3 py-1 bg-orange-500/20 text-orange-300 border border-orange-500/40 rounded-full text-sm">
+                <div className="px-3 py-1 bg-orange-500/20 text-orange-300 border border-orange-500/40 rounded-full text-sm font-medium">
                   {activeTasks.length} Active
                 </div>
-                <div className="px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/40 rounded-full text-sm">
+                <div className="px-3 py-1 bg-green-500/20 text-green-300 border border-green-500/40 rounded-full text-sm font-medium">
                   {completedTasks.length} Completed
                 </div>
-                <div className="px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-500/40 rounded-full text-sm">
+                <div className="px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-500/40 rounded-full text-sm font-medium">
                   {tasks.filter(t => t.status === 'overdue').length} Overdue
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="flex-1 w-full max-w-2xl mx-auto p-6 overflow-y-auto">
+          <div className="flex-1 p-6 overflow-y-auto">
             <div className="space-y-4">
               {chatMessages.map((message) => (
                 <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[80%] p-4 rounded-lg ${
                     message.sender === 'user' 
-                      ? 'bg-orange-600 text-white' 
-                      : 'bg-gray-800 text-gray-100'
+                      ? 'bg-orange-500 text-white shadow-sm' 
+                      : 'bg-gray-800/80 text-gray-100 border border-gray-700/50'
                   }`}>
                     <div className="flex items-start gap-2 mb-2">
                       {message.sender === 'assistant' && (
@@ -170,10 +170,10 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
               {/* Loading Indicator */}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-800 text-gray-100 p-4 rounded-lg">
+                  <div className="bg-gray-800/80 text-gray-100 p-4 rounded-lg border border-gray-700/50">
                     <div className="flex items-center gap-2">
                       <Brain className="w-4 h-4 text-orange-400 animate-pulse" />
-                      <span className="text-sm text-gray-400">Thinking...</span>
+                      <span className="text-sm text-gray-300">Thinking...</span>
                     </div>
                   </div>
                 </div>

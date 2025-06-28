@@ -289,27 +289,27 @@ const AdminTasks: React.FC = () => {
                 onChatUpdate={setChatMessages}
               />
             ) : (
-              <div className="flex flex-col h-full" style={{ backgroundColor: '#252525' }}>
+              <div className="h-full flex flex-col" style={{ backgroundColor: '#252525' }}>
                 {/* Chat Area */}
                 <div className="flex-1 flex flex-col items-center justify-center">
                   {chatMessages.length === 0 ? (
                     <div className="text-center">
                       <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-                        <div className="w-12 h-12 border-2 border-gray-600 rounded-lg flex items-center justify-center">
-                          <div className="w-6 h-6 border-l-2 border-t-2 border-gray-400 transform rotate-45"></div>
+                        <div className="w-12 h-12 border-2 border-orange-500/40 rounded-lg flex items-center justify-center bg-orange-500/20">
+                          <div className="w-6 h-6 border-l-2 border-t-2 border-orange-400 transform rotate-45"></div>
                         </div>
                       </div>
-                      <h2 className="text-xl text-white mb-8">What can I help with?</h2>
+                      <h2 className="text-xl text-white mb-8 font-semibold">What can I help with?</h2>
                     </div>
                   ) : (
-                    <div className="flex-1 w-full max-w-2xl mx-auto p-6 overflow-y-auto">
+                    <div className="flex-1 p-6 overflow-y-auto">
                       <div className="space-y-4">
                         {chatMessages.map((message) => (
                           <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-[80%] p-4 rounded-lg ${
                               message.sender === 'user' 
-                                ? 'bg-orange-600 text-white' 
-                                : 'bg-gray-800 text-gray-100'
+                                ? 'bg-orange-500 text-white shadow-sm' 
+                                : 'bg-gray-800/80 text-gray-100 border border-gray-700/50'
                             }`}>
                               <p className="text-sm">{message.content}</p>
                             </div>
