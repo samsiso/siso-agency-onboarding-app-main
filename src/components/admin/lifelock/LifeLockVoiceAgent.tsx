@@ -99,6 +99,11 @@ export const LifeLockVoiceAgent: React.FC<LifeLockVoiceAgentProps> = ({
 
     console.log('💬 [LIFELOCK VOICE] Generated response:', response);
 
+    // REMOVED: Automatic voice response per user preference  
+    console.log('🔇 [LIFELOCK VOICE] Auto-voice response DISABLED - Voice input only mode');
+    console.log('💬 [LIFELOCK VOICE] Response generated for visual display only');
+    
+    /* REMOVED AUTO-TTS RESPONSE
     // Speak the response
     if (voiceService.isTTSSupported()) {
       console.log('🔊 [LIFELOCK VOICE] Speaking response...');
@@ -125,6 +130,7 @@ export const LifeLockVoiceAgent: React.FC<LifeLockVoiceAgentProps> = ({
         setIsSpeaking(false);
       }
     }
+    */
 
     // Call the parent callback
     if (onVoiceCommand) {

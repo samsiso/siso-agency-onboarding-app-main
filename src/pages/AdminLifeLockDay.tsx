@@ -359,12 +359,18 @@ const AdminLifeLockDay: React.FC = () => {
             setIsListening(false);
             const response = await processVoiceCommand(transcript);
             
+            // REMOVED: Automatic voice response per user preference
+            console.log('🔇 [LIFELOCK] Auto-voice response DISABLED - Voice input only mode');
+            console.log('💬 [LIFELOCK] Voice command processed, showing visual feedback only');
+            
+            /* REMOVED AUTO-VOICE RESPONSE  
             // Speak the response
             if (voiceService.isTTSSupported()) {
               voiceService.speak(response);
             }
+            */
             
-            // Show notification
+            // Show visual notification instead of voice response
             const notification = document.createElement('div');
             notification.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
             notification.textContent = response;

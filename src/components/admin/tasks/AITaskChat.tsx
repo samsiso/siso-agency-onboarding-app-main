@@ -46,7 +46,7 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
 
   // Voice state - simplified
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
 
   // Cleanup voice service on unmount
   useEffect(() => {
@@ -66,7 +66,10 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
 
   // Voice output handler
   const speakMessage = async (text: string) => {
-    if (!voiceService.isTTSSupported() || !voiceEnabled) return;
+    if (!voiceService.isTTSSupported()) return;
+
+    console.log('🔊 [AI TASK] Manual voice playback requested');
+    console.log('📝 [AI TASK] Text to speak:', text.substring(0, 50) + '...');
 
     try {
       setIsSpeaking(true);
@@ -126,7 +129,7 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
     setIsLoading(true);
 
     console.log('🧠 [AI TASK] User Message Received');
-    console.log('�� [AI TASK] Input:', message);
+    console.log('🔍 [AI TASK] Input:', message);
     console.log('🔍 [AI TASK] Message Analysis:', {
       length: message.length,
       wordCount: message.split(' ').length,
@@ -213,7 +216,7 @@ Is there a specific task or project you'd like me to focus on?`;
         console.log('✅ [AI TASK] Status query response generated');
         
       } else if (message.toLowerCase().includes('help')) {
-        console.log('�� [AI TASK] Detected: Help Request');
+        console.log('🤖 [AI TASK] Detected: Help Request');
         
         aiResponse = `I'm here to help you manage your tasks efficiently! Here's what I can do:
 
@@ -258,7 +261,13 @@ What specific area would you like assistance with?`;
 
       onChatUpdate([...chatMessages, userMessage, aiMessage]);
 
-      // Voice response logic with detailed logging
+      // Voice response logic with detailed logging - DISABLED FOR VOICE INPUT ONLY MODE
+      console.log('🔇 [AI TASK] Auto-voice response DISABLED - Voice input only mode');
+      console.log('💬 [AI TASK] Response available for manual playback via message buttons');
+      
+      // Note: Automatic voice response removed per user preference
+      // User can still play voice manually using the play button on each message
+      /* REMOVED AUTO-VOICE RESPONSE
       if (voiceEnabled) {
         console.log('🔊 [AI TASK] Voice Response Enabled - Starting TTS');
         console.log('🎵 [AI TASK] TTS Config:', {
@@ -276,6 +285,7 @@ What specific area would you like assistance with?`;
       } else {
         console.log('🔇 [AI TASK] Voice response disabled by user');
       }
+      */
 
     } catch (error) {
       console.error('❌ [AI TASK] Error processing message:', error);
@@ -339,13 +349,13 @@ What specific area would you like assistance with?`;
               onClick={() => setVoiceEnabled(!voiceEnabled)}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 voiceEnabled 
-                  ? 'bg-green-600/20 text-green-400 border border-green-600/30 hover:bg-green-600/30' 
+                  ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30 hover:bg-blue-600/30' 
                   : 'bg-gray-600/20 text-gray-400 border border-gray-600/30 hover:bg-gray-600/30'
               }`}
-              title={voiceEnabled ? 'Voice responses enabled' : 'Voice responses disabled'}
+              title={voiceEnabled ? 'Voice input enabled, manual playback available' : 'Voice input available, auto-playback disabled'}
             >
-              <span className="text-xs">🔊</span>
-              <span>{voiceEnabled ? 'Voice On' : 'Voice Off'}</span>
+              <span className="text-xs">🎤</span>
+              <span>Voice Input Only</span>
             </button>
             
             {/* Speaking indicator */}
