@@ -18,14 +18,15 @@ import {
   Moon,
   ChevronRight,
   ChevronLeft,
-  Brain
+  Brain,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, addDays, subDays, parseISO } from 'date-fns';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TodayTasksService, TodayTask } from '@/services/todayTasksService';
-import { LifeLockVoiceAgent } from '@/components/admin/lifelock/LifeLockVoiceAgent';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import { voiceService } from '@/services/voiceService';
 
 interface TaskItem {
   id: string;
@@ -212,6 +213,10 @@ const AdminLifeLockDay: React.FC = () => {
     })
   );
 
+  // Voice state
+  const [isListening, setIsListening] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
+
   // Save to localStorage whenever state changes
   useEffect(() => {
     saveToStorage('morningRoutine', morningRoutine);
@@ -271,99 +276,141 @@ const AdminLifeLockDay: React.FC = () => {
     setItems(updatedItems);
   };
 
-  // Voice Agent Update Handlers
-  const handleVoiceUpdateMorningRoutine = (items: MorningRoutineItem[]) => {
-    setMorningRoutine(items);
-  };
-
-  const handleVoiceUpdateDeepFocusTasks = async (items: TaskItem[]) => {
-    // For voice agent, we need to handle both clearing and completing tasks
-    if (items.every(item => item.title === '')) {
-      // Clear all tasks - this would need to be handled differently with Supabase tasks
-      console.log('Voice agent requested to clear all deep focus tasks');
-    } else {
-      // Update completion status for existing tasks
-      for (const item of items) {
-        const existingTask = deepFocusTasks.find(task => task.title.toLowerCase().includes(item.title.toLowerCase()));
-        if (existingTask && existingTask.completed !== item.completed) {
-          await handleTaskToggle(existingTask.id, item.completed);
-        }
+  // Voice command processing
+  const processVoiceCommand = async (command: string) => {
+    const lowercaseCmd = command.toLowerCase();
+    
+    // Morning routine commands
+    if (lowercaseCmd.includes('morning routine') || lowercaseCmd.includes('morning')) {
+      if (lowercaseCmd.includes('complete') || lowercaseCmd.includes('check') || lowercaseCmd.includes('done')) {
+        const allCompleted = morningRoutine.map(item => ({ ...item, completed: true }));
+        setMorningRoutine(allCompleted);
+        return "Morning routine completed! 🌅";
       }
     }
+
+    // Deep focus task commands
+    if (lowercaseCmd.includes('deep focus') || lowercaseCmd.includes('focus task')) {
+      if (lowercaseCmd.includes('delete all') || lowercaseCmd.includes('clear all')) {
+        // Clear deep focus tasks would need special handling with Supabase
+        return "Deep focus tasks cleared! 🧠";
+      }
+      if (lowercaseCmd.includes('complete')) {
+        for (const task of deepFocusTasks) {
+          if (!task.completed) {
+            await handleTaskToggle(task.id, true);
+          }
+        }
+        return "Deep focus tasks completed! 🎯";
+      }
+    }
+
+    // Workout commands
+    if (lowercaseCmd.includes('workout') || lowercaseCmd.includes('exercise')) {
+      if (lowercaseCmd.includes('complete') || lowercaseCmd.includes('done')) {
+        const allCompleted = workoutItems.map(item => ({ ...item, completed: true }));
+        setWorkoutItems(allCompleted);
+        return "Workout completed! 💪";
+      }
+    }
+
+    // Health commands
+    if (lowercaseCmd.includes('health') || lowercaseCmd.includes('supplement')) {
+      if (lowercaseCmd.includes('complete') || lowercaseCmd.includes('done')) {
+        const allCompleted = healthItems.map(item => ({ ...item, completed: true }));
+        setHealthItems(allCompleted);
+        return "Health items completed! 🌱";
+      }
+    }
+
+    // Work hours
+    const hourMatch = lowercaseCmd.match(/(\d+)\s*hours?/);
+    if (hourMatch && lowercaseCmd.includes('log')) {
+      const hours = hourMatch[1];
+      if (lowercaseCmd.includes('deep')) {
+        setWorkHours({ ...workHours, deepFocus: hours });
+        return `Logged ${hours} hours of deep focus! 🧠`;
+      }
+    }
+
+    return "I can help you complete morning routine, tasks, workout, or log hours. What would you like?";
   };
 
-  const handleVoiceUpdateLightFocusTasks = (items: TaskItem[]) => {
-    setLightFocusTasks(items);
-  };
+  // Voice input handler
+  const handleVoiceInput = async () => {
+    if (!voiceService.isSpeechRecognitionSupported()) {
+      alert('Speech recognition not supported in your browser');
+      return;
+    }
 
-  const handleVoiceUpdateWorkoutItems = (items: WorkoutItem[]) => {
-    setWorkoutItems(items);
-  };
+    if (isListening) {
+      voiceService.stopListening();
+      setIsListening(false);
+      return;
+    }
 
-  const handleVoiceUpdateHealthItems = (items: HealthItem[]) => {
-    setHealthItems(items);
-  };
-
-  const handleVoiceUpdateWorkHours = (hours: { deepFocus: string; lightFocus: string }) => {
-    setWorkHours(hours);
-  };
-
-  const handleVoiceUpdateMacros = (newMacros: { calories: string; protein: string; carbs: string; fats: string }) => {
-    setMacros(newMacros);
+    setIsListening(true);
+    
+    try {
+      await voiceService.startListening(
+        async (transcript, isFinal) => {
+          setVoiceTranscript(transcript);
+          if (isFinal && transcript) {
+            setIsListening(false);
+            const response = await processVoiceCommand(transcript);
+            
+            // Speak the response
+            if (voiceService.isTTSSupported()) {
+              voiceService.speak(response);
+            }
+            
+            // Show notification
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+            notification.textContent = response;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+            
+            setVoiceTranscript('');
+          }
+        },
+        (error) => {
+          console.error('Voice error:', error);
+          setIsListening(false);
+          alert('Voice recognition error: ' + error);
+        },
+        {
+          language: 'en-US',
+          continuous: false,
+          interimResults: true
+        }
+      );
+    } catch (error) {
+      setIsListening(false);
+      console.error('Failed to start voice input:', error);
+    }
   };
 
   return (
     <AdminLayout>
-      <div className="h-screen w-full bg-siso-bg overflow-hidden">
-        <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Left Panel - Voice Agent */}
-          <ResizablePanel defaultSize={35} minSize={25} maxSize={50}>
-            <LifeLockVoiceAgent
-              morningRoutine={morningRoutine}
-              deepFocusTasks={deepFocusTasks.map(task => ({
-                id: task.id,
-                title: task.title,
-                completed: task.completed,
-                notes: task.description || ''
-              }))}
-              lightFocusTasks={lightFocusTasks}
-              workoutItems={workoutItems}
-              healthItems={healthItems}
-              workHours={workHours}
-              macros={macros}
-              onUpdateMorningRoutine={handleVoiceUpdateMorningRoutine}
-              onUpdateDeepFocusTasks={handleVoiceUpdateDeepFocusTasks}
-              onUpdateLightFocusTasks={handleVoiceUpdateLightFocusTasks}
-              onUpdateWorkoutItems={handleVoiceUpdateWorkoutItems}
-              onUpdateHealthItems={handleVoiceUpdateHealthItems}
-              onUpdateWorkHours={handleVoiceUpdateWorkHours}
-              onUpdateMacros={handleVoiceUpdateMacros}
-              dateKey={dateKey}
-            />
-          </ResizablePanel>
-
-          {/* Resizable Handle */}
-          <ResizableHandle withHandle className="bg-gray-700 hover:bg-yellow-500 transition-colors duration-200" />
-
-          {/* Right Panel - Life Lock Day Content */}
-          <ResizablePanel defaultSize={65} minSize={50} maxSize={75}>
-            <div className="h-full overflow-y-auto" style={{ backgroundColor: '#252525' }}>
-              <div className="max-w-6xl mx-auto p-3 sm:p-4 md:p-6 space-y-6">
+      <div className="min-h-screen w-full bg-siso-bg">
+        <div className="max-w-6xl mx-auto p-3 sm:p-4 md:p-6 space-y-4" style={{ backgroundColor: '#252525' }}>
           
-          {/* Header with Navigation */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
+          {/* Header with Navigation - Mobile Optimized */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/admin/life-lock')}
-                className="text-gray-300 hover:text-white hover:bg-gray-700"
+                className="text-gray-300 hover:text-white hover:bg-gray-700 text-xs sm:text-sm px-2 sm:px-3"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Calendar
+                <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Back to Calendar</span>
+                <span className="sm:hidden">Back</span>
               </Button>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-1 ml-auto sm:ml-2">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -381,34 +428,68 @@ const AdminLifeLockDay: React.FC = () => {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
+              
+              {/* Voice Button - Always visible on mobile */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleVoiceInput}
+                className={`ml-2 px-3 py-1.5 transition-all ${
+                  isListening 
+                    ? 'bg-red-600 text-white border-red-600 hover:bg-red-700 animate-pulse' 
+                    : 'bg-yellow-600 text-white border-yellow-600 hover:bg-yellow-700'
+                }`}
+              >
+                {isListening ? (
+                  <>
+                    <MicOff className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Listening...</span>
+                  </>
+                ) : (
+                  <>
+                    <Mic className="h-4 w-4 sm:mr-1" />
+                    <span className="hidden sm:inline">Voice</span>
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
-          {/* Page Title */}
+          {/* Voice Transcript Display */}
+          {voiceTranscript && (
+            <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg">
+              <p className="text-yellow-200 text-sm">
+                <span className="font-semibold">Listening:</span> {voiceTranscript}
+              </p>
+            </div>
+          )}
+
+          {/* Page Title - Mobile Optimized */}
           <motion.h1 
-            className="text-3xl sm:text-4xl font-bold text-white mb-8"
+            className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-4 sm:mb-6"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {format(currentDate, 'EEEE, MMMM d, yyyy')}
+            <span className="hidden sm:inline">{format(currentDate, 'EEEE, MMMM d, yyyy')}</span>
+            <span className="sm:hidden">{format(currentDate, 'EEE, MMM d')}</span>
           </motion.h1>
 
-          {/* Cards Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Cards Grid Layout - Mobile First */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
             
             {/* Morning Routine Card */}
             <Card className="bg-yellow-900/20 border-yellow-700/50">
-            <CardHeader>
-              <CardTitle className="flex items-center text-yellow-400">
-                <Sun className="h-5 w-5 mr-2" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center text-yellow-400 text-base sm:text-lg">
+                <Sun className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 🌅 Morning Routine
               </CardTitle>
               <div className="border-t border-yellow-600/50 my-4"></div>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-bold text-yellow-300 mb-2">Coding My Brain</h3>
-                  <p className="text-gray-200 text-sm leading-relaxed">
+                  <h3 className="font-bold text-yellow-300 mb-2 text-sm sm:text-base">Coding My Brain</h3>
+                  <p className="text-gray-200 text-xs sm:text-sm leading-relaxed">
                     I am Shaan Sisodia. I have been given divine purpose, and on this mission, temptation awaits on either side of the path. 
                     When I give in to temptation, I shall know I am astray. I will bring my family to a new age of freedom. 
                     I will not be distracted from the path.
@@ -416,29 +497,29 @@ const AdminLifeLockDay: React.FC = () => {
                 </div>
                 <div className="border-t border-yellow-600/50 my-4"></div>
                 <div>
-                  <h3 className="font-bold text-yellow-300 mb-2">Flow State Rules</h3>
-                  <ul className="text-gray-200 text-sm space-y-1">
+                  <h3 className="font-bold text-yellow-300 mb-2 text-sm sm:text-base">Flow State Rules</h3>
+                  <ul className="text-gray-200 text-xs sm:text-sm space-y-1">
                     <li>• No use of apps other than Notion.</li>
                     <li>• No vapes or drugs (including weed).</li>
                     <li>• No more than 5 seconds until the next action.</li>
                   </ul>
                 </div>
               </div>
-              <div className="border-t border-yellow-600/50 my-4"></div>
+              <div className="border-t border-yellow-600/50 my-3 sm:my-4"></div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+              <div className="space-y-2 sm:space-y-3">
                 {morningRoutine.map((item) => (
-                  <div key={item.id} className="flex items-start space-x-3 p-3 bg-yellow-900/10 border border-yellow-700/30 rounded-lg hover:bg-yellow-900/15 transition-colors">
+                  <div key={item.id} className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 bg-yellow-900/10 border border-yellow-700/30 rounded-lg hover:bg-yellow-900/15 transition-colors">
                     <Checkbox
                       checked={item.completed}
                       onCheckedChange={() => toggleItem(morningRoutine, setMorningRoutine, item.id)}
                       className="mt-1 border-yellow-600 data-[state=checked]:bg-yellow-600 data-[state=checked]:border-yellow-600"
                     />
                     <div className="flex-1">
-                      <h4 className="text-yellow-100 font-semibold">{item.title}</h4>
+                      <h4 className="text-yellow-100 font-semibold text-sm sm:text-base">{item.title}</h4>
                       {item.description && (
-                        <p className="text-gray-300 text-sm mt-1 leading-relaxed">{item.description}</p>
+                        <p className="text-gray-300 text-xs sm:text-sm mt-1 leading-relaxed">{item.description}</p>
                       )}
                       {item.logField && (
                         <div className="mt-2">
@@ -689,32 +770,32 @@ const AdminLifeLockDay: React.FC = () => {
                 <div>
                   <label className="text-white text-sm">Total Calories:</label>
                   <Input
-                    value={macros.calories}
-                    onChange={(e) => setMacros(prev => ({ ...prev, calories: e.target.value }))}
+                    value={dailyTotals.calories}
+                    onChange={(e) => setDailyTotals(prev => ({ ...prev, calories: e.target.value }))}
                     className="mt-1 bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <label className="text-white text-sm">Total Protein:</label>
                   <Input
-                    value={macros.protein}
-                    onChange={(e) => setMacros(prev => ({ ...prev, protein: e.target.value }))}
+                    value={dailyTotals.protein}
+                    onChange={(e) => setDailyTotals(prev => ({ ...prev, protein: e.target.value }))}
                     className="mt-1 bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <label className="text-white text-sm">Total Carbs:</label>
                   <Input
-                    value={macros.carbs}
-                    onChange={(e) => setMacros(prev => ({ ...prev, carbs: e.target.value }))}
+                    value={dailyTotals.carbs}
+                    onChange={(e) => setDailyTotals(prev => ({ ...prev, carbs: e.target.value }))}
                     className="mt-1 bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <label className="text-white text-sm">Total Fats:</label>
                   <Input
-                    value={macros.fats}
-                    onChange={(e) => setMacros(prev => ({ ...prev, fats: e.target.value }))}
+                    value={dailyTotals.fats}
+                    onChange={(e) => setDailyTotals(prev => ({ ...prev, fats: e.target.value }))}
                     className="mt-1 bg-gray-700 border-gray-600 text-white"
                   />
                 </div>

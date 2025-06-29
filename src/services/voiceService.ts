@@ -57,13 +57,25 @@ export class VoiceService {
     config: VoiceConfig = {}
   ): Promise<void> {
     return new Promise((resolve, reject) => {
+      console.log('🎤 [VOICE AI] Starting speech recognition...');
+      console.log('🎤 [VOICE AI] Config:', { 
+        language: config.language || 'en-US',
+        continuous: config.continuous || false,
+        interimResults: config.interimResults || true,
+        maxAlternatives: config.maxAlternatives || 1 
+      });
+
       if (!this.recognition) {
-        reject(new Error('Speech recognition not supported'));
+        const error = 'Speech recognition not supported';
+        console.error('❌ [VOICE AI] Recognition not supported:', error);
+        reject(new Error(error));
         return;
       }
 
       if (this.isListening) {
-        reject(new Error('Already listening'));
+        const error = 'Already listening';
+        console.warn('⚠️ [VOICE AI] Already listening:', error);
+        reject(new Error(error));
         return;
       }
 
@@ -76,6 +88,8 @@ export class VoiceService {
       // Set up event handlers
       this.recognition.onstart = () => {
         this.isListening = true;
+        console.log('✅ [VOICE AI] Speech recognition started successfully');
+        console.log('🎯 [VOICE AI] Listening state:', this.isListening);
         resolve();
       };
 
@@ -83,36 +97,64 @@ export class VoiceService {
         let finalTranscript = '';
         let interimTranscript = '';
 
+        console.log('📝 [VOICE AI] Processing speech results...');
+        console.log('📊 [VOICE AI] Results count:', event.results.length);
+        console.log('📍 [VOICE AI] Result index:', event.resultIndex);
+
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
+          const confidence = event.results[i][0].confidence;
+          const isFinal = event.results[i].isFinal;
+          
+          console.log(`📋 [VOICE AI] Result ${i}:`, {
+            transcript,
+            confidence,
+            isFinal,
+            alternatives: event.results[i].length
+          });
+
+          if (isFinal) {
             finalTranscript += transcript;
+            console.log('✅ [VOICE AI] Final transcript:', finalTranscript);
           } else {
             interimTranscript += transcript;
+            console.log('⏳ [VOICE AI] Interim transcript:', interimTranscript);
           }
         }
 
         if (finalTranscript) {
+          console.log('🎯 [VOICE AI] Sending final result:', finalTranscript);
           onResult(finalTranscript, true);
         } else if (interimTranscript) {
+          console.log('📝 [VOICE AI] Sending interim result:', interimTranscript);
           onResult(interimTranscript, false);
         }
       };
 
       this.recognition.onerror = (event) => {
         this.isListening = false;
-        onError(`Speech recognition error: ${event.error}`);
+        const errorMsg = `Speech recognition error: ${event.error}`;
+        console.error('❌ [VOICE AI] Recognition error:', {
+          error: event.error,
+          message: event.message,
+          timestamp: new Date().toISOString()
+        });
+        onError(errorMsg);
       };
 
       this.recognition.onend = () => {
         this.isListening = false;
+        console.log('🔚 [VOICE AI] Speech recognition ended');
+        console.log('🎯 [VOICE AI] Final listening state:', this.isListening);
       };
 
       // Start recognition
       try {
+        console.log('🚀 [VOICE AI] Attempting to start recognition...');
         this.recognition.start();
       } catch (error) {
         this.isListening = false;
+        console.error('❌ [VOICE AI] Failed to start recognition:', error);
         reject(error);
       }
     });
@@ -131,26 +173,43 @@ export class VoiceService {
     return this.isListening;
   }
 
-  // Speak text using Groq TTS (preferred) or Web Speech API (fallback)
+  // Speak text using available TTS
   public async speak(
-    text: string, 
+    text: string,
     config: TTSConfig = {},
     onStart?: () => void,
     onEnd?: () => void,
     onError?: (error: string) => void
   ): Promise<void> {
-    // Try Groq TTS first if API key is available
-    if (this.groqApiKey) {
-      try {
+    console.log('🔊 [VOICE AI] TTS Request initiated');
+    console.log('📄 [VOICE AI] Text to speak:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
+    console.log('⚙️ [VOICE AI] TTS Config:', config);
+    console.log('🔑 [VOICE AI] Groq API available:', !!this.groqApiKey);
+
+    try {
+      if (this.groqApiKey && text.length <= 10000) {
+        console.log('🌟 [VOICE AI] Using Groq TTS (Premium)');
         await this.speakWithGroqTTS(text, config, onStart, onEnd, onError);
-        return;
-      } catch (error) {
-        console.warn('Groq TTS failed, falling back to Web Speech API:', error);
+      } else {
+        console.log('🔄 [VOICE AI] Using Web Speech API (Fallback)');
+        if (!this.groqApiKey) {
+          console.warn('⚠️ [VOICE AI] No Groq API key configured');
+        }
+        if (text.length > 10000) {
+          console.warn('⚠️ [VOICE AI] Text too long for Groq TTS:', text.length);
+        }
+        await this.speakWithWebAPI(text, config, onStart, onEnd, onError);
+      }
+    } catch (error) {
+      console.error('❌ [VOICE AI] TTS failed, falling back to Web Speech API:', error);
+      try {
+        await this.speakWithWebAPI(text, config, onStart, onEnd, onError);
+      } catch (fallbackError) {
+        console.error('❌ [VOICE AI] All TTS methods failed:', fallbackError);
+        onError?.(fallbackError instanceof Error ? fallbackError.message : 'TTS failed');
+        throw fallbackError;
       }
     }
-
-    // Fallback to Web Speech API
-    await this.speakWithWebAPI(text, config, onStart, onEnd, onError);
   }
 
   // Speak using Groq TTS API
@@ -161,12 +220,30 @@ export class VoiceService {
     onEnd?: () => void,
     onError?: (error: string) => void
   ): Promise<void> {
+    console.log('🌟 [VOICE AI] Groq TTS Starting...');
+    console.log('📊 [VOICE AI] Request details:', {
+      textLength: text.length,
+      voice: config.voice || 'Fritz-PlayAI',
+      model: 'playai-tts',
+      apiKeyPresent: !!this.groqApiKey
+    });
+
     if (!this.groqApiKey) {
       throw new Error('Groq API key not configured');
     }
 
     try {
       onStart?.();
+      console.log('🚀 [VOICE AI] Calling Groq TTS API...');
+
+      const requestBody = {
+        model: 'playai-tts',
+        input: text.substring(0, 10000), // Groq TTS limit
+        voice: config.voice || 'Fritz-PlayAI',
+        response_format: 'mp3'
+      };
+
+      console.log('📝 [VOICE AI] API Request:', requestBody);
 
       const response = await fetch('https://api.groq.com/openai/v1/audio/speech', {
         method: 'POST',
@@ -174,35 +251,51 @@ export class VoiceService {
           'Authorization': `Bearer ${this.groqApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: 'playai-tts',
-          input: text.substring(0, 10000), // Groq TTS limit
-          voice: config.voice || 'Fritz-PlayAI',
-          response_format: 'mp3'
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.log('📡 [VOICE AI] API Response status:', response.status);
+      console.log('📋 [VOICE AI] Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ [VOICE AI] Groq API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
+        });
         throw new Error(`Groq TTS API error: ${response.statusText}`);
       }
 
+      console.log('✅ [VOICE AI] Groq TTS API success');
       const audioBlob = await response.blob();
+      console.log('🎵 [VOICE AI] Audio blob created:', {
+        size: audioBlob.size,
+        type: audioBlob.type
+      });
+
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
 
+      console.log('🎧 [VOICE AI] Audio element created, starting playback...');
+
       audio.onended = () => {
+        console.log('🏁 [VOICE AI] Groq TTS playback completed');
         URL.revokeObjectURL(audioUrl);
         onEnd?.();
       };
 
       audio.onerror = () => {
+        console.error('❌ [VOICE AI] Audio playback failed');
         URL.revokeObjectURL(audioUrl);
         onError?.('Audio playback failed');
       };
 
       await audio.play();
+      console.log('▶️ [VOICE AI] Groq TTS playback started successfully');
 
     } catch (error) {
+      console.error('❌ [VOICE AI] Groq TTS Error:', error);
       onError?.(error instanceof Error ? error.message : 'TTS failed');
       throw error;
     }
@@ -216,15 +309,26 @@ export class VoiceService {
     onEnd?: () => void,
     onError?: (error: string) => void
   ): Promise<void> {
+    console.log('🔄 [VOICE AI] Web Speech API TTS Starting...');
+    console.log('📊 [VOICE AI] Web API details:', {
+      textLength: text.length,
+      rate: config.rate || 1,
+      pitch: config.pitch || 1,
+      volume: config.volume || 1,
+      voice: config.voice || 'default'
+    });
+
     return new Promise((resolve, reject) => {
       if (!this.synthesis) {
         const error = 'Text-to-speech not supported';
+        console.error('❌ [VOICE AI] Web Speech API not supported:', error);
         onError?.(error);
         reject(new Error(error));
         return;
       }
 
       // Cancel any ongoing speech
+      console.log('🛑 [VOICE AI] Canceling any existing speech...');
       this.synthesis.cancel();
 
       const utterance = new SpeechSynthesisUtterance(text);
@@ -234,32 +338,54 @@ export class VoiceService {
       utterance.pitch = config.pitch || 1;
       utterance.volume = config.volume || 1;
 
+      console.log('⚙️ [VOICE AI] Utterance configured:', {
+        rate: utterance.rate,
+        pitch: utterance.pitch,
+        volume: utterance.volume
+      });
+
       // Set voice if specified
       if (config.voice) {
         const voices = this.synthesis.getVoices();
+        console.log('🎭 [VOICE AI] Available voices:', voices.length);
         const selectedVoice = voices.find(voice => 
           voice.name.includes(config.voice!) || voice.lang.includes(config.voice!)
         );
         if (selectedVoice) {
           utterance.voice = selectedVoice;
+          console.log('✅ [VOICE AI] Voice selected:', {
+            name: selectedVoice.name,
+            lang: selectedVoice.lang,
+            gender: selectedVoice.gender
+          });
+        } else {
+          console.warn('⚠️ [VOICE AI] Requested voice not found:', config.voice);
         }
       }
 
       utterance.onstart = () => {
+        console.log('▶️ [VOICE AI] Web Speech API playback started');
         onStart?.();
       };
 
       utterance.onend = () => {
+        console.log('🏁 [VOICE AI] Web Speech API playback completed');
         onEnd?.();
         resolve();
       };
 
       utterance.onerror = (event) => {
         const error = `Speech synthesis error: ${event.error}`;
+        console.error('❌ [VOICE AI] Web Speech API Error:', {
+          error: event.error,
+          message: event.message,
+          timestamp: new Date().toISOString()
+        });
         onError?.(error);
         reject(new Error(error));
       };
 
+      console.log('🚀 [VOICE AI] Starting Web Speech API synthesis...');
       this.synthesis.speak(utterance);
     });
   }

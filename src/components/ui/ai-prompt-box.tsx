@@ -627,22 +627,54 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
   // Enhanced voice handlers
   const handleVoiceRecording = async () => {
     if (isRecording) {
+      console.log('🛑 [VOICE INPUT] Stopping voice recording...');
       stopRecording();
-      return;
-    }
+    } else {
+      console.log('🎤 [VOICE INPUT] Starting voice recording session');
+      console.log('🔧 [VOICE INPUT] Voice service check:', {
+        speechRecognitionSupported: voiceService.isSpeechRecognitionSupported(),
+        isCurrentlyListening: isRecording,
+        browserSupport: typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)
+      });
 
-    try {
-      const voiceText = await startRecording();
-      if (voiceText.trim()) {
-        setInput(voiceText);
-        // Auto-submit voice messages
-        setTimeout(() => {
-          onSend?.(voiceText, []);
-          setInput("");
-        }, 100);
+      try {
+        console.log('🚀 [VOICE INPUT] Initiating speech recognition...');
+        const result = await startRecording();
+        
+        console.log('✅ [VOICE INPUT] Voice recording completed successfully');
+        console.log('📝 [VOICE INPUT] Final transcript:', result);
+        console.log('📊 [VOICE INPUT] Transcript analysis:', {
+          length: result.length,
+          wordCount: result.split(' ').length,
+          containsCommand: result.toLowerCase().includes('create') || result.toLowerCase().includes('add'),
+          containsQuestion: result.includes('?'),
+          isEmpty: !result.trim()
+        });
+
+        if (result.trim()) {
+          console.log('🎯 [VOICE INPUT] Setting transcript as input value');
+          setInput(result);
+          
+          // Auto-submit the voice input
+          if (onSubmit) {
+            console.log('📤 [VOICE INPUT] Auto-submitting voice input');
+            setTimeout(() => {
+              onSubmit(result);
+              setInput("");
+              console.log('✅ [VOICE INPUT] Voice input submitted and cleared');
+            }, 100);
+          }
+        } else {
+          console.warn('⚠️ [VOICE INPUT] Empty transcript received');
+        }
+      } catch (error) {
+        console.error('❌ [VOICE INPUT] Voice recording failed:', error);
+        console.log('🔧 [VOICE INPUT] Error details:', {
+          errorType: error instanceof Error ? error.constructor.name : typeof error,
+          errorMessage: error instanceof Error ? error.message : String(error),
+          timestamp: new Date().toISOString()
+        });
       }
-    } catch (error) {
-      console.error('Voice recording failed:', error);
     }
   };
 
