@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,8 +21,11 @@ import {
   Brain
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { format, addDays, subDays } from 'date-fns';
+import { format, addDays, subDays, parseISO } from 'date-fns';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { TodayTasksService, TodayTask } from '@/services/todayTasksService';
+import { LifeLockVoiceAgent } from '@/components/admin/lifelock/LifeLockVoiceAgent';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 
 interface TaskItem {
   id: string;
@@ -37,13 +40,6 @@ interface MorningRoutineItem {
   completed: boolean;
   description?: string;
   logField?: string;
-}
-
-interface Goal {
-  id: string;
-  title: string;
-  completed: boolean;
-  target?: string;
 }
 
 interface WorkoutItem {
@@ -64,71 +60,110 @@ const AdminLifeLockDay: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const dateParam = searchParams.get('date');
-  const currentDate = dateParam ? new Date(dateParam) : new Date();
-  
+  const currentDate = dateParam ? parseISO(dateParam) : new Date();
+  const dateKey = format(currentDate, 'yyyy-MM-dd');
+
+  // Load data from localStorage on component mount
+  const loadFromStorage = (key: string, defaultValue: any) => {
+    try {
+      const stored = localStorage.getItem(`lifelock-${dateKey}-${key}`);
+      return stored ? JSON.parse(stored) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  };
+
+  // Save data to localStorage
+  const saveToStorage = (key: string, data: any) => {
+    try {
+      localStorage.setItem(`lifelock-${dateKey}-${key}`, JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error);
+    }
+  };
+
   // Morning Routine Data
-  const [morningRoutine, setMorningRoutine] = useState<MorningRoutineItem[]>([
-    { id: '1', title: 'Wake Up', completed: false, description: 'Start the day before midday to maximize productivity.' },
-    { id: '2', title: 'Get Blood Flowing (5 min)', completed: false, description: 'Max rep push-ups (Target PB: 30).', logField: 'Log reps: ____' },
-    { id: '3', title: 'Hydrate (5 min)', completed: false, description: 'Drink 500 ml water to start the day.' },
-    { id: '4', title: 'Supplements & Pre-Workout (5 min)', completed: false, description: 'Take omega-3, multivitamin, ashwagandha, and pre-workout.' },
-    { id: '5', title: 'Shower & Brush Teeth (25 min)', completed: false, description: 'Cold shower to wake up.' },
-    { id: '6', title: 'Review & Plan Day (15 min)', completed: false, description: 'Go through tasks, prioritize, and allocate time slots.' },
-    { id: '7', title: 'Meditation (2 min)', completed: false, description: 'Meditate to set an innovative mindset for creating business value.' }
-  ]);
+  const [morningRoutine, setMorningRoutine] = useState<MorningRoutineItem[]>(() =>
+    loadFromStorage('morningRoutine', [
+      { id: '1', title: 'Wake Up', completed: false, description: 'Start the day before midday to maximize productivity.' },
+      { id: '2', title: 'Get Blood Flowing (5 min)', completed: false, description: 'Max rep push-ups (Target PB: 30).', logField: 'Log reps: ____' },
+      { id: '3', title: 'Hydrate (5 min)', completed: false, description: 'Drink 500 ml water to start the day.' },
+      { id: '4', title: 'Supplements & Pre-Workout (5 min)', completed: false, description: 'Take omega-3, multivitamin, ashwagandha, and pre-workout.' },
+      { id: '5', title: 'Shower & Brush Teeth (25 min)', completed: false, description: 'Cold shower to wake up.' },
+      { id: '6', title: 'Review & Plan Day (15 min)', completed: false, description: 'Go through tasks, prioritize, and allocate time slots.' },
+      { id: '7', title: 'Meditation (2 min)', completed: false, description: 'Meditate to set an innovative mindset for creating business value.' }
+    ])
+  );
 
-  // Goals Data
-  const [goals, setGoals] = useState<Goal[]>([
-    { id: '1', title: 'Put on 5 kg', completed: false, target: 'part of your 10 kg gain over 6 months; 5 kg by end of 75 days' },
-    { id: '2', title: 'Have court stuff sorted, ready for community service', completed: false },
-    { id: '3', title: 'Automated a process for app dev', completed: false },
-    { id: '4', title: 'Built systems to manage sales team', completed: false },
-    { id: '5', title: 'Have 10 salespeople', completed: false },
-    { id: '6', title: 'Have 3k in crypto', completed: false },
-    { id: '7', title: 'Have Mac Mini M4 setup', completed: false },
-    { id: '8', title: '24.9k in the pipeline', completed: false },
-    { id: '9', title: 'Stuck to no smoking THC 95% of the time', completed: false },
-    { id: '10', title: 'Obtain driver\'s license before Bali', completed: false }
-  ]);
+  // Deep Focus Work Tasks - Load from Supabase
+  const [deepFocusTasks, setDeepFocusTasks] = useState<TodayTask[]>([]);
+  const [isLoadingTasks, setIsLoadingTasks] = useState(true);
 
-  // Deep Focus Work Tasks
-  const [deepFocusTasks, setDeepFocusTasks] = useState<TaskItem[]>([
-    { id: '1', title: 'Get cursor student working', completed: false },
-    { id: '2', title: 'Create Document for Corsa Student Account Verification', completed: false },
-    { id: '3', title: 'Kodex Autonomous Editor – test codex on a prompt and compare same issues to cursor', completed: false },
-    { id: '4', title: 'Analyze Anthropic Prompt Engineering Masterclass', completed: false },
-    { id: '5', title: 'Research into what we can use to automate cursor intelligently automated', completed: false },
-    { id: '6', title: 'Crypto Guide Payment Follow-Up', completed: false }
-  ]);
+  // Load tasks from Supabase on mount and date change
+  useEffect(() => {
+    const loadTasks = async () => {
+      setIsLoadingTasks(true);
+      try {
+        const tasks = await TodayTasksService.getTodaysTasks(currentDate);
+        setDeepFocusTasks(tasks);
+      } catch (error) {
+        console.error('Failed to load tasks:', error);
+      } finally {
+        setIsLoadingTasks(false);
+      }
+    };
 
-  // Light Focus Work Tasks
-  const [lightFocusTasks, setLightFocusTasks] = useState<TaskItem[]>([
-    { id: '1', title: '', completed: false },
-    { id: '2', title: '', completed: false },
-    { id: '3', title: '', completed: false },
-    { id: '4', title: '', completed: false },
-    { id: '5', title: '', completed: false }
-  ]);
+    loadTasks();
+  }, [currentDate]);
+
+  // Update task completion in Supabase
+  const handleTaskToggle = async (taskId: string, completed: boolean) => {
+    try {
+      const success = await TodayTasksService.updateTaskCompletion(taskId, completed);
+      if (success) {
+        setDeepFocusTasks(prev => 
+          prev.map(task => 
+            task.id === taskId ? { ...task, completed } : task
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Failed to update task:', error);
+    }
+  };
+
+  // Light Focus Work Tasks - Keep as editable local tasks
+  const [lightFocusTasks, setLightFocusTasks] = useState<TaskItem[]>(() =>
+    loadFromStorage('lightFocusTasks', [
+      { id: '1', title: '', completed: false },
+      { id: '2', title: '', completed: false },
+      { id: '3', title: '', completed: false },
+      { id: '4', title: '', completed: false },
+      { id: '5', title: '', completed: false }
+    ])
+  );
 
   // Workout Data
-  const [workoutItems, setWorkoutItems] = useState<WorkoutItem[]>([
-    { id: '1', title: '200 Push-ups', completed: false, logged: '' },
-    { id: '2', title: '100 Sit-ups', completed: false, logged: '' },
-    { id: '3', title: '100 Dips', completed: false, logged: '' },
-    { id: '4', title: '50 Pull-ups', completed: false, logged: '' },
-    { id: '5', title: 'Gym/Training (45 min)', completed: false, target: 'Progressive strength training (e.g., 3–5 sets, 8–12 reps, squats, bench) or boxing.' },
-    { id: '6', title: 'Outdoor Activity (15 min)', completed: false, logged: '' }
-  ]);
+  const [workoutItems, setWorkoutItems] = useState<WorkoutItem[]>(() =>
+    loadFromStorage('workoutItems', [
+      { id: '1', title: 'Push-ups', completed: false, target: '50 reps', logged: '' },
+      { id: '2', title: 'Squats', completed: false, target: '100 reps', logged: '' },
+      { id: '3', title: 'Plank', completed: false, target: '2 minutes', logged: '' },
+      { id: '4', title: 'Burpees', completed: false, target: '20 reps', logged: '' },
+      { id: '5', title: 'Mountain Climbers', completed: false, target: '50 reps', logged: '' }
+    ])
+  );
 
   // Health Non-Negotiables
-  const [healthItems, setHealthItems] = useState<HealthItem[]>([
-    { id: '1', title: 'Supplements', completed: false },
-    { id: '2', title: 'Protein Shake (1k Cals)', completed: false },
-    { id: '3', title: '2L milk', completed: false },
-    { id: '4', title: '2L Water', completed: false },
-    { id: '5', title: 'Gym', completed: false },
-    { id: '6', title: 'Steam + Sauna', completed: false }
-  ]);
+  const [healthItems, setHealthItems] = useState<HealthItem[]>(() =>
+    loadFromStorage('healthItems', [
+      { id: '1', title: 'Take vitamins/supplements', completed: false },
+      { id: '2', title: 'Drink 2L+ water', completed: false },
+      { id: '3', title: 'No smoking THC', completed: false },
+      { id: '4', title: 'Eat balanced meals', completed: false },
+      { id: '5', title: 'Get 7+ hours sleep', completed: false }
+    ])
+  );
 
   // Meal tracking
   const [meals, setMeals] = useState({
@@ -161,10 +196,61 @@ const AdminLifeLockDay: React.FC = () => {
     changes: ['', '', '']
   });
 
-  const [workHours, setWorkHours] = useState({
-    deepFocus: '',
-    lightFocus: ''
-  });
+  const [workHours, setWorkHours] = useState(() =>
+    loadFromStorage('workHours', {
+      deepFocus: '',
+      lightFocus: ''
+    })
+  );
+
+  const [macros, setMacros] = useState(() =>
+    loadFromStorage('macros', {
+      calories: '',
+      protein: '',
+      carbs: '',
+      fats: ''
+    })
+  );
+
+  // Save to localStorage whenever state changes
+  useEffect(() => {
+    saveToStorage('morningRoutine', morningRoutine);
+  }, [morningRoutine, dateKey]);
+
+  useEffect(() => {
+    saveToStorage('lightFocusTasks', lightFocusTasks);
+  }, [lightFocusTasks, dateKey]);
+
+  useEffect(() => {
+    saveToStorage('workoutItems', workoutItems);
+  }, [workoutItems, dateKey]);
+
+  useEffect(() => {
+    saveToStorage('healthItems', healthItems);
+  }, [healthItems, dateKey]);
+
+  useEffect(() => {
+    saveToStorage('workHours', workHours);
+  }, [workHours, dateKey]);
+
+  useEffect(() => {
+    saveToStorage('macros', macros);
+  }, [macros, dateKey]);
+
+  // Save data when user navigates away or closes the page
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      saveToStorage('morningRoutine', morningRoutine);
+      saveToStorage('lightFocusTasks', lightFocusTasks);
+      saveToStorage('workoutItems', workoutItems);
+      saveToStorage('healthItems', healthItems);
+      saveToStorage('workHours', workHours);
+      saveToStorage('macros', macros);
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [morningRoutine, lightFocusTasks, workoutItems, healthItems, workHours, macros, dateKey]);
 
   const navigateDay = (direction: 'prev' | 'next') => {
     const newDate = direction === 'next' ? addDays(currentDate, 1) : subDays(currentDate, 1);
@@ -172,21 +258,97 @@ const AdminLifeLockDay: React.FC = () => {
   };
 
   const toggleItem = (items: any[], setItems: Function, id: string) => {
-    setItems(items.map((item: any) => 
+    const updatedItems = items.map((item: any) => 
       item.id === id ? { ...item, completed: !item.completed } : item
-    ));
+    );
+    setItems(updatedItems);
   };
 
   const updateItemField = (items: any[], setItems: Function, id: string, field: string, value: string) => {
-    setItems(items.map((item: any) => 
+    const updatedItems = items.map((item: any) => 
       item.id === id ? { ...item, [field]: value } : item
-    ));
+    );
+    setItems(updatedItems);
+  };
+
+  // Voice Agent Update Handlers
+  const handleVoiceUpdateMorningRoutine = (items: MorningRoutineItem[]) => {
+    setMorningRoutine(items);
+  };
+
+  const handleVoiceUpdateDeepFocusTasks = async (items: TaskItem[]) => {
+    // For voice agent, we need to handle both clearing and completing tasks
+    if (items.every(item => item.title === '')) {
+      // Clear all tasks - this would need to be handled differently with Supabase tasks
+      console.log('Voice agent requested to clear all deep focus tasks');
+    } else {
+      // Update completion status for existing tasks
+      for (const item of items) {
+        const existingTask = deepFocusTasks.find(task => task.title.toLowerCase().includes(item.title.toLowerCase()));
+        if (existingTask && existingTask.completed !== item.completed) {
+          await handleTaskToggle(existingTask.id, item.completed);
+        }
+      }
+    }
+  };
+
+  const handleVoiceUpdateLightFocusTasks = (items: TaskItem[]) => {
+    setLightFocusTasks(items);
+  };
+
+  const handleVoiceUpdateWorkoutItems = (items: WorkoutItem[]) => {
+    setWorkoutItems(items);
+  };
+
+  const handleVoiceUpdateHealthItems = (items: HealthItem[]) => {
+    setHealthItems(items);
+  };
+
+  const handleVoiceUpdateWorkHours = (hours: { deepFocus: string; lightFocus: string }) => {
+    setWorkHours(hours);
+  };
+
+  const handleVoiceUpdateMacros = (newMacros: { calories: string; protein: string; carbs: string; fats: string }) => {
+    setMacros(newMacros);
   };
 
   return (
     <AdminLayout>
-      <div className="min-h-screen w-full bg-siso-bg">
-        <div className="max-w-6xl mx-auto p-3 sm:p-4 md:p-6 space-y-6" style={{ backgroundColor: '#252525' }}>
+      <div className="h-screen w-full bg-siso-bg overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          {/* Left Panel - Voice Agent */}
+          <ResizablePanel defaultSize={35} minSize={25} maxSize={50}>
+            <LifeLockVoiceAgent
+              morningRoutine={morningRoutine}
+              deepFocusTasks={deepFocusTasks.map(task => ({
+                id: task.id,
+                title: task.title,
+                completed: task.completed,
+                notes: task.description || ''
+              }))}
+              lightFocusTasks={lightFocusTasks}
+              workoutItems={workoutItems}
+              healthItems={healthItems}
+              workHours={workHours}
+              macros={macros}
+              onUpdateMorningRoutine={handleVoiceUpdateMorningRoutine}
+              onUpdateDeepFocusTasks={handleVoiceUpdateDeepFocusTasks}
+              onUpdateLightFocusTasks={handleVoiceUpdateLightFocusTasks}
+              onUpdateWorkoutItems={handleVoiceUpdateWorkoutItems}
+              onUpdateHealthItems={handleVoiceUpdateHealthItems}
+              onUpdateWorkHours={handleVoiceUpdateWorkHours}
+              onUpdateMacros={handleVoiceUpdateMacros}
+              dateKey={dateKey}
+            />
+          </ResizablePanel>
+
+          {/* Resizable Handle */}
+          <ResizableHandle withHandle className="bg-gray-700 hover:bg-yellow-500 transition-colors duration-200" />
+
+          {/* Right Panel - Life Lock Day Content */}
+          <ResizablePanel defaultSize={65} minSize={50} maxSize={75}>
+            <div className="h-full overflow-y-auto" style={{ backgroundColor: '#252525' }}>
+              <div className="max-w-6xl mx-auto p-3 sm:p-4 md:p-6 space-y-6">
           
           {/* Header with Navigation */}
           <div className="flex items-center justify-between mb-8">
@@ -236,81 +398,56 @@ const AdminLifeLockDay: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             
             {/* Morning Routine Card */}
-            <Card className="bg-orange-900/20 border-orange-700/50">
+            <Card className="bg-yellow-900/20 border-yellow-700/50">
             <CardHeader>
-              <CardTitle className="flex items-center text-orange-400">
+              <CardTitle className="flex items-center text-yellow-400">
                 <Sun className="h-5 w-5 mr-2" />
                 🌅 Morning Routine
               </CardTitle>
-              <div className="border-t border-gray-600 my-4"></div>
-              <div className="space-y-2">
-                <h3 className="font-semibold text-white">Coding My Brain</h3>
-                <p className="text-gray-300 text-sm">
-                  I am Shaan Sisodia. I have been given divine purpose, and on this mission, temptation awaits on either side of the path. 
-                  When I give in to temptation, I shall know I am astray. I will bring my family to a new age of freedom. 
-                  I will not be distracted from the path.
-                </p>
-                <div className="border-t border-gray-600 my-4"></div>
-                <h3 className="font-semibold text-white">Flow State Rules</h3>
-                <ul className="text-gray-300 text-sm space-y-1">
-                  <li>• No use of apps other than Notion.</li>
-                  <li>• No vapes or drugs (including weed).</li>
-                  <li>• No more than 5 seconds until the next action.</li>
-                </ul>
+              <div className="border-t border-yellow-600/50 my-4"></div>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-bold text-yellow-300 mb-2">Coding My Brain</h3>
+                  <p className="text-gray-200 text-sm leading-relaxed">
+                    I am Shaan Sisodia. I have been given divine purpose, and on this mission, temptation awaits on either side of the path. 
+                    When I give in to temptation, I shall know I am astray. I will bring my family to a new age of freedom. 
+                    I will not be distracted from the path.
+                  </p>
+                </div>
+                <div className="border-t border-yellow-600/50 my-4"></div>
+                <div>
+                  <h3 className="font-bold text-yellow-300 mb-2">Flow State Rules</h3>
+                  <ul className="text-gray-200 text-sm space-y-1">
+                    <li>• No use of apps other than Notion.</li>
+                    <li>• No vapes or drugs (including weed).</li>
+                    <li>• No more than 5 seconds until the next action.</li>
+                  </ul>
+                </div>
               </div>
+              <div className="border-t border-yellow-600/50 my-4"></div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {morningRoutine.map((item) => (
-                  <div key={item.id} className="flex items-start space-x-3 p-3 bg-gray-700/50 rounded">
+                  <div key={item.id} className="flex items-start space-x-3 p-3 bg-yellow-900/10 border border-yellow-700/30 rounded-lg hover:bg-yellow-900/15 transition-colors">
                     <Checkbox
                       checked={item.completed}
                       onCheckedChange={() => toggleItem(morningRoutine, setMorningRoutine, item.id)}
-                      className="mt-1"
+                      className="mt-1 border-yellow-600 data-[state=checked]:bg-yellow-600 data-[state=checked]:border-yellow-600"
                     />
                     <div className="flex-1">
-                      <h4 className="text-white font-medium">{item.title}</h4>
+                      <h4 className="text-yellow-100 font-semibold">{item.title}</h4>
                       {item.description && (
-                        <p className="text-gray-400 text-sm mt-1">{item.description}</p>
+                        <p className="text-gray-300 text-sm mt-1 leading-relaxed">{item.description}</p>
                       )}
                       {item.logField && (
-                        <Input
-                          placeholder={item.logField}
-                          className="mt-2 bg-gray-600 border-gray-500 text-white text-sm"
-                        />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-            {/* Goals Card */}
-            <Card className="bg-blue-900/20 border-blue-700/50">
-            <CardHeader>
-              <CardTitle className="flex items-center text-blue-400">
-                <Target className="h-5 w-5 mr-2" />
-                💡 GOALS
-              </CardTitle>
-              <div className="border-t border-gray-600 my-4"></div>
-              <h3 className="font-semibold text-white text-center">End of 75 Days hard</h3>
-              <div className="border-t border-gray-600 my-4"></div>
-              <h3 className="font-semibold text-white">Goals Overview</h3>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {goals.map((goal) => (
-                  <div key={goal.id} className="flex items-start space-x-3 p-3 bg-gray-700/50 rounded">
-                    <Checkbox
-                      checked={goal.completed}
-                      onCheckedChange={() => toggleItem(goals, setGoals, goal.id)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <h4 className="text-white font-medium">{goal.title}</h4>
-                      {goal.target && (
-                        <p className="text-gray-400 text-sm mt-1">({goal.target})</p>
+                        <div className="mt-2">
+                          <Input
+                            placeholder={item.logField}
+                            className="bg-yellow-900/20 border-yellow-700/50 text-yellow-100 text-sm placeholder:text-gray-400 focus:border-yellow-600"
+                          />
+                          <p className="text-xs text-gray-400 mt-1 italic">Log your max reps to track progress toward your 5% weekly increase goal.</p>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -344,25 +481,54 @@ const AdminLifeLockDay: React.FC = () => {
               <h3 className="font-semibold text-white">Main Tasks:</h3>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {deepFocusTasks.map((task) => (
-                  <div key={task.id} className="flex items-start space-x-3 p-3 bg-gray-700/50 rounded">
-                    <Checkbox
-                      checked={task.completed}
-                      onCheckedChange={() => toggleItem(deepFocusTasks, setDeepFocusTasks, task.id)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <Input
-                        value={task.title}
-                        onChange={(e) => updateItemField(deepFocusTasks, setDeepFocusTasks, task.id, 'title', e.target.value)}
-                        className="bg-transparent border-none text-white p-0 focus:ring-0"
-                        placeholder="Enter task..."
-                      />
+              {isLoadingTasks ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-gray-400">Loading today's tasks...</div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {deepFocusTasks.length === 0 ? (
+                    <div className="text-center py-8 text-gray-400">
+                      <p>No tasks found for today.</p>
+                      <p className="text-sm mt-2">Tasks will appear here when created in the task management system.</p>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ) : (
+                    deepFocusTasks.map((task) => (
+                      <div key={task.id} className="flex items-start space-x-3 p-3 bg-gray-700/50 rounded">
+                        <Checkbox
+                          checked={task.completed}
+                          onCheckedChange={() => handleTaskToggle(task.id, !task.completed)}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-white font-medium">{task.title}</h4>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${
+                                task.priority === 'high' ? 'border-red-400 text-red-400' :
+                                task.priority === 'medium' ? 'border-yellow-400 text-yellow-400' :
+                                'border-green-400 text-green-400'
+                              }`}
+                            >
+                              {task.priority}
+                            </Badge>
+                            <Badge variant="outline" className="text-xs border-blue-400 text-blue-400">
+                              {task.category}
+                            </Badge>
+                          </div>
+                          {task.description && (
+                            <p className="text-gray-400 text-sm mt-1">{task.description}</p>
+                          )}
+                          {task.due_date && (
+                            <p className="text-gray-500 text-xs mt-1">Due: {task.due_date}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -523,32 +689,32 @@ const AdminLifeLockDay: React.FC = () => {
                 <div>
                   <label className="text-white text-sm">Total Calories:</label>
                   <Input
-                    value={dailyTotals.calories}
-                    onChange={(e) => setDailyTotals(prev => ({ ...prev, calories: e.target.value }))}
+                    value={macros.calories}
+                    onChange={(e) => setMacros(prev => ({ ...prev, calories: e.target.value }))}
                     className="mt-1 bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <label className="text-white text-sm">Total Protein:</label>
                   <Input
-                    value={dailyTotals.protein}
-                    onChange={(e) => setDailyTotals(prev => ({ ...prev, protein: e.target.value }))}
+                    value={macros.protein}
+                    onChange={(e) => setMacros(prev => ({ ...prev, protein: e.target.value }))}
                     className="mt-1 bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <label className="text-white text-sm">Total Carbs:</label>
                   <Input
-                    value={dailyTotals.carbs}
-                    onChange={(e) => setDailyTotals(prev => ({ ...prev, carbs: e.target.value }))}
+                    value={macros.carbs}
+                    onChange={(e) => setMacros(prev => ({ ...prev, carbs: e.target.value }))}
                     className="mt-1 bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
                 <div>
                   <label className="text-white text-sm">Total Fats:</label>
                   <Input
-                    value={dailyTotals.fats}
-                    onChange={(e) => setDailyTotals(prev => ({ ...prev, fats: e.target.value }))}
+                    value={macros.fats}
+                    onChange={(e) => setMacros(prev => ({ ...prev, fats: e.target.value }))}
                     className="mt-1 bg-gray-700 border-gray-600 text-white"
                   />
                 </div>

@@ -208,6 +208,40 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
     <div className="h-full flex flex-col" style={{ backgroundColor: '#252525' }}>
       {/* Chat Area */}
       <div className="flex-1 flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-gray-700/50">
+          <div className="flex items-center gap-3">
+            <Brain className="h-6 w-6 text-blue-400" />
+            <h3 className="text-lg font-semibold text-white">AI Task Assistant</h3>
+          </div>
+          
+          {/* Voice Toggle */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setVoiceEnabled(!voiceEnabled)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                voiceEnabled 
+                  ? 'bg-green-600/20 text-green-400 border border-green-600/30 hover:bg-green-600/30' 
+                  : 'bg-gray-600/20 text-gray-400 border border-gray-600/30 hover:bg-gray-600/30'
+              }`}
+              title={voiceEnabled ? 'Voice responses enabled' : 'Voice responses disabled'}
+            >
+              <span className="text-xs">🔊</span>
+              <span>{voiceEnabled ? 'Voice On' : 'Voice Off'}</span>
+            </button>
+            
+            {/* Speaking indicator */}
+            {isSpeaking && (
+              <button
+                onClick={stopSpeaking}
+                className="flex items-center gap-1 px-2 py-1 bg-red-600/20 text-red-400 border border-red-600/30 rounded-lg text-xs hover:bg-red-600/30 transition-colors"
+                title="Stop speaking"
+              >
+                <span className="animate-pulse">🔊</span>
+                <span>Stop</span>
+              </button>
+            )}
+          </div>
+        </div>
         {chatMessages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-6">
             <motion.div 
