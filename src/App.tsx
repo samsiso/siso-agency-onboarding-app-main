@@ -30,6 +30,7 @@ import AdminClients from './pages/AdminClients';
 import AdminPayments from './pages/AdminPayments';
 import AdminDailyPlanner from './pages/AdminDailyPlanner';
 import AdminLifeLock from './pages/AdminLifeLock';
+import AdminLifeLockDay from './pages/AdminLifeLockDay';
 import ClientDetailPage from './pages/ClientDetailPage';
 import AdminTasks from './pages/AdminTasks';
 import AdminSettings from './pages/AdminSettings';
@@ -203,6 +204,7 @@ function App() {
           <Route path="/admin/payments" element={<AuthGuard adminOnly={true}><AdminPayments /></AuthGuard>} />
           <Route path="/admin/daily-planner" element={<AuthGuard adminOnly={true}><AdminDailyPlanner /></AuthGuard>} />
           <Route path="/admin/life-lock" element={<AuthGuard adminOnly={true}><AdminLifeLock /></AuthGuard>} />
+          <Route path="/admin/life-lock/day" element={<AuthGuard adminOnly={true}><AdminLifeLockDay /></AuthGuard>} />
           <Route path="/admin/tasks" element={<AuthGuard adminOnly={true}><AdminTasks /></AuthGuard>} />
           <Route path="/admin/tasks/:memberId" element={<AuthGuard adminOnly={true}><TeamMemberTasksPage /></AuthGuard>} />
           <Route path="/admin/settings" element={<AuthGuard adminOnly={true}><AdminSettings /></AuthGuard>} />

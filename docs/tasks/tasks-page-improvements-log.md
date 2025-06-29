@@ -560,3 +560,87 @@ Keywords → Priorities:
 - ✅ **Validation**: Proper task structure validation and enhancement
 
 The AI agent can now understand complex task creation requests and automatically add properly categorized, prioritized tasks to the task list with detailed descriptions and subtasks.
+
+## **Voice API Integration** 🎤
+**Date**: January 2025  
+**Status**: ✅ Complete
+
+### **Implementation Overview**
+Implemented comprehensive voice input and output capabilities for the AI chat interface using:
+- **Speech Recognition**: Web Speech API for voice input
+- **Text-to-Speech**: Groq TTS API (preferred) with Web Speech API fallback
+- **Voice Controls**: Microphone button, voice response toggle, speaking indicators
+
+### **Key Features**
+1. **Voice Input**:
+   - Click microphone button to start/stop voice recording
+   - Real-time transcript display during recording
+   - Automatic message sending when speech is finalized
+   - Visual feedback with animated listening indicators
+
+2. **Voice Output**:
+   - AI responses automatically spoken when voice is enabled
+   - Manual voice playback buttons on AI message bubbles
+   - High-quality Groq TTS with Fritz-PlayAI voice
+   - Fallback to browser Web Speech API if Groq unavailable
+
+3. **Voice Controls**:
+   - Voice input toggle (microphone on/off)
+   - Voice response toggle (enable/disable AI speech)
+   - Speaking indicator with stop button
+   - Voice status indicators (microphone ready, TTS ready)
+
+### **Technical Implementation**
+
+#### **Voice Service** (`src/services/voiceService.ts`)
+```typescript
+// Comprehensive voice service with dual API support
+export class VoiceService {
+  // Speech recognition using Web Speech API
+  public startListening(onResult, onError, config)
+  
+  // Text-to-speech using Groq TTS + Web Speech fallback
+  public async speak(text, config, onStart, onEnd, onError)
+  
+  // Voice capability detection
+  public isSpeechRecognitionSupported()
+  public isTTSSupported()
+}
+```
+
+#### **Enhanced AI Chat** (`src/components/admin/tasks/AITaskChat.tsx`)
+- Added voice state management (listening, speaking, errors)
+- Integrated voice controls in chat header
+- Real-time transcript display during voice input
+- Automatic AI response playback when voice enabled
+- Manual voice playback buttons on AI messages
+
+### **Voice API Configuration**
+- **Groq API Key**: Uses existing `VITE_GROQ_API_KEY` environment variable
+- **TTS Model**: `playai-tts` with Fritz-PlayAI voice
+- **Speech Recognition**: Browser Web Speech API (Chrome/Edge recommended)
+- **Fallback**: Web Speech API TTS if Groq unavailable
+
+### **User Experience**
+1. **Voice Input**: Click microphone → speak → automatic transcription → message sent
+2. **Voice Output**: AI responses automatically spoken (if enabled) + manual playback
+3. **Visual Feedback**: Animated indicators for listening/speaking states
+4. **Error Handling**: Clear error messages for unsupported browsers/API failures
+
+### **Browser Compatibility**
+- **Speech Recognition**: Chrome, Edge, Safari (with webkit prefix)
+- **Text-to-Speech**: All modern browsers + Groq TTS enhancement
+- **Graceful Degradation**: Features disabled if not supported
+
+### **Files Modified**
+- ✅ `src/services/voiceService.ts` - New comprehensive voice service
+- ✅ `src/components/admin/tasks/AITaskChat.tsx` - Enhanced with voice controls
+- ✅ Voice state management and UI integration
+- ✅ Error handling and browser compatibility
+
+### **Testing Status**
+- ✅ Voice input functionality implemented
+- ✅ Voice output with Groq TTS integration
+- ✅ Visual feedback and error handling
+- ✅ Browser compatibility checks
+- 🔄 **Ready for user testing**

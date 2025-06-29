@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, addWeeks, subWeeks, startOfMonth, endOfMonth, addMonths, subMonths, getYear, eachWeekOfInterval, getWeek } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface TaskCard {
   id: string;
@@ -31,6 +32,7 @@ interface TaskCard {
 }
 
 const AdminLifeLock: React.FC = () => {
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [selectedYear, setSelectedYear] = useState(getYear(new Date()));
@@ -94,11 +96,12 @@ const AdminLifeLock: React.FC = () => {
   }
   
   const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const dayLabelsMobile = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
   const handleCardClick = (card: TaskCard) => {
     // Navigate to notion-like page for this day
-    console.log('Navigate to day:', card.date);
-    // TODO: Implement navigation to individual day page
+    const dateParam = format(card.date, 'yyyy-MM-dd');
+    navigate(`/admin/life-lock/day?date=${dateParam}`);
   };
 
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -128,9 +131,9 @@ const AdminLifeLock: React.FC = () => {
     const completionRate = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
     const cardSizes = {
-      small: 'p-3 h-[140px]',
-      medium: 'p-4 h-[160px]',
-      large: 'p-4 h-[220px]'
+      small: 'p-2 sm:p-3 h-[100px] sm:h-[120px] md:h-[140px]',
+      medium: 'p-3 sm:p-4 h-[120px] sm:h-[140px] md:h-[160px]',
+      large: 'p-3 sm:p-4 md:p-6 h-[180px] sm:h-[200px] md:h-[220px]'
     };
 
     return (
@@ -149,37 +152,57 @@ const AdminLifeLock: React.FC = () => {
           ${!isCurrentMonth ? 'opacity-30' : ''}
           hover:shadow-lg transition-all duration-200 text-white cursor-pointer
         `}>
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-1 sm:pb-2">
             <div className="flex items-center justify-between">
-              <h3 className={`font-semibold ${size === 'large' ? 'text-lg' : 'text-sm'}`}>
-                {card.title}
+              <h3 className={`font-semibold ${
+                size === 'large' 
+                  ? 'text-sm sm:text-base md:text-lg' 
+                  : size === 'medium'
+                  ? 'text-xs sm:text-sm'
+                  : 'text-xs'
+              }`}>
+                {size === 'small' ? format(card.date, 'd') : card.title}
               </h3>
               {card.completed ? (
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <CheckCircle2 className={`${size === 'small' ? 'h-3 w-3 sm:h-4 sm:w-4' : 'h-4 w-4 sm:h-5 sm:w-5'} text-green-600`} />
               ) : (
-                <Circle className="h-5 w-5 text-gray-400" />
+                <Circle className={`${size === 'small' ? 'h-3 w-3 sm:h-4 sm:w-4' : 'h-4 w-4 sm:h-5 sm:w-5'} text-gray-400`} />
               )}
             </div>
-            {isToday && (
-              <Badge variant="secondary" className="w-fit bg-orange-500/20 text-orange-300 border-orange-500/40">
+            {isToday && size !== 'small' && (
+              <Badge variant="secondary" className="w-fit bg-orange-500/20 text-orange-300 border-orange-500/40 text-xs">
                 Today
               </Badge>
             )}
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs text-gray-400">
-                <span>{completedTasks}/{totalTasks} tasks</span>
-                <span>{Math.round(completionRate)}%</span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-orange-500 to-green-500 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${completionRate}%` }}
-                />
-              </div>
+          <CardContent className={size === 'small' ? 'p-2' : ''}>
+            <div className={`space-y-1 ${size === 'small' ? 'sm:space-y-2' : 'space-y-2'}`}>
+              {size !== 'small' && (
+                <>
+                  <div className="flex justify-between text-xs text-gray-400">
+                    <span>{completedTasks}/{totalTasks} tasks</span>
+                    <span>{Math.round(completionRate)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-1.5 sm:h-2">
+                    <div 
+                      className="bg-gradient-to-r from-orange-500 to-green-500 h-1.5 sm:h-2 rounded-full transition-all duration-500"
+                      style={{ width: `${completionRate}%` }}
+                    />
+                  </div>
+                </>
+              )}
+              {size === 'small' && (
+                <div className="flex items-center justify-center">
+                  <div className="w-full bg-gray-700 rounded-full h-1.5">
+                    <div 
+                      className="bg-gradient-to-r from-orange-500 to-green-500 h-1.5 rounded-full transition-all duration-500"
+                      style={{ width: `${completionRate}%` }}
+                    />
+                  </div>
+                </div>
+              )}
               {size === 'large' && (
-                <div className="space-y-1 mt-2">
+                <div className="space-y-1 mt-2 hidden sm:block">
                   {card.tasks.slice(0, 3).map((task) => (
                     <div key={task.id} className="flex items-center space-x-2 text-xs">
                       {task.completed ? (
@@ -209,7 +232,7 @@ const AdminLifeLock: React.FC = () => {
   return (
     <AdminLayout>
       <div className="min-h-screen w-full bg-siso-bg">
-        <div className="p-6 space-y-8" style={{ backgroundColor: '#252525' }}>
+        <div className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 md:space-y-8" style={{ backgroundColor: '#252525' }}>
         <AdminPageTitle
           icon={Lock}
           title="Life Lock"
@@ -218,45 +241,45 @@ const AdminLifeLock: React.FC = () => {
 
         {/* Today's Task Card - Centered */}
         <section className="flex flex-col items-center">
-          <h2 className="text-xl font-semibold mb-6 flex items-center text-white">
-            <Calendar className="h-5 w-5 mr-2 text-orange-500" />
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 md:mb-6 flex items-center text-white">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-orange-500" />
             Today's Progress
           </h2>
-          <div className="w-full max-w-lg">
+          <div className="w-full max-w-sm sm:max-w-md md:max-w-lg">
             <TaskCardComponent card={todayCard} size="large" />
           </div>
         </section>
 
         {/* Weekly View */}
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center text-white">
-              <Calendar className="h-5 w-5 mr-2 text-orange-500" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+            <h2 className="text-lg sm:text-xl font-semibold flex items-center text-white">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-orange-500" />
               This Week
             </h2>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between sm:justify-end space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 px-2 sm:px-3"
                 onClick={() => navigateWeek('prev')}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
-              <span className="text-sm font-medium text-white">
+              <span className="text-xs sm:text-sm font-medium text-white px-2">
                 {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 px-2 sm:px-3"
                 onClick={() => navigateWeek('next')}
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 sm:gap-3">
             {weekCards.map((card) => (
               <TaskCardComponent key={card.id} card={card} size="medium" />
             ))}
@@ -265,45 +288,45 @@ const AdminLifeLock: React.FC = () => {
 
         {/* Monthly View */}
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center text-white">
-              <Calendar className="h-5 w-5 mr-2 text-orange-500" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
+            <h2 className="text-lg sm:text-xl font-semibold flex items-center text-white">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-orange-500" />
               Monthly Overview
             </h2>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between sm:justify-end space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 px-2 sm:px-3"
                 onClick={() => navigateMonth('prev')}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
-              <span className="text-sm font-medium text-white">
+              <span className="text-xs sm:text-sm font-medium text-white px-2">
                 {format(selectedMonth, 'MMMM yyyy')}
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700 px-2 sm:px-3"
                 onClick={() => navigateMonth('next')}
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </div>
           </div>
           
           {/* Month and Year Filters */}
-          <div className="flex items-center justify-center space-x-4 mb-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4 sm:mb-6">
             <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-300">Month:</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-300">Month:</label>
               <Select value={selectedMonth.getMonth().toString()} onValueChange={handleMonthChange}>
-                <SelectTrigger className="w-[140px] bg-gray-800 border-gray-600 text-white">
+                <SelectTrigger className="w-[120px] sm:w-[140px] bg-gray-800 border-gray-600 text-white text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-600">
                   {months.map((month, index) => (
-                    <SelectItem key={index} value={index.toString()} className="text-white hover:bg-gray-700">
+                    <SelectItem key={index} value={index.toString()} className="text-white hover:bg-gray-700 text-sm">
                       {month}
                     </SelectItem>
                   ))}
@@ -311,14 +334,14 @@ const AdminLifeLock: React.FC = () => {
               </Select>
             </div>
             <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-300">Year:</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-300">Year:</label>
               <Select value={selectedYear.toString()} onValueChange={handleYearChange}>
-                <SelectTrigger className="w-[100px] bg-gray-800 border-gray-600 text-white">
+                <SelectTrigger className="w-[80px] sm:w-[100px] bg-gray-800 border-gray-600 text-white text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-600">
                   {availableYears.map((year) => (
-                    <SelectItem key={year} value={year.toString()} className="text-white hover:bg-gray-700">
+                    <SelectItem key={year} value={year.toString()} className="text-white hover:bg-gray-700 text-sm">
                       {year}
                     </SelectItem>
                   ))}
@@ -327,20 +350,21 @@ const AdminLifeLock: React.FC = () => {
             </div>
           </div>
           {/* Calendar Grid */}
-          <div className="bg-gray-800/50 rounded-lg p-4">
+          <div className="bg-gray-800/50 rounded-lg p-2 sm:p-3 md:p-4">
             {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-2 mb-4">
-              {dayLabels.map((day) => (
-                <div key={day} className="text-center text-sm font-semibold text-orange-300 py-2">
-                  {day}
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 mb-2 sm:mb-3 md:mb-4">
+              {dayLabels.map((day, index) => (
+                <div key={day} className="text-center text-xs sm:text-sm font-semibold text-orange-300 py-1 sm:py-2">
+                  <span className="hidden sm:inline">{day}</span>
+                  <span className="sm:hidden">{dayLabelsMobile[index]}</span>
                 </div>
               ))}
             </div>
             
             {/* Calendar Weeks */}
-            <div className="space-y-2">
+            <div className="space-y-1 sm:space-y-2">
               {calendarWeeks.map((week, weekIndex) => (
-                <div key={weekIndex} className="grid grid-cols-7 gap-2">
+                <div key={weekIndex} className="grid grid-cols-7 gap-1 sm:gap-2">
                   {week.map((day) => {
                     const card = generateSampleTasks(day);
                     const isCurrentMonth = day.getMonth() === selectedMonth.getMonth();
@@ -360,12 +384,12 @@ const AdminLifeLock: React.FC = () => {
         </section>
 
         {/* Quick Actions */}
-        <section className="flex justify-center">
+        <section className="flex justify-center pt-2 sm:pt-4">
           <Button 
-            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-6 py-3"
+            className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
             onClick={() => console.log('Add new task')}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
             Add New Task
           </Button>
         </section>
