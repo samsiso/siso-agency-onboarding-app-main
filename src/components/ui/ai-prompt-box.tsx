@@ -5,6 +5,9 @@ import { ArrowUp, Paperclip, Square, X, StopCircle, Mic, Globe, BrainCog, Folder
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+// Import voice service
+import { voiceService } from '@/services/voiceService';
+
 // Embedded CSS for minimal custom styles
 const styles = `
   *:focus-visible {
@@ -162,18 +165,84 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
+// Enhanced voice input handler for real speech-to-text
+const useVoiceInput = () => {
+  const [isRecording, setIsRecording] = React.useState(false);
+  const [transcript, setTranscript] = React.useState('');
+  const [error, setError] = React.useState<string | null>(null);
+
+  const startRecording = React.useCallback(async (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!voiceService.isSpeechRecognitionSupported()) {
+        const errorMsg = 'Speech recognition not supported in this browser';
+        setError(errorMsg);
+        reject(new Error(errorMsg));
+        return;
+      }
+
+      setIsRecording(true);
+      setError(null);
+      setTranscript('');
+
+      voiceService.startListening(
+        (currentTranscript, isFinal) => {
+          setTranscript(currentTranscript);
+          if (isFinal && currentTranscript.trim()) {
+            setIsRecording(false);
+            resolve(currentTranscript);
+          }
+        },
+        (errorMsg) => {
+          setError(errorMsg);
+          setIsRecording(false);
+          setTranscript('');
+          reject(new Error(errorMsg));
+        },
+        {
+          language: 'en-US',
+          continuous: false,
+          interimResults: true
+        }
+      ).catch((err) => {
+        setError(err.message);
+        setIsRecording(false);
+        reject(err);
+      });
+    });
+  }, []);
+
+  const stopRecording = React.useCallback(() => {
+    voiceService.stopListening();
+    setIsRecording(false);
+    setTranscript('');
+  }, []);
+
+  return {
+    isRecording,
+    transcript,
+    error,
+    startRecording,
+    stopRecording,
+    clearError: () => setError(null)
+  };
+};
+
 // VoiceRecorder Component
 interface VoiceRecorderProps {
   isRecording: boolean;
   onStartRecording: () => void;
   onStopRecording: (duration: number) => void;
   visualizerBars?: number;
+  transcript?: string;
 }
+
+// Enhanced VoiceRecorder Component with real transcript
 const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   isRecording,
   onStartRecording,
   onStopRecording,
   visualizerBars = 32,
+  transcript
 }) => {
   const [time, setTime] = React.useState(0);
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -198,29 +267,35 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center w-full transition-all duration-300 py-3",
-        isRecording ? "opacity-100" : "opacity-0 h-0"
-      )}
-    >
-      <div className="flex items-center gap-2 mb-3">
-        <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-        <span className="font-mono text-sm text-white/80">{formatTime(time)}</span>
+    <div className="flex items-center justify-between p-4 bg-[#1F2023] rounded-lg border border-red-500/30">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+          <span className="text-red-400 text-sm font-medium">Recording</span>
+        </div>
+        <span className="text-gray-300 text-sm">{formatTime(time)}</span>
       </div>
-      <div className="w-full h-10 flex items-center justify-center gap-0.5 px-4">
-        {[...Array(visualizerBars)].map((_, i) => (
+      
+      {/* Real-time transcript display */}
+      {transcript && (
+        <div className="flex-1 mx-4 p-2 bg-gray-800/50 rounded text-sm text-gray-200">
+          {transcript || 'Listening...'}
+        </div>
+      )}
+      
+      {/* Visualizer bars */}
+      <div className="flex items-center gap-1">
+        {Array.from({ length: Math.min(visualizerBars, 20) }).map((_, i) => (
           <div
             key={i}
-            className="w-0.5 rounded-full bg-white/50 animate-pulse"
+            className="w-1 bg-red-400 rounded-full animate-pulse"
             style={{
-              height: `${Math.max(15, Math.random() * 100)}%`,
-              animationDelay: `${i * 0.05}s`,
-              animationDuration: `${0.5 + Math.random() * 0.5}s`,
+              height: `${Math.random() * 20 + 10}px`,
+              animationDelay: `${i * 50}ms`,
             }}
           />
         ))}
@@ -466,20 +541,24 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
   const [files, setFiles] = React.useState<File[]>([]);
   const [filePreviews, setFilePreviews] = React.useState<{ [key: string]: string }>({});
   const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
-  const [isRecording, setIsRecording] = React.useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
   const [showThink, setShowThink] = React.useState(false);
   const [showCanvas, setShowCanvas] = React.useState(false);
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
   const promptBoxRef = React.useRef<HTMLDivElement>(null);
+  
+  // Enhanced voice functionality
+  const { isRecording, transcript, error: voiceError, startRecording, stopRecording, clearError } = useVoiceInput();
 
   const handleToggleChange = (value: string) => {
     if (value === "search") {
       setShowSearch((prev) => !prev);
       setShowThink(false);
+      setShowCanvas(false);
     } else if (value === "think") {
       setShowThink((prev) => !prev);
       setShowSearch(false);
+      setShowCanvas(false);
     }
   };
 
@@ -488,86 +567,83 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
   const isImageFile = (file: File) => file.type.startsWith("image/");
 
   const processFile = (file: File) => {
-    if (!isImageFile(file)) {
-      console.log("Only image files are allowed");
-      return;
+    if (files.length >= 10) return;
+    
+    setFiles((prevFiles) => [...prevFiles, file]);
+    
+    if (isImageFile(file)) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setFilePreviews((prev) => ({
+            ...prev,
+            [file.name]: e.target!.result as string,
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
     }
-    if (file.size > 10 * 1024 * 1024) {
-      console.log("File too large (max 10MB)");
-      return;
-    }
-    setFiles([file]);
-    const reader = new FileReader();
-    reader.onload = (e) => setFilePreviews({ [file.name]: e.target?.result as string });
-    reader.readAsDataURL(file);
   };
 
-  const handleDragOver = React.useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
-  const handleDragLeave = React.useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  }, []);
-
-  const handleDrop = React.useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const files = Array.from(e.dataTransfer.files);
-    const imageFiles = files.filter((file) => isImageFile(file));
-    if (imageFiles.length > 0) processFile(imageFiles[0]);
-  }, []);
-
   const handleRemoveFile = (index: number) => {
-    const fileToRemove = files[index];
-    if (fileToRemove && filePreviews[fileToRemove.name]) setFilePreviews({});
-    setFiles([]);
+    const file = files[index];
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    if (isImageFile(file)) {
+      setFilePreviews((prev) => {
+        const newPreviews = { ...prev };
+        delete newPreviews[file.name];
+        return newPreviews;
+      });
+    }
   };
 
   const openImageModal = (imageUrl: string) => setSelectedImage(imageUrl);
 
-  const handlePaste = React.useCallback((e: ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.indexOf("image") !== -1) {
-        const file = items[i].getAsFile();
-        if (file) {
-          e.preventDefault();
-          processFile(file);
-          break;
-        }
-      }
-    }
-  }, []);
-
-  React.useEffect(() => {
-    document.addEventListener("paste", handlePaste);
-    return () => document.removeEventListener("paste", handlePaste);
-  }, [handlePaste]);
-
-  const handleSubmit = () => {
-    if (input.trim() || files.length > 0) {
-      let messagePrefix = "";
-      if (showSearch) messagePrefix = "[Search: ";
-      else if (showThink) messagePrefix = "[Think: ";
-      else if (showCanvas) messagePrefix = "[Canvas: ";
-      const formattedInput = messagePrefix ? `${messagePrefix}${input}]` : input;
-      onSend(formattedInput, files);
-      setInput("");
-      setFiles([]);
-      setFilePreviews({});
-    }
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
   };
 
-  const handleStartRecording = () => console.log("Started recording");
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
-  const handleStopRecording = (duration: number) => {
-    console.log(`Stopped recording after ${duration} seconds`);
-    setIsRecording(false);
-    onSend(`[Voice message - ${duration} seconds]`, []);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    droppedFiles.forEach(processFile);
+  };
+
+  const handleSubmit = () => {
+    if (input.trim() === "" && files.length === 0) return;
+    onSend?.(input, files);
+    setInput("");
+    setFiles([]);
+    setFilePreviews({});
+  };
+
+  // Enhanced voice handlers
+  const handleVoiceRecording = async () => {
+    if (isRecording) {
+      stopRecording();
+      return;
+    }
+
+    try {
+      const voiceText = await startRecording();
+      if (voiceText.trim()) {
+        setInput(voiceText);
+        // Auto-submit voice messages
+        setTimeout(() => {
+          onSend?.(voiceText, []);
+          setInput("");
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Voice recording failed:', error);
+    }
   };
 
   const hasContent = input.trim() !== "" || files.length > 0;
@@ -620,6 +696,19 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
           </div>
         )}
 
+        {/* Voice error display */}
+        {voiceError && (
+          <div className="mb-3 p-2 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center justify-between">
+            <span className="text-red-400 text-sm">⚠️ {voiceError}</span>
+            <button
+              onClick={clearError}
+              className="text-red-400 hover:text-red-300 text-sm"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         <div
           className={cn(
             "transition-all duration-300",
@@ -643,8 +732,9 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
         {isRecording && (
           <VoiceRecorder
             isRecording={isRecording}
-            onStartRecording={handleStartRecording}
-            onStopRecording={handleStopRecording}
+            onStartRecording={() => console.log("Voice recording started")}
+            onStopRecording={(duration) => console.log(`Voice recording stopped. Duration: ${duration} seconds`)}
+            transcript={transcript}
           />
         )}
 
@@ -807,9 +897,13 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                   : "bg-transparent hover:bg-gray-600/30 text-[#9CA3AF] hover:text-[#D1D5DB]"
               )}
               onClick={() => {
-                if (isRecording) setIsRecording(false);
-                else if (hasContent) handleSubmit();
-                else setIsRecording(true);
+                if (isRecording) {
+                  stopRecording();
+                } else if (hasContent) {
+                  handleSubmit();
+                } else {
+                  handleVoiceRecording();
+                }
               }}
               disabled={isLoading && !hasContent}
             >

@@ -3,8 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 import { grokTaskService } from '@/services/grokTaskService';
 import { voiceService } from '@/services/voiceService';
-import { Brain, Copy, Check, Mic, MicOff, Volume2, VolumeX, Play, Square } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Brain, Copy, Check, Play } from 'lucide-react';
 
 // Simple types to avoid import issues
 interface Task {
@@ -45,12 +44,9 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Voice state
-  const [isListening, setIsListening] = useState(false);
+  // Voice state - simplified
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [currentTranscript, setCurrentTranscript] = useState('');
-  const [voiceError, setVoiceError] = useState<string | null>(null);
 
   // Cleanup voice service on unmount
   useEffect(() => {
@@ -67,50 +63,6 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, [chatMessages]);
-
-  // Voice input handlers
-  const startVoiceInput = async () => {
-    if (!voiceService.isSpeechRecognitionSupported()) {
-      setVoiceError('Speech recognition not supported in this browser');
-      return;
-    }
-
-    try {
-      setIsListening(true);
-      setVoiceError(null);
-      setCurrentTranscript('');
-
-      await voiceService.startListening(
-        (transcript, isFinal) => {
-          setCurrentTranscript(transcript);
-          if (isFinal) {
-            handleSendMessage(transcript);
-            setCurrentTranscript('');
-            setIsListening(false);
-          }
-        },
-        (error) => {
-          setVoiceError(error);
-          setIsListening(false);
-          setCurrentTranscript('');
-        },
-        {
-          language: 'en-US',
-          continuous: false,
-          interimResults: true
-        }
-      );
-    } catch (error) {
-      setVoiceError(error instanceof Error ? error.message : 'Voice input failed');
-      setIsListening(false);
-    }
-  };
-
-  const stopVoiceInput = () => {
-    voiceService.stopListening();
-    setIsListening(false);
-    setCurrentTranscript('');
-  };
 
   // Voice output handler
   const speakMessage = async (text: string) => {
@@ -137,6 +89,35 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
   const stopSpeaking = () => {
     voiceService.stopSpeaking();
     setIsSpeaking(false);
+  };
+
+  // Enhanced voice input handler for PromptInputBox integration
+  const handleVoiceInput = async (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!voiceService.isSpeechRecognitionSupported()) {
+        reject(new Error('Speech recognition not supported'));
+        return;
+      }
+
+      let finalTranscript = '';
+
+      voiceService.startListening(
+        (transcript, isFinal) => {
+          if (isFinal) {
+            finalTranscript = transcript;
+            resolve(transcript);
+          }
+        },
+        (error) => {
+          reject(new Error(error));
+        },
+        {
+          language: 'en-US',
+          continuous: false,
+          interimResults: true
+        }
+      ).catch(reject);
+    });
   };
 
   const handleSendMessage = async (message: string) => {
@@ -442,162 +423,14 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
         )}
       </div>
       
-      {/* Enhanced Chat Input with Voice Controls */}
+      {/* Clean Chat Input */}
       <div className="p-4 border-t border-white/10 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm">
-        {/* Voice Controls Header */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            {/* Voice Input Button */}
-            <Button
-              onClick={isListening ? stopVoiceInput : startVoiceInput}
-              disabled={isLoading}
-              size="sm"
-              className={`transition-all duration-200 ${
-                isListening 
-                  ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/30' 
-                  : 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/30'
-              } shadow-lg`}
-            >
-              {isListening ? (
-                <>
-                  <MicOff className="w-4 h-4 mr-2" />
-                  Stop
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4 mr-2" />
-                  Voice
-                </>
-              )}
-            </Button>
-
-            {/* Voice Response Toggle */}
-            <Button
-              onClick={() => setVoiceEnabled(!voiceEnabled)}
-              size="sm"
-              variant="outline"
-              className={`transition-all duration-200 ${
-                voiceEnabled 
-                  ? 'border-green-500/50 text-green-400 hover:bg-green-500/10' 
-                  : 'border-gray-600 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              {voiceEnabled ? (
-                <>
-                  <Volume2 className="w-4 h-4 mr-2" />
-                  Voice On
-                </>
-              ) : (
-                <>
-                  <VolumeX className="w-4 h-4 mr-2" />
-                  Voice Off
-                </>
-              )}
-            </Button>
-
-            {/* Speaking Indicator */}
-            {isSpeaking && (
-              <div className="flex items-center gap-2 text-green-400 text-sm">
-                <div className="flex gap-1">
-                  <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                </div>
-                <span>Speaking...</span>
-                <Button
-                  onClick={stopSpeaking}
-                  size="sm"
-                  variant="ghost"
-                  className="h-6 w-6 p-0 text-red-400 hover:text-red-300"
-                >
-                  <Square className="w-3 h-3" />
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Voice Status */}
-          <div className="flex items-center gap-2 text-xs">
-            {voiceService.isSpeechRecognitionSupported() ? (
-              <span className="text-green-400">🎤 Voice Ready</span>
-            ) : (
-              <span className="text-orange-400">⚠️ Voice Not Supported</span>
-            )}
-            {voiceService.isTTSSupported() && (
-              <span className="text-green-400">🔊 TTS Ready</span>
-            )}
-          </div>
-        </div>
-
-        {/* Current Transcript Display */}
-        {(isListening || currentTranscript) && (
-          <motion.div 
-            className="mb-3 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex gap-1">
-                <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" style={{ animationDelay: '200ms' }}></div>
-                <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" style={{ animationDelay: '400ms' }}></div>
-              </div>
-              <span className="text-orange-300 text-sm font-medium">Listening...</span>
-            </div>
-            <p className="text-white text-sm">
-              {currentTranscript || 'Speak now...'}
-            </p>
-          </motion.div>
-        )}
-
-        {/* Voice Error Display */}
-        {voiceError && (
-          <motion.div 
-            className="mb-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-red-400 text-sm">⚠️ {voiceError}</span>
-              <Button
-                onClick={() => setVoiceError(null)}
-                size="sm"
-                variant="ghost"
-                className="h-6 w-6 p-0 text-red-400 hover:text-red-300"
-              >
-                ×
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Text Input */}
         <PromptInputBox 
           onSend={(message, files) => handleSendMessage(message)} 
-          placeholder="Ask me to create tasks, analyze workload, or help with planning... (or use voice input)"
+          placeholder="Ask me to create tasks, analyze workload, or help with planning..."
           isLoading={isLoading}
           className="bg-gray-800/90 border-gray-600/50 shadow-xl backdrop-blur-sm"
         />
-        
-        {/* Enhanced Example Prompts */}
-        {chatMessages.length === 0 && (
-          <motion.div 
-            className="mt-4 text-xs text-gray-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-          >
-            <p className="mb-2 text-gray-300 font-medium">💡 Try these examples (voice or text):</p>
-            <div className="space-y-1 text-gray-500">
-              <p>• "Create a task to redesign the landing page by next Friday"</p>
-              <p>• "Help me prioritize my tasks for this week"</p>
-              <p>• "Break down the new feature project into smaller tasks"</p>
-              <p>• "What should I focus on to meet my deadlines?"</p>
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   );
