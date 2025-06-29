@@ -565,6 +565,8 @@ const AdminTasks: React.FC = () => {
             </div>
           </div>
         </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
 
         {/* Task Detail Modal */}
         <AdminTaskDetailModal

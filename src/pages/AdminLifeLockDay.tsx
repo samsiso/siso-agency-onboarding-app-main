@@ -27,6 +27,7 @@ import { format, addDays, subDays, parseISO } from 'date-fns';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TodayTasksService, TodayTask } from '@/services/todayTasksService';
 import { voiceService } from '@/services/voiceService';
+import DailyTrackerAIAssistant from '@/components/admin/lifelock/DailyTrackerAIAssistant';
 
 interface TaskItem {
   id: string;
@@ -394,6 +395,94 @@ const AdminLifeLockDay: React.FC = () => {
     } catch (error) {
       setIsListening(false);
       console.error('Failed to start voice input:', error);
+    }
+  };
+
+  // AI Assistant task update handler
+  const handleAITasksUpdate = (category: string, action: string, tasks?: any[]) => {
+    try {
+      switch (action) {
+        case 'clear':
+          if (category === 'all' || category === 'deepFocus') {
+            setDeepFocusTasks([]);
+          }
+          if (category === 'all' || category === 'lightFocus') {
+            setLightFocusTasks(prev => prev.map(task => ({ ...task, completed: false, title: '' })));
+          }
+          if (category === 'all' || category === 'morningRoutine') {
+            setMorningRoutine(prev => prev.map(item => ({ ...item, completed: false })));
+          }
+          if (category === 'all' || category === 'workout') {
+            setWorkoutItems(prev => prev.map(item => ({ ...item, completed: false, logged: '' })));
+          }
+          if (category === 'all' || category === 'health') {
+            setHealthItems(prev => prev.map(item => ({ ...item, completed: false })));
+          }
+          break;
+
+        case 'complete_all':
+          if (category === 'all' || category === 'deepFocus') {
+            deepFocusTasks.forEach(task => {
+              if (!task.completed) {
+                handleTaskToggle(task.id, true);
+              }
+            });
+          }
+          if (category === 'all' || category === 'lightFocus') {
+            setLightFocusTasks(prev => prev.map(task => ({ ...task, completed: true })));
+          }
+          if (category === 'all' || category === 'morningRoutine') {
+            setMorningRoutine(prev => prev.map(item => ({ ...item, completed: true })));
+          }
+          if (category === 'all' || category === 'workout') {
+            setWorkoutItems(prev => prev.map(item => ({ ...item, completed: true })));
+          }
+          if (category === 'all' || category === 'health') {
+            setHealthItems(prev => prev.map(item => ({ ...item, completed: true })));
+          }
+          break;
+
+        case 'add':
+          if (tasks && category === 'deepFocus') {
+            // Add tasks to light focus as editable items since deep focus is from Supabase
+            const newLightTasks = tasks.map(task => ({
+              id: task.id,
+              title: task.title,
+              completed: false,
+              notes: task.notes
+            }));
+            setLightFocusTasks(prev => {
+              const updated = [...prev];
+              newLightTasks.forEach((newTask, index) => {
+                if (index < updated.length && !updated[index].title) {
+                  updated[index] = newTask;
+                }
+              });
+              return updated;
+            });
+          }
+          break;
+
+        default:
+          console.log(`Unknown action: ${action}`);
+      }
+
+      // Show success notification
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+      notification.textContent = `✅ AI Command executed successfully!`;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 2000);
+
+    } catch (error) {
+      console.error('AI task update error:', error);
+      
+      // Show error notification
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+      notification.textContent = `❌ Failed to execute AI command`;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 2000);
     }
   };
 
@@ -964,6 +1053,25 @@ const AdminLifeLockDay: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* AI Assistant */}
+      <DailyTrackerAIAssistant
+        currentTasks={{
+          deepFocus: deepFocusTasks.map(task => ({
+            id: task.id,
+            title: task.title,
+            completed: task.completed,
+            priority: task.priority,
+            category: 'deep_focus',
+            notes: task.description
+          })),
+          lightFocus: lightFocusTasks,
+          morningRoutine: morningRoutine,
+          workout: workoutItems,
+          health: healthItems
+        }}
+        onTasksUpdate={handleAITasksUpdate}
+      />
     </AdminLayout>
   );
 };
