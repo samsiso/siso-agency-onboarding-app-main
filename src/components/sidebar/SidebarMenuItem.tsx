@@ -84,13 +84,14 @@ export const SidebarMenuItem = ({
       variants={menuItemVariants}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="relative"
+      className="relative pointer-events-none"
     >
       <Link
         to={href}
         onClick={onClick}
         className={cn(
           'relative flex items-center gap-3 rounded-lg px-3 py-2 text-siso-text transition-all duration-300',
+          'pointer-events-auto cursor-pointer z-10', // Ensure clickability in Electron
           isActive && 'bg-gradient-to-r from-siso-red/10 to-siso-orange/10 text-siso-text-bold shadow-sm',
           !isActive && 'hover:bg-gradient-to-r hover:from-siso-red/5 hover:to-siso-orange/5 hover:text-siso-text-bold',
           isMain ? 'text-base font-semibold' : 'text-sm',
@@ -116,7 +117,7 @@ export const SidebarMenuItem = ({
           />
           {isActive && (
             <motion.div 
-              className="absolute inset-0 blur-lg bg-siso-orange/30 -z-10"
+              className="absolute inset-0 blur-lg bg-siso-orange/30 -z-10 pointer-events-none"
               animate={{
                 scale: [1, 1.2, 1],
                 opacity: [0.3, 0.6, 0.3]
@@ -152,13 +153,13 @@ export const SidebarMenuItem = ({
         {isActive && (
           <motion.div
             layoutId="sidebar-highlight"
-            className="absolute left-0 top-0 h-full w-full rounded-lg bg-gradient-to-r from-siso-red/5 to-siso-orange/5 -z-10"
+            className="absolute left-0 top-0 h-full w-full rounded-lg bg-gradient-to-r from-siso-red/5 to-siso-orange/5 -z-10 pointer-events-none"
             initial="initial"
             animate="animate"
             variants={highlightVariants}
           >
             <motion.div 
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-12 bg-gradient-to-b from-siso-red to-siso-orange rounded-r-full"
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-12 bg-gradient-to-b from-siso-red to-siso-orange rounded-r-full pointer-events-none"
               animate={{
                 boxShadow: [
                   "0 0 10px rgba(255, 87, 34, 0.3)",
@@ -173,7 +174,7 @@ export const SidebarMenuItem = ({
                 ease: "easeInOut"
               }}
             >
-              <div className="absolute w-8 h-8 bg-siso-orange/20 rounded-full blur-xl -left-3 top-1/2 -translate-y-1/2" />
+              <div className="absolute w-8 h-8 bg-siso-orange/20 rounded-full blur-xl -left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </motion.div>
           </motion.div>
         )}

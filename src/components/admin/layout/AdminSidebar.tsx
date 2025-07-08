@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AdminSidebarLogo from './AdminSidebarLogo';
 import { AdminSidebarNavigation } from './AdminSidebarNavigation';
 import { SidebarFooter } from '@/components/sidebar/SidebarFooter';
@@ -14,6 +14,7 @@ export const Sidebar = () => {
   const [showNavigation, setShowNavigation] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useIsMobile();
 
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -22,22 +23,27 @@ export const Sidebar = () => {
     
     if (!href) return;
 
-    if (href.startsWith('/')) {
-      navigate(href);
+    // Always navigate for admin routes - no smooth scrolling needed
+    if (href.startsWith('/') || href.startsWith('#/')) {
+      const path = href.startsWith('#/') ? href.substring(1) : href;
+      navigate(path);
       if (isMobile) {
         setIsMobileMenuOpen(false);
       }
       return;
     }
 
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-      if (isMobile) {
-        setIsMobileMenuOpen(false);
+    // Only try querySelector for actual hash fragments (not routes)
+    if (href.startsWith('#') && !href.startsWith('#/')) {
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+        if (isMobile) {
+          setIsMobileMenuOpen(false);
+        }
       }
     }
   };
