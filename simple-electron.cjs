@@ -9,7 +9,11 @@ function createWindow() {
     height: 800,
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      enableRemoteModule: false,
+      allowRunningInsecureContent: false,
+      webSecurity: false, // Allow localhost connections
+      experimentalFeatures: true
     },
     icon: path.join(__dirname, 'SISO-Agency-App.icns'),
     show: false,
@@ -24,6 +28,33 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     mainWindow.focus();
+    
+    // Enable debugging
+    console.log('✅ Window ready and focused');
+    
+    // Test JavaScript interaction
+    mainWindow.webContents.executeJavaScript(`
+      console.log('🔧 JavaScript execution test - SUCCESS');
+      
+      // Test if clicking works
+      document.addEventListener('click', (e) => {
+        console.log('👆 Click detected on:', e.target.tagName, e.target.className);
+      });
+      
+      // Test if React is working
+      if (window.React) {
+        console.log('⚛️ React is available');
+      } else {
+        console.log('❌ React not found');
+      }
+      
+      // Return success
+      'JavaScript injection successful'
+    `).then(result => {
+      console.log('JS injection result:', result);
+    }).catch(err => {
+      console.error('JS injection failed:', err);
+    });
   });
 
   // Prevent accidental closing
