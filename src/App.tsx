@@ -93,6 +93,9 @@ import AdminPartnershipTraining from './pages/admin/AdminPartnershipTraining';
 // Automation System imports
 import { AutomationPage } from './pages/automation/AutomationPage';
 
+// Dev Tools imports
+import DevTools from './pages/DevTools';
+
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -225,6 +228,10 @@ function App() {
           {/* Automation System Routes */}
           <Route path="/automation" element={<AuthGuard adminOnly={true}><AutomationPage /></AuthGuard>} />
           <Route path="/admin/automation" element={<AuthGuard adminOnly={true}><AutomationPage /></AuthGuard>} />
+          
+          {/* Dev Tools Routes */}
+          <Route path="/dev-tools" element={<AuthGuard adminOnly={true}><DevTools /></AuthGuard>} />
+          <Route path="/admin/dev-tools" element={<AuthGuard adminOnly={true}><DevTools /></AuthGuard>} />
           
           {/* Protected Dashboard Routes */}
           <Route path="/home" element={<AuthGuard><Home /></AuthGuard>} />

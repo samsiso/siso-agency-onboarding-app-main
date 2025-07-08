@@ -3,7 +3,7 @@ import {
   ListTodo, CalendarClock, CreditCard,
   ClipboardList, Building2, UserCog, FileText,
   ScrollText, Zap, Bot, Database, FolderOpen,
-  Lock, Settings
+  Lock, Settings, Terminal, Code
 } from 'lucide-react';
 import { MenuSection } from './types';
 
@@ -76,6 +76,23 @@ export const getAdminMenuSections = (): MenuSection[] => {
           href: '/admin/templates',
           icon: FileText,
           label: 'Templates',
+        },
+        {
+          href: '/admin/automation',
+          icon: Bot,
+          label: 'Automation',
+        }
+      ]
+    },
+    {
+      type: 'section',
+      title: 'Development Tools',
+      icon: Code,
+      items: [
+        {
+          href: '/admin/dev-tools',
+          icon: Terminal,
+          label: 'SISO Dev Tools',
         }
       ]
     },
