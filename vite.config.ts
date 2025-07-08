@@ -6,10 +6,25 @@ import path from "path";
 // [Plan] Monitor performance impact and adjust splits if needed
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
-    port: 8080,
+    host: true, // Allow network access
+    port: 2222,
+    strictPort: true, // Don't try other ports
+    open: false, // Don't auto-open browser
+    hmr: {
+      overlay: false // Disable overlay for faster updates
+    },
+    fs: {
+      strict: false // Allow serving files from outside root
+    }
   },
   plugins: [react()],
+  
+  // M4 Mac Mini Optimizations
+  esbuild: {
+    target: 'es2022',
+    platform: 'neutral',
+    keepNames: true
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -25,92 +40,18 @@ export default defineConfig(({ mode }) => ({
     },
     reportCompressedSize: true,
     rollupOptions: {
+      external: ['child_process', 'fs', 'path', 'os'],
       output: {
         manualChunks: {
-          // Core vendor bundles - split by functionality
-          'react-core': ['react', 'react-dom'],
-          'react-router': ['react-router-dom'],
-          
-          // UI Components bundles - split by feature
-          'ui-core': [
-            '@radix-ui/react-slot',
-            '@/components/ui/button',
-            '@/components/ui/dialog',
-            '@/components/ui/input',
-            '@/components/ui/form',
-            '@/components/ui/avatar',
-            '@/components/ui/select',
-            '@/components/ui/tabs',
-          ],
-          'ui-navigation': ['@radix-ui/react-navigation-menu'],
-          'ui-overlay': ['@radix-ui/react-dialog', '@radix-ui/react-popover'],
-          'ui-tooltip': ['@radix-ui/react-tooltip'],
-          'ui-forms': ['@radix-ui/react-label', '@radix-ui/react-select'],
-          'ui-data': ['@radix-ui/react-avatar', '@radix-ui/react-progress'],
-          'ui-tabs': ['@radix-ui/react-tabs'],
-          'ui-switch': ['@radix-ui/react-switch'],
-          'ui-checkbox': ['@radix-ui/react-checkbox'],
-          
-          // Landing page chunks - split by section
-          'landing-hero': ['@/components/ui/animated-hero'],
-          'landing-features': ['@/components/blocks/feature-section-with-hover-effects'],
-          'landing-testimonials': ['@/components/landing/sections/TestimonialsSection'],
-          'landing-pricing': ['@/components/ui/pricing-card'],
-          
-          // Chat components - split by functionality
-          'chat-messages': ['@/components/chat/ChatMessage'],
-          'chat-input': ['@/components/chat/ChatInput'],
-          'chat-thread': ['@/components/ui/chat-message-list'],
-          
-          // Modal variants
-          'modal-drawer': ['@/components/ui/drawer'],
-          'modal-sheet': ['@/components/ui/sheet'],
-          
-          // Animation bundles
-          'animation': [
-            'framer-motion',
-            '@/components/ui/message-loading'
-          ],
-          
-          // Utility bundles
-          'utils-styling': ['clsx', 'tailwind-merge'],
-          'utils-icons': ['lucide-react'],
-          'utils-date': ['date-fns'],
-          
-          // Form handling bundle
-          'form-core': ['react-hook-form'],
-          'form-validation': ['zod'],
-          
-          // Data management bundles
-          'data-query': ['@tanstack/react-query', 'jotai'],
-          'data-charts': ['recharts'],
-          
-          // Auth bundles
-          'auth-supabase': ['@supabase/auth-helpers-react'],
-          'auth-ui': ['@supabase/auth-ui-react'],
-          
-          // Blockchain bundles
-          'blockchain-solana': ['@solana/web3.js'],
-          'blockchain-moralis': ['moralis'],
-          
-          // State management
-          'state-auth': ['@/hooks/useAuthSession'],
-          'state-preferences': ['@/hooks/use-mobile'],
-          'state-app': ['@/hooks/usePoints'],
-          
-          // Index route specific bundles
-          'index-components': [
-            '@/components/Hero',
-            '@/components/ui/expandable-chat',
-            '@/components/Footer',
-            '@/components/effects/FloatingOrbs'
-          ],
-          
-          // Testimonial section
-          'testimonials': [
-            './src/components/landing/TestimonialSection.tsx',
-            './src/components/landing/TestimonialCard.tsx',
-          ],
+          // Safe code splitting - less aggressive
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-router': ['react-router-dom'],
+          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-select', '@radix-ui/react-tabs'],
+          'vendor-utils': ['clsx', 'tailwind-merge', 'lucide-react'],
+          'vendor-forms': ['react-hook-form', 'zod'],
+          'vendor-supabase': ['@supabase/supabase-js', '@supabase/auth-helpers-react'],
+          'vendor-charts': ['recharts', 'reaviz'],
+          'vendor-animation': ['framer-motion'],
         },
         
         assetFileNames: (assetInfo) => {
@@ -152,8 +93,19 @@ export default defineConfig(({ mode }) => ({
       'tailwind-merge',
       'lucide-react',
     ],
-    exclude: ['moralis']
+    exclude: ['moralis'],
+    // M4 Optimizations
+    esbuildOptions: {
+      target: 'es2022',
+      platform: 'neutral',
+      keepNames: true
+    },
+    // Pre-bundle heavy dependencies
+    force: mode === 'development'
   },
+  
+  // Enhanced caching for M4 performance
+  cacheDir: './.vite-cache',
   
   experimental: {
     renderBuiltUrl(filename: string, { hostType }: { hostType: 'js' | 'css' | 'html' }) {

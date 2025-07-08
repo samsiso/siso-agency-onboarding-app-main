@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+# Build artifacts and cache
+.vite-cache/
+storage/
+dist-app/
+node_modules/
+*.tgz
+*.app
+*.dmg
+*.exe

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import SidebarLogo from './sidebar/SidebarLogo';
 import { SidebarNavigation } from './sidebar/SidebarNavigation';
 import { SidebarFooter } from './sidebar/SidebarFooter';
@@ -29,12 +29,12 @@ export const Sidebar = () => {
   const ignoreMouseLeaveUntil = useRef<number>(0);
   const projectMenuButtonRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const isMobile = useIsMobile();
   const { selectedProject, projects, selectProject } = useSelectedProject();
 
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevent event bubbling
     
     // Set the sidebar to stay expanded when clicking navigation items
     if (!isMobile) {
@@ -45,6 +45,8 @@ export const Sidebar = () => {
     
     const href = e.currentTarget.getAttribute('href');
     if (!href) return;
+
+    console.log('Navigating to:', href); // Debug log
 
     if (href.startsWith('/')) {
       navigate(href);

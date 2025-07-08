@@ -1,4 +1,12 @@
-import { spawn, ChildProcess } from 'child_process';
+// @ts-ignore - Node.js imports only available in Electron
+let spawn: any, ChildProcess: any;
+
+if (typeof window === 'undefined') {
+  // Only import in Node.js environment (Electron main process)
+  const childProcess = require('child_process');
+  spawn = childProcess.spawn;
+  ChildProcess = childProcess.ChildProcess;
+}
 
 export interface ClaudeExecutionRequest {
   prompt: string;
@@ -23,7 +31,7 @@ export interface ClaudeExecutionResult {
 
 export interface ClaudeProcess {
   id: string;
-  process: ChildProcess;
+  process: any; // ChildProcess type only available in Node.js
   status: 'running' | 'completed' | 'failed' | 'cancelled';
   startTime: Date;
   endTime?: Date;
