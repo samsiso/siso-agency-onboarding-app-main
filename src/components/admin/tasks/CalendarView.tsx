@@ -163,7 +163,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({
   // Handle day click - navigate to LifeLock day view
   const handleDayClick = (dayData: DayCardData) => {
     const dateString = format(dayData.date, 'yyyy-MM-dd');
-    navigate(`/admin/lifelock-day?date=${dateString}`);
+    navigate(`/admin/life-lock/day?date=${dateString}`);
   };
 
   // Handle task click

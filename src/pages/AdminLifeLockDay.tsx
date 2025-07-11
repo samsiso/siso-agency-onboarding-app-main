@@ -77,19 +77,38 @@ const AdminLifeLockDay: React.FC = () => {
 
   // Load enhanced tasks from Supabase on mount and date change
   useEffect(() => {
+    let isMounted = true;
+    
     const loadTasks = async () => {
+      if (!isMounted) return;
+      
       setIsLoadingTasks(true);
+      console.log('Loading enhanced tasks for date:', format(currentDate, 'yyyy-MM-dd'));
+      
       try {
         const tasks = await EnhancedTaskService.getDeepFocusTasksForDate(currentDate);
+        
+        if (!isMounted) return;
+        
+        console.log('Loaded enhanced tasks successfully:', tasks);
         setDeepFocusTasks(tasks);
       } catch (error) {
         console.error('Failed to load enhanced tasks:', error);
+        if (isMounted) {
+          setDeepFocusTasks([]); // Set empty array on error
+        }
       } finally {
-        setIsLoadingTasks(false);
+        if (isMounted) {
+          setIsLoadingTasks(false);
+        }
       }
     };
 
     loadTasks();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [currentDate]);
 
   // Update task completion with enhanced analytics
@@ -323,24 +342,21 @@ const AdminLifeLockDay: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [voiceTranscript, setVoiceTranscript] = useState('');
 
-  // Show loading state if data is still loading
-  if (isLoadingLifeLockData) {
-    return (
-      <AdminLayout>
-        <div className="min-h-screen w-full bg-gray-900 flex items-center justify-center">
-          <div className="text-white text-lg">Loading your LifeLock data...</div>
-        </div>
-      </AdminLayout>
-    );
-  }
-
   // Load all LifeLock data from Supabase on mount and date change
   useEffect(() => {
+    let isMounted = true; // Prevent state updates if component unmounted
+    
     const loadLifeLockData = async () => {
+      if (!isMounted) return;
+      
       setIsLoadingLifeLockData(true);
+      console.log('Loading LifeLock data for date:', format(currentDate, 'yyyy-MM-dd'));
+      
       try {
         // Try to migrate localStorage data first (only if Supabase data doesn't exist)
         const existingData = await LifeLockService.getAllDailyData(currentDate);
+        
+        if (!isMounted) return;
         
         // If no data exists in Supabase, try to migrate from localStorage
         if (!existingData.routine && !existingData.workout && !existingData.health) {
@@ -348,9 +364,14 @@ const AdminLifeLockDay: React.FC = () => {
           await LifeLockService.migrateLocalStorageData(currentDate);
         }
         
+        if (!isMounted) return;
+        
         // Load fresh data from Supabase after potential migration
         const data = await LifeLockService.getAllDailyData(currentDate);
         
+        if (!isMounted) return;
+        
+        console.log('Loaded LifeLock data successfully:', data);
         setDailyRoutineData(data.routine);
         setDailyWorkoutData(data.workout);
         setDailyHealthData(data.health);
@@ -359,12 +380,26 @@ const AdminLifeLockDay: React.FC = () => {
         
       } catch (error) {
         console.error('Failed to load LifeLock data:', error);
+        if (isMounted) {
+          // Set default data to prevent infinite loading
+          setDailyRoutineData(null);
+          setDailyWorkoutData(null);
+          setDailyHealthData(null);
+          setDailyHabitsData(null);
+          setDailyReflectionsData(null);
+        }
       } finally {
-        setIsLoadingLifeLockData(false);
+        if (isMounted) {
+          setIsLoadingLifeLockData(false);
+        }
       }
     };
 
     loadLifeLockData();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [currentDate]);
 
   const navigateDay = (direction: 'prev' | 'next') => {
@@ -600,6 +635,17 @@ const AdminLifeLockDay: React.FC = () => {
     { id: 'workout', label: 'Workout', completed: workoutItems.filter(i => i.completed).length, total: workoutItems.length, color: 'danger' as const },
     { id: 'health', label: 'Health', completed: healthItems.filter(i => i.completed).length, total: healthItems.length, color: 'default' as const }
   ];
+
+  // Show loading state if data is still loading
+  if (isLoadingLifeLockData) {
+    return (
+      <AdminLayout>
+        <div className="min-h-screen w-full bg-gray-900 flex items-center justify-center">
+          <div className="text-white text-lg">Loading your LifeLock data...</div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
