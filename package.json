@@ -37,7 +37,8 @@
     "kb:search": "tsx src/knowledge-base/knowledge-base-manager.ts search",
     "migrate:lifelock": "node scripts/migrate-lifelock-hardcoded-data.js",
     "migrate:lifelock:default": "node scripts/migrate-lifelock-default-data.js",
-    "setup:admin": "node scripts/setup-admin-user.js"
+    "setup:admin": "node scripts/setup-admin-user.js",
+    "setup:lifelock:complete": "node scripts/complete-lifelock-setup.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
