@@ -137,21 +137,21 @@ export const Sidebar = () => {
         onMouseLeave={handleMouseLeave}
       >
         <AdminSidebarLogo 
-          collapsed={!isExpanded} 
+          collapsed={isMobile ? !isMobileMenuOpen : !isExpanded} 
           setCollapsed={() => setIsExpanded(!isExpanded)}
           onLogoClick={() => setShowNavigation(!showNavigation)}
         />
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto admin-sidebar">
           <AnimatePresence mode="wait">
             <AdminSidebarNavigation 
-              collapsed={!isExpanded} 
+              collapsed={isMobile ? !isMobileMenuOpen : !isExpanded} 
               onItemClick={handleItemClick}
               visible={showNavigation}
             />
           </AnimatePresence>
         </div>
         <SidebarFooter 
-          collapsed={!isExpanded} 
+          collapsed={isMobile ? !isMobileMenuOpen : !isExpanded} 
           onProfileOpen={(isOpen) => {
             setIsProfileOpen(isOpen);
             if (isOpen) setIsExpanded(true);
