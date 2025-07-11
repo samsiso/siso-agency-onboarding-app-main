@@ -42,6 +42,7 @@ A comprehensive agency onboarding platform built with Vite + React + TypeScript,
 - **BATCH OPERATIONS** - Use multiple tool calls simultaneously
 - **QUALITY GATES** - Run lint, type-check, build before commits
 - **DOCUMENT EVERYTHING** - Log research, decisions, progress
+- **PROTECT CRITICAL FILES** - Never delete build configuration files
 
 ### 🔄 **RIPER Development Cycle**
 Execute within each response:
@@ -194,6 +195,35 @@ All templates in `docs/templates/AUTONOMOUS-DEVELOPMENT-TEMPLATES.md`:
 - **Progress Tracking** - Update relevant documentation
 - **Thought Processes** - Maintain thought logs for complex features
 - **Template Usage** - Follow established patterns
+
+## 🚨 **CRITICAL BUILD FILES - DO NOT DELETE**
+
+### 🔒 **Protected Configuration Files**
+These files are ESSENTIAL for the application to function. **NEVER DELETE THEM:**
+
+1. **`postcss.config.js`** - Required for Tailwind CSS compilation
+2. **`tailwind.config.ts`** - Tailwind configuration and SISO theme
+3. **`vite.config.ts`** - Build configuration
+4. **`package.json`** - Dependencies and scripts
+5. **`tsconfig.json`** - TypeScript configuration
+6. **`components.json`** - shadcn/ui configuration
+7. **`src/index.css`** - Main CSS file with Tailwind imports
+8. **`src/main.tsx`** - Application entry point
+
+### ⚠️ **Before Any File Cleanup:**
+1. **ALWAYS check** if files are build-related
+2. **VERIFY** the file isn't imported or referenced
+3. **TEST** the application after any deletions
+4. **COMMIT** changes incrementally to isolate issues
+
+### 🔧 **Recovery Commands** (if accidentally deleted):
+```bash
+# Restore PostCSS config
+echo 'export default { plugins: { tailwindcss: {}, autoprefixer: {} } }' > postcss.config.js
+
+# Restart dev server
+npm run dev
+```
 
 ## 🎯 **SUCCESS METRICS FOR AUTONOMOUS AGENT**
 
