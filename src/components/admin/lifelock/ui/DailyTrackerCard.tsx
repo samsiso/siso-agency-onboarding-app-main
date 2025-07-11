@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { LucideIcon } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface DailyTrackerCardProps {
@@ -108,12 +107,11 @@ export const DailyTrackerCard: React.FC<DailyTrackerCardProps> = ({
   const colors = colorClasses[color];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      whileHover={{ scale: onClick ? 1.02 : 1 }}
-      className={cn('h-full', onClick && 'cursor-pointer')}
+    <div
+      className={cn(
+        'h-full transition-transform duration-200',
+        onClick && 'cursor-pointer hover:scale-[1.02]'
+      )}
       onClick={onClick}
     >
       <Card 
@@ -126,7 +124,7 @@ export const DailyTrackerCard: React.FC<DailyTrackerCardProps> = ({
         )}
       >
         <CardHeader className={cn(
-          isCompact ? 'p-4 pb-3' : 'p-4 sm:p-6',
+          isCompact ? 'p-3 sm:p-4 pb-2 sm:pb-3' : 'p-3 sm:p-4 lg:p-6',
           'relative'
         )}>
           {/* Progress bar at top of card */}
@@ -187,12 +185,12 @@ export const DailyTrackerCard: React.FC<DailyTrackerCardProps> = ({
 
         <CardContent className={cn(
           'flex-1',
-          isCompact ? 'p-4 pt-0' : 'p-4 sm:p-6 pt-0 sm:pt-0'
+          isCompact ? 'p-3 sm:p-4 pt-0' : 'p-3 sm:p-4 lg:p-6 pt-0'
         )}>
           {children}
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 };
 

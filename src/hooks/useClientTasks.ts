@@ -41,7 +41,7 @@ export function useClientTasks(clientId?: string) {
     const fetchTasks = async () => {
       try {
         setError(null);
-        let query = supabase.from('tasks').select('*');
+        let query = supabase.from('tasks').select('id, title, description, due_date, category, priority, status, assigned_to, assigned_client_id');
 
         if (clientId) {
           query = query.eq('assigned_client_id', clientId);

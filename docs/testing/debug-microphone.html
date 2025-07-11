@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎤 Microphone Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        button {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #e55a2e;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .success {
+            background: #0a4d0a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #4d0a0a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #4d4d0a;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .info {
+            background: #0a2d4d;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .status {
+            font-size: 14px;
+            color: #ccc;
+            margin: 5px 0;
+        }
+        .step {
+            background: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #ff6b35;
+        }
+        .code {
+            background: #111;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎤 Microphone Permission Debugger</h1>
+    <p>This tool will help diagnose why your microphone isn't working in the app.</p>
+
+    <div class="container">
+        <h2>Step 1: Browser Compatibility Check</h2>
+        <button onclick="checkBrowserSupport()">🔍 Check Browser Support</button>
+        <div id="browserResults"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 2: Permission Status Check</h2>
+        <button onclick="checkPermissions()">🔐 Check Permissions</button>
+        <div id="permissionResults"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 3: Request Microphone Access</h2>
+        <button onclick="requestMicrophoneAccess()">🎤 Request Microphone</button>
+        <div id="microphoneResults"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 4: Test Speech Recognition</h2>
+        <button id="testSpeechBtn" onclick="testSpeechRecognition()">🗣️ Test Speech Recognition</button>
+        <button id="stopSpeechBtn" onclick="stopSpeechRecognition()" disabled>⏹️ Stop Test</button>
+        <div id="speechResults"></div>
+        <div id="transcript" class="info" style="display: none;"></div>
+    </div>
+
+    <div class="container">
+        <h2>Step 5: Solutions & Next Steps</h2>
+        <div id="solutions"></div>
+    </div>
+
+    <script>
+        let recognition = null;
+        let stream = null;
+
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = message;
+            element.appendChild(div);
+        }
+
+        function clear(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        // Step 1: Browser Support Check
+        function checkBrowserSupport() {
+            clear('browserResults');
+            
+            const checks = {
+                'SpeechRecognition API': window.SpeechRecognition || window.webkitSpeechRecognition,
+                'MediaDevices API': navigator.mediaDevices,
+                'getUserMedia': navigator.mediaDevices && navigator.mediaDevices.getUserMedia,
+                'Permissions API': navigator.permissions,
+                'HTTPS/Localhost': location.protocol === 'https:' || location.hostname === 'localhost',
+                'Service Worker': 'serviceWorker' in navigator
+            };
+
+            log('browserResults', '<h3>Browser Compatibility Results:</h3>');
+            
+            Object.entries(checks).forEach(([feature, supported]) => {
+                const status = supported ? '✅' : '❌';
+                const type = supported ? 'success' : 'error';
+                log('browserResults', `${status} ${feature}: ${supported ? 'Supported' : 'Not Supported'}`, type);
+            });
+
+            // Browser-specific advice
+            const userAgent = navigator.userAgent;
+            if (userAgent.includes('Chrome')) {
+                log('browserResults', '🎯 Chrome detected - Best browser for speech recognition', 'success');
+            } else if (userAgent.includes('Firefox')) {
+                log('browserResults', '⚠️ Firefox detected - Limited speech recognition support', 'warning');
+            } else if (userAgent.includes('Safari')) {
+                log('browserResults', '🍎 Safari detected - Good support on newer versions', 'info');
+            } else {
+                log('browserResults', '❓ Unknown browser - Chrome recommended for best results', 'warning');
+            }
+
+            // Protocol check
+            if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+                log('browserResults', '🔒 SECURITY WARNING: Speech recognition requires HTTPS or localhost', 'error');
+                log('browserResults', '💡 Solution: Use https://localhost:5173 or deploy to HTTPS', 'warning');
+            }
+        }
+
+        // Step 2: Permission Check
+        async function checkPermissions() {
+            clear('permissionResults');
+            log('permissionResults', '<h3>Permission Status Check:</h3>');
+
+            if (!navigator.permissions) {
+                log('permissionResults', '❌ Permissions API not supported', 'error');
+                return;
+            }
+
+            try {
+                const micPermission = await navigator.permissions.query({ name: 'microphone' });
+                
+                switch (micPermission.state) {
+                    case 'granted':
+                        log('permissionResults', '✅ Microphone permission: GRANTED', 'success');
+                        break;
+                    case 'denied':
+                        log('permissionResults', '❌ Microphone permission: DENIED', 'error');
+                        log('permissionResults', '🔧 Fix: Click the lock icon 🔒 in your address bar → Site settings → Allow microphone', 'warning');
+                        break;
+                    case 'prompt':
+                        log('permissionResults', '🔄 Microphone permission: PROMPT (will ask when needed)', 'info');
+                        break;
+                }
+
+                // Listen for permission changes
+                micPermission.onchange = () => {
+                    log('permissionResults', `🔄 Permission changed to: ${micPermission.state}`, 'info');
+                };
+
+            } catch (error) {
+                log('permissionResults', `❌ Error checking permissions: ${error.message}`, 'error');
+            }
+        }
+
+        // Step 3: Request Microphone Access
+        async function requestMicrophoneAccess() {
+            clear('microphoneResults');
+            log('microphoneResults', '<h3>Requesting Microphone Access:</h3>');
+
+            try {
+                log('microphoneResults', '🔄 Requesting microphone access...', 'info');
+                
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                log('microphoneResults', '✅ Microphone access GRANTED!', 'success');
+                log('microphoneResults', `📊 Audio tracks: ${stream.getAudioTracks().length}`, 'info');
+                
+                const audioTrack = stream.getAudioTracks()[0];
+                if (audioTrack) {
+                    log('microphoneResults', `🎤 Device: ${audioTrack.label || 'Default microphone'}`, 'info');
+                    log('microphoneResults', `⚙️ Settings: ${JSON.stringify(audioTrack.getSettings())}`, 'info');
+                }
+
+                // Clean up
+                stream.getTracks().forEach(track => track.stop());
+                log('microphoneResults', '🛑 Stream stopped (cleanup complete)', 'info');
+
+            } catch (error) {
+                log('microphoneResults', `❌ Microphone access DENIED: ${error.message}`, 'error');
+                
+                switch (error.name) {
+                    case 'NotAllowedError':
+                        log('microphoneResults', '🔧 Fix: Click the microphone icon 🎤 in your address bar and select "Allow"', 'warning');
+                        break;
+                    case 'NotFoundError':
+                        log('microphoneResults', '🔧 Fix: Check that a microphone is connected to your computer', 'warning');
+                        break;
+                    case 'NotReadableError':
+                        log('microphoneResults', '🔧 Fix: Close other apps that might be using your microphone', 'warning');
+                        break;
+                    default:
+                        log('microphoneResults', `🔧 Error type: ${error.name}`, 'warning');
+                }
+            }
+        }
+
+        // Step 4: Test Speech Recognition
+        function testSpeechRecognition() {
+            clear('speechResults');
+            log('speechResults', '<h3>Testing Speech Recognition:</h3>');
+
+            if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+                log('speechResults', '❌ Speech Recognition not supported in this browser', 'error');
+                return;
+            }
+
+            try {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => {
+                    log('speechResults', '✅ Speech recognition started - SAY SOMETHING!', 'success');
+                    document.getElementById('testSpeechBtn').disabled = true;
+                    document.getElementById('stopSpeechBtn').disabled = false;
+                    document.getElementById('transcript').style.display = 'block';
+                    document.getElementById('transcript').innerHTML = 'Listening...';
+                };
+
+                recognition.onresult = (event) => {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    
+                    document.getElementById('transcript').innerHTML = `"${transcript}"`;
+                    
+                    if (event.results[event.results.length - 1].isFinal) {
+                        log('speechResults', `🎯 Final result: "${transcript}"`, 'success');
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    log('speechResults', `❌ Speech recognition error: ${event.error}`, 'error');
+                    document.getElementById('testSpeechBtn').disabled = false;
+                    document.getElementById('stopSpeechBtn').disabled = true;
+                };
+
+                recognition.onend = () => {
+                    log('speechResults', '🏁 Speech recognition ended', 'info');
+                    document.getElementById('testSpeechBtn').disabled = false;
+                    document.getElementById('stopSpeechBtn').disabled = true;
+                };
+
+                recognition.start();
+
+            } catch (error) {
+                log('speechResults', `❌ Failed to start speech recognition: ${error.message}`, 'error');
+            }
+        }
+
+        function stopSpeechRecognition() {
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+
+        // Auto-run initial checks
+        window.onload = function() {
+            // Show solutions
+            document.getElementById('solutions').innerHTML = `
+                <h3>🔧 Common Solutions:</h3>
+                <div class="step">
+                    <h4>1. Browser Permission Fix</h4>
+                    <p>Click the <strong>lock icon 🔒</strong> or <strong>microphone icon 🎤</strong> in your browser address bar</p>
+                    <p>Select <strong>"Allow"</strong> for microphone access</p>
+                </div>
+                <div class="step">
+                    <h4>2. Browser Settings</h4>
+                    <p><strong>Chrome:</strong> Settings → Privacy & Security → Site Settings → Microphone → Allow</p>
+                    <p><strong>Firefox:</strong> about:preferences#privacy → Permissions → Microphone → Settings</p>
+                    <p><strong>Safari:</strong> Safari → Preferences → Websites → Microphone</p>
+                </div>
+                <div class="step">
+                    <h4>3. System Settings</h4>
+                    <p><strong>Windows:</strong> Settings → Privacy → Microphone → Allow apps to access microphone</p>
+                    <p><strong>Mac:</strong> System Preferences → Security & Privacy → Privacy → Microphone</p>
+                </div>
+                <div class="step">
+                    <h4>4. If Still Not Working</h4>
+                    <p>• Try a different browser (Chrome works best)</p>
+                    <p>• Check if other apps are using your microphone</p>
+                    <p>• Restart your browser</p>
+                    <p>• Make sure you're on HTTPS or localhost</p>
+                </div>
+            `;
+        };
+    </script>
+</body>
+</html>

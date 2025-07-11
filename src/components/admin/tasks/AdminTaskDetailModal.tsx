@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+// Removed framer-motion for performance optimization
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -184,32 +184,32 @@ interface AdminTaskDetailModalProps {
     });
   };  return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] bg-[#1A1F2C] border border-[#403E43]/30 p-0 max-h-[85vh] overflow-hidden">
+      <DialogContent className="sm:max-w-[700px] bg-gradient-to-br from-[#1f2533]/95 to-[#252229]/95 border border-[#3a3942]/50 p-0 max-h-[85vh] overflow-hidden rounded-xl backdrop-blur-sm shadow-xl">
         {/* Header */}
-        <DialogHeader className="p-6 pb-4 border-b border-white/10">
+        <DialogHeader className="p-6 pb-4 border-b border-[#3a3942]/30">
           <div className="flex items-start justify-between">
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 space-y-3">
               {isEditing ? (
                 <Input
                   value={editedTask.title}
                   onChange={(e) => handleInputChange('title', e.target.value)}
-                  className="text-lg font-semibold text-white bg-transparent border-white/20 focus:border-orange-500"
+                  className="text-lg font-semibold text-gray-100 bg-[#1f2533]/50 border border-[#3a3942]/50 focus:border-[#9b87f5]/60 rounded-lg"
                   placeholder="Task title..."
                 />
               ) : (
-                <DialogTitle className="text-lg font-semibold text-white leading-tight">
+                <DialogTitle className="text-lg font-semibold text-gray-100 leading-tight">
                   {editedTask.title}
                 </DialogTitle>
               )}
               
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge className={`text-xs px-2 py-1 ${getStatusColor(editedTask.status)}`}>
+                <Badge className={`text-xs px-3 py-1 rounded-full border ${getStatusColor(editedTask.status)}`}>
                   {editedTask.status.replace('-', ' ')}
                 </Badge>
-                <Badge className={`text-xs px-2 py-1 ${getPriorityColor(editedTask.priority)}`}>
+                <Badge className={`text-xs px-3 py-1 rounded-full border ${getPriorityColor(editedTask.priority)}`}>
                   {editedTask.priority} priority
                 </Badge>
-                <Badge className={`text-xs px-2 py-1 ${getCategoryColor(editedTask.category)}`}>
+                <Badge className={`text-xs px-3 py-1 rounded-full border ${getCategoryColor(editedTask.category)}`}>
                   {editedTask.category}
                 </Badge>
               </div>
@@ -218,17 +218,17 @@ interface AdminTaskDetailModalProps {
             <div className="flex items-center gap-2 ml-4">
               {isEditing ? (
                 <>
-                  <Button size="sm" onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                  <Button size="sm" onClick={handleSave} className="bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/40 rounded-lg">
                     <Save className="w-4 h-4 mr-1" />
                     Save
                   </Button>
-                  <Button size="sm" variant="outline" onClick={handleCancel} className="border-gray-600 text-gray-300">
+                  <Button size="sm" variant="outline" onClick={handleCancel} className="border-[#3a3942]/50 text-gray-300 hover:bg-[#1f2533]/50 rounded-lg">
                     <X className="w-4 h-4 mr-1" />
                     Cancel
                   </Button>
                 </>
               ) : (
-                <Button size="sm" onClick={() => setIsEditing(true)} className="bg-orange-600 hover:bg-orange-700">
+                <Button size="sm" onClick={() => setIsEditing(true)} className="bg-[#9b87f5]/20 hover:bg-[#9b87f5]/30 text-[#9b87f5] border border-[#9b87f5]/40 rounded-lg">
                   <Edit2 className="w-4 h-4 mr-1" />
                   Edit
                 </Button>
@@ -238,23 +238,23 @@ interface AdminTaskDetailModalProps {
         </DialogHeader>        {/* Tabs */}
         <div className="px-6 overflow-y-auto flex-1">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="bg-black/20 mb-4">
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="subtasks">Subtasks</TabsTrigger>
-              <TabsTrigger value="description">Description</TabsTrigger>
+            <TabsList className="bg-[#1f2533]/50 border border-[#3a3942]/30 rounded-lg mb-6">
+              <TabsTrigger value="details" className="rounded-md text-gray-300 data-[state=active]:bg-[#9b87f5]/20 data-[state=active]:text-[#9b87f5]">Details</TabsTrigger>
+              <TabsTrigger value="subtasks" className="rounded-md text-gray-300 data-[state=active]:bg-[#9b87f5]/20 data-[state=active]:text-[#9b87f5]">Subtasks</TabsTrigger>
+              <TabsTrigger value="description" className="rounded-md text-gray-300 data-[state=active]:bg-[#9b87f5]/20 data-[state=active]:text-[#9b87f5]">Description</TabsTrigger>
             </TabsList>
 
             {/* Details Tab */}
-            <TabsContent value="details" className="space-y-4">
+            <TabsContent value="details" className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-sm font-medium text-gray-300">Status</label>
                   {isEditing ? (
                     <Select value={editedTask.status} onValueChange={(value) => handleInputChange('status', value)}>
-                      <SelectTrigger className="bg-[#252525] border-gray-600 text-white">
+                      <SelectTrigger className="bg-[#1f2533]/50 border border-[#3a3942]/50 text-gray-100 rounded-lg">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#252525] border-gray-600">
+                      <SelectContent className="bg-[#1f2533] border border-[#3a3942]/50 rounded-lg">
                         <SelectItem value="not-started">Not Started</SelectItem>
                         <SelectItem value="in-progress">In Progress</SelectItem>
                         <SelectItem value="blocked">Blocked</SelectItem>
@@ -263,40 +263,40 @@ interface AdminTaskDetailModalProps {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className={`px-3 py-2 rounded-md text-sm ${getStatusColor(editedTask.status)}`}>
+                    <div className={`px-4 py-3 rounded-lg text-sm border ${getStatusColor(editedTask.status)}`}>
                       {editedTask.status.replace('-', ' ')}
                     </div>
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-sm font-medium text-gray-300">Priority</label>
                   {isEditing ? (
                     <Select value={editedTask.priority} onValueChange={(value) => handleInputChange('priority', value)}>
-                      <SelectTrigger className="bg-[#252525] border-gray-600 text-white">
+                      <SelectTrigger className="bg-[#1f2533]/50 border border-[#3a3942]/50 text-gray-100 rounded-lg">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#252525] border-gray-600">
+                      <SelectContent className="bg-[#1f2533] border border-[#3a3942]/50 rounded-lg">
                         <SelectItem value="low">Low</SelectItem>
                         <SelectItem value="medium">Medium</SelectItem>
                         <SelectItem value="high">High</SelectItem>
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className={`px-3 py-2 rounded-md text-sm ${getPriorityColor(editedTask.priority)}`}>
+                    <div className={`px-4 py-3 rounded-lg text-sm border ${getPriorityColor(editedTask.priority)}`}>
                       {editedTask.priority} priority
                     </div>
                   )}
                 </div>
               </div>              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-sm font-medium text-gray-300">Category</label>
                   {isEditing ? (
                     <Select value={editedTask.category} onValueChange={(value) => handleInputChange('category', value)}>
-                      <SelectTrigger className="bg-[#252525] border-gray-600 text-white">
+                      <SelectTrigger className="bg-[#1f2533]/50 border border-[#3a3942]/50 text-gray-100 rounded-lg">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#252525] border-gray-600">
+                      <SelectContent className="bg-[#1f2533] border border-[#3a3942]/50 rounded-lg">
                         <SelectItem value="development">Development</SelectItem>
                         <SelectItem value="design">Design</SelectItem>
                         <SelectItem value="marketing">Marketing</SelectItem>
@@ -305,56 +305,79 @@ interface AdminTaskDetailModalProps {
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className={`px-3 py-2 rounded-md text-sm ${getCategoryColor(editedTask.category)}`}>
+                    <div className={`px-4 py-3 rounded-lg text-sm border ${getCategoryColor(editedTask.category)}`}>
                       {editedTask.category}
                     </div>
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <label className="text-sm font-medium text-gray-300">Due Date</label>
                   {isEditing ? (
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start bg-[#252525] border-gray-600 text-white hover:bg-[#2a2a2a]">
+                        <Button variant="outline" className="w-full justify-start bg-[#1f2533]/50 border border-[#3a3942]/50 text-gray-100 hover:bg-[#1f2533]/70 rounded-lg">
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {editedTask.dueDate ? new Date(editedTask.dueDate).toLocaleDateString() : "Set date"}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0 bg-[#252525] border-gray-600">
+                      <PopoverContent className="w-auto p-0 bg-[#1f2533] border border-[#3a3942]/50 rounded-lg">
                         <Calendar
                           mode="single"
                           selected={editedTask.dueDate ? new Date(editedTask.dueDate) : undefined}
                           onSelect={(date) => handleInputChange('dueDate', date?.toISOString().split('T')[0])}
-                          className="rounded-md"
+                          className="rounded-lg"
                         />
                       </PopoverContent>
                     </Popover>
                   ) : (
-                    <div className="px-3 py-2 rounded-md text-sm bg-gray-800 text-gray-300 border border-gray-600">
+                    <div className="px-4 py-3 rounded-lg text-sm bg-[#1f2533]/50 border border-[#3a3942]/30 text-gray-300 flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4" />
                       {editedTask.dueDate ? new Date(editedTask.dueDate).toLocaleDateString() : 'No due date'}
                     </div>
                   )}
                 </div>
-              </div>              {editedTask.assignee && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Assignee</label>
-                  <div className="px-3 py-2 rounded-md text-sm bg-gray-800 text-gray-300 border border-gray-600 flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    {editedTask.assignee}
-                  </div>
-                </div>
-              )}
+              </div>
 
-              {editedTask.estimatedHours && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Estimated Hours</label>
-                  <div className="px-3 py-2 rounded-md text-sm bg-gray-800 text-gray-300 border border-gray-600 flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    {editedTask.estimatedHours}h
-                  </div>
+              {/* Additional Fields Row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-gray-300">Assignee</label>
+                  {isEditing ? (
+                    <Input
+                      value={editedTask.assignee || ''}
+                      onChange={(e) => handleInputChange('assignee', e.target.value)}
+                      placeholder="Assign to..."
+                      className="bg-[#1f2533]/50 border border-[#3a3942]/50 text-gray-100 rounded-lg"
+                    />
+                  ) : (
+                    <div className="px-4 py-3 rounded-lg text-sm bg-[#1f2533]/50 border border-[#3a3942]/30 text-gray-300 flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      {editedTask.assignee || 'Not assigned'}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                <div className="space-y-3">
+                  <label className="text-sm font-medium text-gray-300">Estimated Hours</label>
+                  {isEditing ? (
+                    <Input
+                      type="number"
+                      value={editedTask.estimatedHours || ''}
+                      onChange={(e) => handleInputChange('estimatedHours', e.target.value ? Number(e.target.value) : undefined)}
+                      placeholder="Hours..."
+                      min="0"
+                      step="0.5"
+                      className="bg-[#1f2533]/50 border border-[#3a3942]/50 text-gray-100 rounded-lg"
+                    />
+                  ) : (
+                    <div className="px-4 py-3 rounded-lg text-sm bg-[#1f2533]/50 border border-[#3a3942]/30 text-gray-300 flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      {editedTask.estimatedHours ? `${editedTask.estimatedHours}h` : 'Not estimated'}
+                    </div>
+                  )}
+                </div>
+              </div>
             </TabsContent>
 
             {/* Subtasks Tab */}
@@ -370,22 +393,20 @@ interface AdminTaskDetailModalProps {
                     </div>
                   </div>
                   
-                  <div className="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden mb-4">
-                    <motion.div
-                      className="h-full bg-gradient-to-r from-orange-500 to-orange-400"
-                      initial={{ width: 0 }}
-                      animate={{ 
+                  <div className="w-full bg-[#1f2533]/50 rounded-full h-3 overflow-hidden mb-4 border border-[#3a3942]/30">
+                    <div
+                      className="h-full bg-gradient-to-r from-[#9b87f5] to-purple-400 transition-all duration-500 ease-out rounded-full"
+                      style={{ 
                         width: `${((editedTask.subtasks.filter(st => st.completed).length) / editedTask.subtasks.length) * 100}%` 
                       }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
                     />
                   </div>
 
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
                     {editedTask.subtasks.map((subtask) => (
                       <div
                         key={subtask.id}
-                        className="flex items-center gap-3 p-3 rounded-lg bg-gray-800/50 border border-gray-700/50 group hover:bg-gray-800/70 transition-colors"
+                        className="flex items-center gap-3 p-4 rounded-lg bg-[#1f2533]/50 border border-[#3a3942]/30 group hover:bg-[#1f2533]/70 transition-all duration-200"
                       >
                         <button
                           onClick={() => handleSubtaskToggle(subtask.id)}
@@ -408,7 +429,7 @@ interface AdminTaskDetailModalProps {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleDeleteSubtask(subtask.id)}
-                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 hover:bg-red-500/20"
+                            className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-md"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -419,12 +440,12 @@ interface AdminTaskDetailModalProps {
                 </div>
               )}              {/* Add new subtask */}
               {isEditing && (
-                <div className="flex items-center gap-2 mt-4">
+                <div className="flex items-center gap-3 mt-4">
                   <Input
                     placeholder="Add a new subtask..."
                     value={newSubtaskTitle}
                     onChange={(e) => setNewSubtaskTitle(e.target.value)}
-                    className="flex-1 bg-[#252525] border-gray-600 text-white"
+                    className="flex-1 bg-[#1f2533]/50 border border-[#3a3942]/50 text-gray-100 rounded-lg"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         handleAddSubtask();
@@ -434,7 +455,7 @@ interface AdminTaskDetailModalProps {
                   <Button
                     onClick={handleAddSubtask}
                     size="sm"
-                    className="bg-orange-600 hover:bg-orange-700"
+                    className="bg-[#9b87f5]/20 hover:bg-[#9b87f5]/30 text-[#9b87f5] border border-[#9b87f5]/40 rounded-lg"
                     disabled={!newSubtaskTitle.trim()}
                   >
                     <Plus className="w-4 h-4" />
@@ -453,18 +474,18 @@ interface AdminTaskDetailModalProps {
             </TabsContent>
 
             {/* Description Tab */}
-            <TabsContent value="description" className="space-y-4">
-              <div className="space-y-2">
+            <TabsContent value="description" className="space-y-6">
+              <div className="space-y-3">
                 <label className="text-sm font-medium text-gray-300">Description</label>
                 {isEditing ? (
                   <Textarea
                     value={editedTask.description || ''}
                     onChange={(e) => handleInputChange('description', e.target.value)}
                     placeholder="Add a description for this task..."
-                    className="min-h-[120px] bg-[#252525] border-gray-600 text-white resize-none"
+                    className="min-h-[140px] bg-[#1f2533]/50 border border-[#3a3942]/50 text-gray-100 resize-none rounded-lg"
                   />
                 ) : (
-                  <div className="min-h-[120px] p-3 rounded-md bg-gray-800/50 border border-gray-700/50 text-sm text-gray-300">
+                  <div className="min-h-[140px] p-4 rounded-lg bg-[#1f2533]/50 border border-[#3a3942]/30 text-sm text-gray-300">
                     {editedTask.description || (
                       <span className="text-gray-500 italic">No description provided</span>
                     )}

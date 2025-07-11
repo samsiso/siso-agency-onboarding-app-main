@@ -6,17 +6,25 @@ import {
   Play, 
   Square, 
   FolderOpen,
-  Copy,
   Loader2,
   Settings,
-  GitBranch
+  Key
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ClaudeCodeIntegration, ClaudeExecutionRequest } from '@/services/automation/ClaudeCodeIntegration';
+import { ClaudeService, getCurrentSession } from '@/services/claude-api';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 interface ClaudeCodeSessionProps {
   onBack?: () => void;
@@ -39,9 +47,17 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
   const [prompt, setPrompt] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [claudeIntegration] = useState(() => new ClaudeCodeIntegration());
-  const [processId, setProcessId] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState('');
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const claudeSession = useRef<ClaudeService>(getCurrentSession());
+
+  // Check if API key is configured on mount
+  useEffect(() => {
+    if (!ClaudeService.isConfigured()) {
+      setShowApiKeyDialog(true);
+    }
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -69,6 +85,15 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
     ));
   };
 
+  const handleSaveApiKey = () => {
+    if (apiKey.trim()) {
+      ClaudeService.saveApiKey(apiKey.trim());
+      setShowApiKeyDialog(false);
+      setApiKey('');
+      addMessage('system', 'API key saved successfully!');
+    }
+  };
+
   const handleSelectDirectory = async () => {
     // In a real implementation, you'd use a file picker dialog
     // For now, we'll simulate it
@@ -79,7 +104,12 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!prompt.trim() || !projectPath.trim()) return;
+    if (!prompt.trim()) return;
+
+    if (!ClaudeService.isConfigured()) {
+      setShowApiKeyDialog(true);
+      return;
+    }
 
     const userPrompt = prompt.trim();
     setPrompt('');
@@ -89,46 +119,21 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
     addMessage('user', userPrompt);
 
     // Add pending assistant message
-    const assistantMessageId = addMessage('assistant', 'Processing...', 'pending');
+    const assistantMessageId = addMessage('assistant', 'Thinking...', 'pending');
 
     try {
-      const request: ClaudeExecutionRequest = {
-        prompt: userPrompt,
-        allowedTools: ['read', 'write', 'edit', 'bash', 'grep', 'ls'],
-        outputFormat: 'text',
-        onProgress: (progress, log) => {
-          updateMessage(assistantMessageId, {
-            content: `Progress: ${progress}%\n\n${log}`,
-            status: 'pending'
-          });
-        },
-        onOutput: (output) => {
-          updateMessage(assistantMessageId, {
-            content: output,
-            status: 'pending'
-          });
-        },
-        onError: (error) => {
-          updateMessage(assistantMessageId, {
-            content: `Error: ${error}`,
-            status: 'error'
-          });
-        }
-      };
+      // Create a context-aware prompt
+      const contextPrompt = projectPath 
+        ? `Working in project: ${projectPath}\n\n${userPrompt}`
+        : userPrompt;
 
-      const result = await claudeIntegration.executeTask(request);
+      // Get response from Claude
+      const response = await claudeSession.current.sendMessage(contextPrompt);
 
-      if (result.success) {
-        updateMessage(assistantMessageId, {
-          content: result.output,
-          status: 'completed'
-        });
-      } else {
-        updateMessage(assistantMessageId, {
-          content: `Error: ${result.error}`,
-          status: 'error'
-        });
-      }
+      updateMessage(assistantMessageId, {
+        content: response,
+        status: 'completed'
+      });
     } catch (error) {
       updateMessage(assistantMessageId, {
         content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -139,15 +144,10 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
     }
   };
 
-  const handleStop = async () => {
-    if (processId) {
-      const process = claudeIntegration.getProcess(processId);
-      if (process) {
-        await claudeIntegration.stopProcess(process);
-        addMessage('system', 'Execution stopped by user');
-      }
-    }
+  const handleStop = () => {
+    // In a real implementation, you might have a way to cancel the request
     setIsLoading(false);
+    addMessage('system', 'Request cancelled by user');
   };
 
   const getMessageStatusColor = (status?: string) => {
@@ -194,7 +194,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
           <Terminal className="h-5 w-5 text-orange-400" />
           <div>
             <h2 className="text-lg font-semibold text-white">Claude Code Session</h2>
-            <p className="text-xs text-gray-400">Interactive AI development environment</p>
+            <p className="text-xs text-gray-400">AI-powered development assistant</p>
           </div>
         </div>
         
@@ -202,9 +202,53 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
           <Badge variant={isLoading ? "destructive" : "secondary"}>
             {isLoading ? 'Running' : 'Ready'}
           </Badge>
-          <Button variant="outline" size="sm">
-            <Settings className="h-4 w-4" />
-          </Button>
+          <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Configure Claude API</DialogTitle>
+                <DialogDescription>
+                  Enter your Anthropic API key to use Claude. Your key will be stored locally.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="api-key">API Key</Label>
+                  <Input
+                    id="api-key"
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="sk-ant-api03-..."
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Get your API key from{' '}
+                  <a 
+                    href="https://console.anthropic.com/settings/keys" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-orange-400 hover:underline"
+                  >
+                    Anthropic Console
+                  </a>
+                </p>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowApiKeyDialog(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSaveApiKey} disabled={!apiKey.trim()}>
+                  <Key className="h-4 w-4 mr-2" />
+                  Save API Key
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -214,7 +258,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
           <Input
             value={projectPath}
             onChange={(e) => setProjectPath(e.target.value)}
-            placeholder="/path/to/your/project"
+            placeholder="/path/to/your/project (optional)"
             className="flex-1 bg-gray-800 border-gray-600 text-white"
           />
           <Button
@@ -275,7 +319,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
         <Textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Enter your prompt for Claude Code... (e.g., 'Add a new API endpoint for user authentication')"
+          placeholder="Enter your prompt for Claude... (e.g., 'Add a new API endpoint for user authentication')"
           className="min-h-[100px] bg-gray-800 border-gray-600 text-white resize-none"
           disabled={isLoading}
           onKeyDown={(e) => {
@@ -288,7 +332,7 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
         
         <div className="flex items-center justify-between">
           <div className="text-xs text-gray-400">
-            {projectPath ? `Working in: ${projectPath}` : 'No project selected'}
+            {projectPath ? `Working in: ${projectPath}` : 'No project path set (optional)'}
           </div>
           
           <div className="flex items-center gap-2">
@@ -305,18 +349,18 @@ export const ClaudeCodeSession: React.FC<ClaudeCodeSessionProps> = ({
             ) : (
               <Button
                 onClick={handleSubmit}
-                disabled={!prompt.trim() || !projectPath.trim()}
+                disabled={!prompt.trim()}
                 className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700"
               >
                 <Play className="h-4 w-4" />
-                Execute
+                Send
               </Button>
             )}
           </div>
         </div>
         
         <div className="text-xs text-gray-500 text-center">
-          Press Cmd/Ctrl + Enter to execute • Ensure project path is set before running
+          Press Cmd/Ctrl + Enter to send • {ClaudeService.isConfigured() ? 'API key configured' : 'API key required'}
         </div>
       </div>
     </div>

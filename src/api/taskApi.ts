@@ -13,7 +13,7 @@ export async function fetchTasks(category?: TaskCategory, userId?: string): Prom
   
   let query = supabase
     .from('tasks')
-    .select('*');
+    .select('id, title, description, status, priority, category, assigned_to, due_date, created_at, updated_at');
 
   if (category) {
     console.log('Applying category filter:', category);
@@ -39,93 +39,101 @@ export async function fetchTasks(category?: TaskCategory, userId?: string): Prom
 export async function fetchTaskStats(userId?: string): Promise<TaskStats> {
   console.log('Fetching task statistics for userId:', userId);
   
-  // Mock data with different stats for different users
-  if (userId === 'siso') {
-    return {
-      byStatus: {
-        pending: 5,
-        in_progress: 4,
-        completed: 15
-      },
-      byPriority: {
-        low: 8,
-        medium: 9,
-        high: 5,
-        urgent: 2
-      },
-      byDay: [
-        { day: 'Mon', created: 3, completed: 2 },
-        { day: 'Tue', created: 4, completed: 3 },
-        { day: 'Wed', created: 3, completed: 4 },
-        { day: 'Thu', created: 5, completed: 3 },
-        { day: 'Fri', created: 2, completed: 5 },
-        { day: 'Sat', created: 1, completed: 1 },
-        { day: 'Sun', created: 0, completed: 0 },
-      ],
-      totals: {
-        pending: 5,
-        in_progress: 4,
-        completed: 15,
-        total: 24
-      }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.log('No authenticated user found for task stats');
+    throw new Error('Not authenticated');
+  }
+  
+  try {
+    // Build base query
+    let query = supabase.from('tasks').select('status, priority, created_at, completed_at');
+    
+    // Filter by user if specified
+    if (userId) {
+      query = query.eq('assigned_to', userId);
+    }
+    
+    const { data: tasks, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching task stats:', error);
+      throw error;
+    }
+
+    // Process data to generate statistics
+    const taskArray = tasks || [];
+    
+    // Calculate status statistics
+    const byStatus = {
+      pending: taskArray.filter(t => t.status === 'pending').length,
+      in_progress: taskArray.filter(t => t.status === 'in_progress').length,
+      completed: taskArray.filter(t => t.status === 'completed').length
     };
-  } else if (userId === 'sam') {
-    return {
-      byStatus: {
-        pending: 7,
-        in_progress: 4,
-        completed: 9
-      },
-      byPriority: {
-        low: 7,
-        medium: 9,
-        high: 3,
-        urgent: 1
-      },
-      byDay: [
-        { day: 'Mon', created: 2, completed: 2 },
-        { day: 'Tue', created: 3, completed: 3 },
-        { day: 'Wed', created: 3, completed: 4 },
-        { day: 'Thu', created: 3, completed: 2 },
-        { day: 'Fri', created: 2, completed: 4 },
-        { day: 'Sat', created: 1, completed: 1 },
-        { day: 'Sun', created: 1, completed: 0 },
-      ],
-      totals: {
-        pending: 7,
-        in_progress: 4,
-        completed: 9,
-        total: 20
-      }
+
+    // Calculate priority statistics
+    const byPriority = {
+      low: taskArray.filter(t => t.priority === 'low').length,
+      medium: taskArray.filter(t => t.priority === 'medium').length,
+      high: taskArray.filter(t => t.priority === 'high').length,
+      urgent: taskArray.filter(t => t.priority === 'urgent').length
     };
+
+    // Calculate daily statistics for the past week
+    const byDay = generateDailyStats(taskArray);
+
+    // Calculate totals
+    const totals = {
+      pending: byStatus.pending,
+      in_progress: byStatus.in_progress,
+      completed: byStatus.completed,
+      total: taskArray.length
+    };
+
+    console.log('Task stats calculated successfully:', { totals, byStatus, byPriority });
+    
+    return {
+      byStatus,
+      byPriority,
+      byDay,
+      totals
+    };
+  } catch (error) {
+    console.error('Failed to fetch task stats:', error);
+    throw error;
+  }
+}
+
+// Helper function to generate daily statistics
+function generateDailyStats(tasks: any[]) {
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const now = new Date();
+  const dayStats = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    const dayName = days[date.getDay()];
+    
+    // Count tasks created on this day
+    const created = tasks.filter(task => {
+      const createdDate = new Date(task.created_at);
+      return createdDate.toDateString() === date.toDateString();
+    }).length;
+
+    // Count tasks completed on this day
+    const completed = tasks.filter(task => {
+      if (!task.completed_at) return false;
+      const completedDate = new Date(task.completed_at);
+      return completedDate.toDateString() === date.toDateString();
+    }).length;
+
+    dayStats.push({
+      day: dayName,
+      created,
+      completed
+    });
   }
 
-  return {
-    byStatus: {
-      pending: 12,
-      in_progress: 8,
-      completed: 24
-    },
-    byPriority: {
-      low: 15,
-      medium: 18,
-      high: 8,
-      urgent: 3
-    },
-    byDay: [
-      { day: 'Mon', created: 5, completed: 4 },
-      { day: 'Tue', created: 7, completed: 6 },
-      { day: 'Wed', created: 6, completed: 8 },
-      { day: 'Thu', created: 8, completed: 5 },
-      { day: 'Fri', created: 4, completed: 9 },
-      { day: 'Sat', created: 2, completed: 2 },
-      { day: 'Sun', created: 1, completed: 0 },
-    ],
-    totals: {
-      pending: 12,
-      in_progress: 8,
-      completed: 24,
-      total: 44
-    }
-  };
+  return dayStats;
 }

@@ -624,18 +624,38 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
     setFilePreviews({});
   };
 
-  // Enhanced voice handlers
+  // Enhanced voice handlers with better permission handling
   const handleVoiceRecording = async () => {
     if (isRecording) {
       console.log('🛑 [VOICE INPUT] Stopping voice recording...');
       stopRecording();
     } else {
       console.log('🎤 [VOICE INPUT] Starting voice recording session');
-      console.log('🔧 [VOICE INPUT] Voice service check:', {
-        speechRecognitionSupported: voiceService.isSpeechRecognitionSupported(),
-        isCurrentlyListening: isRecording,
-        browserSupport: typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)
-      });
+      
+      // Check browser compatibility first
+      if (!voiceService.isSpeechRecognitionSupported()) {
+        alert('🚫 Speech recognition is not supported in this browser.\n\nFor best results, please use:\n• Chrome (recommended)\n• Edge\n• Safari (newer versions)');
+        return;
+      }
+
+      // Check if we're on a secure connection
+      if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        alert('🔒 Voice recognition requires a secure connection.\n\nPlease use HTTPS or localhost to enable microphone access.');
+        return;
+      }
+
+      // First try to check/request microphone permissions
+      try {
+        console.log('🔐 [VOICE INPUT] Checking microphone permissions...');
+        const hasPermission = await voiceService.checkMicrophonePermissions();
+        
+        if (!hasPermission) {
+          console.warn('⚠️ [VOICE INPUT] No microphone permission, but trying speech recognition anyway...');
+          alert('🎤 Microphone permission needed!\n\n1. Click the microphone icon 🎤 in your browser address bar\n2. Select "Allow" for microphone access\n3. Try again');
+        }
+      } catch (permError) {
+        console.warn('⚠️ [VOICE INPUT] Permission check failed:', permError);
+      }
 
       try {
         console.log('🚀 [VOICE INPUT] Initiating speech recognition...');
@@ -643,37 +663,38 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
         
         console.log('✅ [VOICE INPUT] Voice recording completed successfully');
         console.log('📝 [VOICE INPUT] Final transcript:', result);
-        console.log('📊 [VOICE INPUT] Transcript analysis:', {
-          length: result.length,
-          wordCount: result.split(' ').length,
-          containsCommand: result.toLowerCase().includes('create') || result.toLowerCase().includes('add'),
-          containsQuestion: result.includes('?'),
-          isEmpty: !result.trim()
-        });
 
         if (result.trim()) {
           console.log('🎯 [VOICE INPUT] Setting transcript as input value');
           setInput(result);
           
           // Auto-submit the voice input
-          if (onSubmit) {
-            console.log('📤 [VOICE INPUT] Auto-submitting voice input');
-            setTimeout(() => {
-              onSubmit(result);
-              setInput("");
-              console.log('✅ [VOICE INPUT] Voice input submitted and cleared');
-            }, 100);
-          }
+          console.log('📤 [VOICE INPUT] Auto-submitting voice input');
+          setTimeout(() => {
+            onSend(result, files);
+            setInput("");
+            setFiles([]);
+            setFilePreviews({});
+            console.log('✅ [VOICE INPUT] Voice input submitted and cleared');
+          }, 100);
         } else {
           console.warn('⚠️ [VOICE INPUT] Empty transcript received');
         }
       } catch (error) {
         console.error('❌ [VOICE INPUT] Voice recording failed:', error);
-        console.log('🔧 [VOICE INPUT] Error details:', {
-          errorType: error instanceof Error ? error.constructor.name : typeof error,
-          errorMessage: error instanceof Error ? error.message : String(error),
-          timestamp: new Date().toISOString()
-        });
+        
+        let userMessage = '❌ Voice recording failed: ';
+        if (error.message.includes('not-allowed') || error.message.includes('permission')) {
+          userMessage += '\n\n🔧 Fix: Click the microphone icon 🎤 in your browser address bar and select "Allow"';
+        } else if (error.message.includes('no-speech')) {
+          userMessage += '\n\n🔧 Try speaking louder or closer to your microphone';
+        } else if (error.message.includes('network')) {
+          userMessage += '\n\n🔧 Check your internet connection';
+        } else {
+          userMessage += error.message;
+        }
+        
+        alert(userMessage);
       }
     }
   };
@@ -725,6 +746,21 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Voice status display */}
+        {isRecording && (
+          <div className="mb-3 p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-orange-400 text-sm font-medium">🎤 Listening...</span>
+            </div>
+            {transcript && (
+              <div className="text-gray-300 text-sm italic">
+                "{transcript}"
+              </div>
+            )}
           </div>
         )}
 
@@ -811,7 +847,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                 <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                   <motion.div
                     animate={{ rotate: showSearch ? 360 : 0, scale: showSearch ? 1.1 : 1 }}
-                    whileHover={{ rotate: showSearch ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
+                    whileHover={{ rotate: showSearch ? 360 : 15, transition: { type: "spring", stiffness: 300, damping: 10 } }}
                     transition={{ type: "spring", stiffness: 260, damping: 25 }}
                   >
                     <Globe className={cn("w-4 h-4", showSearch ? "text-[#1EAEDB]" : "text-inherit")} />
@@ -847,7 +883,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                 <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                   <motion.div
                     animate={{ rotate: showThink ? 360 : 0, scale: showThink ? 1.1 : 1 }}
-                    whileHover={{ rotate: showThink ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
+                    whileHover={{ rotate: showThink ? 360 : 15, transition: { type: "spring", stiffness: 300, damping: 10 } }}
                     transition={{ type: "spring", stiffness: 260, damping: 25 }}
                   >
                     <BrainCog className={cn("w-4 h-4", showThink ? "text-[#8B5CF6]" : "text-inherit")} />
@@ -883,7 +919,7 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
                 <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
                   <motion.div
                     animate={{ rotate: showCanvas ? 360 : 0, scale: showCanvas ? 1.1 : 1 }}
-                    whileHover={{ rotate: showCanvas ? 360 : 15, scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 10 } }}
+                    whileHover={{ rotate: showCanvas ? 360 : 15, transition: { type: "spring", stiffness: 300, damping: 10 } }}
                     transition={{ type: "spring", stiffness: 260, damping: 25 }}
                   >
                     <FolderCode className={cn("w-4 h-4", showCanvas ? "text-[#F97316]" : "text-inherit")} />
@@ -906,50 +942,65 @@ export const PromptInputBox = React.forwardRef<HTMLDivElement, PromptInputBoxPro
             </div>
           </div>
 
-          <PromptInputAction
-            tooltip={
-              isLoading
-                ? "Stop generation"
-                : isRecording
-                ? "Stop recording"
-                : hasContent
-                ? "Send message"
-                : "Voice message"
-            }
-          >
-            <Button
-              variant="default"
-              size="icon"
-              className={cn(
-                "h-8 w-8 rounded-full transition-all duration-200",
+          <div className="flex items-center gap-2">
+            {/* Dedicated Voice Button - Always Visible */}
+            <PromptInputAction
+              tooltip={
                 isRecording
-                  ? "bg-transparent hover:bg-gray-600/30 text-red-500 hover:text-red-400"
-                  : hasContent
-                  ? "bg-white hover:bg-white/80 text-[#1F2023]"
-                  : "bg-transparent hover:bg-gray-600/30 text-[#9CA3AF] hover:text-[#D1D5DB]"
-              )}
-              onClick={() => {
-                if (isRecording) {
-                  stopRecording();
-                } else if (hasContent) {
-                  handleSubmit();
-                } else {
-                  handleVoiceRecording();
-                }
-              }}
-              disabled={isLoading && !hasContent}
+                  ? "Stop voice recording"
+                  : "Start voice recording"
+              }
             >
-              {isLoading ? (
-                <Square className="h-4 w-4 fill-[#1F2023] animate-pulse" />
-              ) : isRecording ? (
-                <StopCircle className="h-5 w-5 text-red-500" />
-              ) : hasContent ? (
-                <ArrowUp className="h-4 w-4 text-[#1F2023]" />
-              ) : (
-                <Mic className="h-5 w-5 text-[#1F2023] transition-colors" />
-              )}
-            </Button>
-          </PromptInputAction>
+              <Button
+                variant="default"
+                size="icon"
+                className={cn(
+                  "h-8 w-8 rounded-full transition-all duration-200",
+                  isRecording
+                    ? "bg-red-500 hover:bg-red-600 text-white animate-pulse"
+                    : "bg-orange-500 hover:bg-orange-600 text-white"
+                )}
+                onClick={handleVoiceRecording}
+                disabled={isLoading}
+              >
+                {isRecording ? (
+                  <StopCircle className="h-4 w-4" />
+                ) : (
+                  <Mic className="h-4 w-4" />
+                )}
+              </Button>
+            </PromptInputAction>
+
+            {/* Send Button */}
+            <PromptInputAction
+              tooltip={
+                isLoading
+                  ? "Stop generation"
+                  : hasContent
+                  ? "Send message"
+                  : "Type a message or use voice"
+              }
+            >
+              <Button
+                variant="default"
+                size="icon"
+                className={cn(
+                  "h-8 w-8 rounded-full transition-all duration-200",
+                  hasContent
+                    ? "bg-white hover:bg-white/80 text-[#1F2023]"
+                    : "bg-gray-600 hover:bg-gray-700 text-gray-400"
+                )}
+                onClick={handleSubmit}
+                disabled={!hasContent || isLoading || isRecording}
+              >
+                {isLoading ? (
+                  <Square className="h-4 w-4 fill-[#1F2023] animate-pulse" />
+                ) : (
+                  <ArrowUp className="h-4 w-4" />
+                )}
+              </Button>
+            </PromptInputAction>
+          </div>
         </PromptInputActions>
       </PromptInput>
 

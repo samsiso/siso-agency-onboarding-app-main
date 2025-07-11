@@ -1,6 +1,6 @@
+import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, CreditCard, BarChart3, TrendingUp } from "lucide-react";
-import { motion } from "framer-motion";
 import { formatCompactNumber } from "@/lib/formatters";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,15 +15,9 @@ interface StatCardProps {
   delay?: number;
 }
 
-const StatCard = ({ title, value, icon, change, trend, loading, delay = 0 }: StatCardProps) => {
+const StatCard = React.memo(function StatCard({ title, value, icon, change, trend, loading, delay = 0 }: StatCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: delay * 0.1 }}
-      whileHover={{ y: -5 }}
-      className="will-change-transform"
-    >
+    <div className="transform hover:-translate-y-1 transition-transform duration-200">
       <Card className="bg-black border-orange-500/20 hover:border-orange-500/40 transition-all duration-300">
         <CardContent className="p-6">
           <div className="flex justify-between">
@@ -51,11 +45,11 @@ const StatCard = ({ title, value, icon, change, trend, loading, delay = 0 }: Sta
           )}
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
-};
+});
 
-export function StatsOverview() {
+export const StatsOverview = React.memo(function StatsOverview() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
@@ -121,4 +115,4 @@ export function StatsOverview() {
       />
     </div>
   );
-}
+});

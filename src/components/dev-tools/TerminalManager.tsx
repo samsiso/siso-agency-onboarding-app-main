@@ -191,17 +191,15 @@ export const TerminalManager: React.FC<TerminalManagerProps> = ({ projects }) =>
                     className="data-[state=active]:bg-gray-700 data-[state=active]:text-white px-4 py-2 rounded-t-lg border-x border-t border-gray-600 data-[state=active]:border-gray-600 flex items-center gap-2"
                   >
                     <span className="text-xs">{terminal.name}</span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
+                    <span
                       onClick={(e) => {
                         e.stopPropagation();
                         closeTerminal(terminal.id);
                       }}
-                      className="h-4 w-4 p-0 hover:bg-gray-600"
+                      className="h-4 w-4 flex items-center justify-center hover:bg-gray-600 rounded cursor-pointer"
                     >
                       <X className="h-3 w-3" />
-                    </Button>
+                    </span>
                   </TabsTrigger>
                 </div>
               ))}

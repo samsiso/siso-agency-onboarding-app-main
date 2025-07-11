@@ -107,7 +107,7 @@ const StatCard = ({ data, index }: { data: StatCardData; index: number }) => {
       className="group"
     >
       <Card className={cn(
-        "relative overflow-hidden border-0 bg-gradient-to-br transition-all duration-300 hover:scale-[1.02] hover:shadow-xl",
+        "relative overflow-hidden border-0 bg-gradient-to-br transition-[box-shadow] duration-200 hover:shadow-xl",
         data.gradient
       )}>
         {/* Subtle pattern overlay */}

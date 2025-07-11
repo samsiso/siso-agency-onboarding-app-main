@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdminLayout } from '@/components/admin/layout/AdminLayout';
-import { motion, AnimatePresence } from 'framer-motion';
+// Removed framer-motion for performance optimization
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,14 @@ import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 import { AITaskChat } from '@/components/admin/tasks/AITaskChat';
 import { EnhancedTaskItem } from '@/components/admin/tasks/EnhancedTaskItem';
 import { AdminTaskDetailModal } from '@/components/admin/tasks/AdminTaskDetailModal';
+import { KanbanBoard } from '@/components/admin/tasks/KanbanBoard';
+import CalendarView from '@/components/admin/tasks/CalendarView';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { useToast } from '@/components/ui/use-toast';
+import { useTasks } from '@/hooks/useTasks';
+import { useTaskOperations } from '@/hooks/useTaskOperations';
 import {
   Calendar,
   Clock,
@@ -71,10 +78,131 @@ const AdminTasks: React.FC = () => {
   const [selectedTaskForEdit, setSelectedTaskForEdit] = useState<string | null>(null);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [showDisplayDropdown, setShowDisplayDropdown] = useState(false);
   const [selectedTaskForModal, setSelectedTaskForModal] = useState<Task | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>([
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [selectedPriority, setSelectedPriority] = useState<string>('all');
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const { user } = useAuthSession();
+  const { toast } = useToast();
+  
+  // Use React Query for task management
+  const { useTaskQuery, useUpdateTask } = useTasks();
+  const { useCreateTask, useDeleteTask } = useTaskOperations();
+  const { data: dbTasks = [], isLoading, error, refetch: refetchTasks } = useTaskQuery(undefined, user?.id);
+  const updateTaskMutation = useUpdateTask();
+  const createTaskMutation = useCreateTask();
+  const deleteTaskMutation = useDeleteTask();
+
+  // Filter options organized by categories
+  const filterCategories = {
+    general: [
+      { value: 'all', label: 'All Tasks', icon: '📋', color: 'bg-gray-600' }
+    ],
+    priority: [
+      { value: 'high', label: 'High Priority', icon: '🔴', color: 'bg-red-500' },
+      { value: 'medium', label: 'Medium Priority', icon: '🟡', color: 'bg-yellow-500' },
+      { value: 'low', label: 'Low Priority', icon: '🟢', color: 'bg-green-500' }
+    ],
+    projects: [
+      { value: 'ubahcrypt', label: 'Ubahcrypt', icon: '🔐', color: 'bg-purple-500' },
+      { value: 'siso-agency', label: 'SISO Agency App', icon: '🏢', color: 'bg-blue-500' },
+      { value: 'excursions', label: 'We Are Excursions', icon: '🏝️', color: 'bg-teal-500' },
+      { value: 'instagram', label: 'Instagram Marketing', icon: '📱', color: 'bg-pink-500' },
+      { value: 'business-ops', label: 'Business Operations', icon: '💼', color: 'bg-orange-500' }
+    ]
+  };
+
+  // Priority sub-filters
+  const priorityOptions = [
+    { value: 'all', label: 'All Priorities', icon: '📊' },
+    { value: 'high', label: 'High', icon: '🔴' },
+    { value: 'medium', label: 'Medium', icon: '🟡' },
+    { value: 'low', label: 'Low', icon: '🟢' }
+  ];
+
+  // Filter tasks based on selected filter and priority
+  const getFilteredTasks = () => {
+    let filteredTasks = tasks;
+    
+    // Apply main filter
+    if (selectedFilter !== 'all') {
+      // Priority filters
+      if (['high', 'medium', 'low'].includes(selectedFilter)) {
+        filteredTasks = tasks.filter(task => task.priority === selectedFilter);
+      } else {
+        // Project filters
+        const projectFilters: { [key: string]: string[] } = {
+          'ubahcrypt': ['[Ubahcrypt]'],
+          'siso-agency': ['[SISO Agency App]'],
+          'excursions': ['[We Are Excursions]'],
+          'instagram': ['[Instagram Marketing]'],
+          'business-ops': ['[Business Operations]']
+        };
+        
+        const keywords = projectFilters[selectedFilter];
+        if (keywords) {
+          filteredTasks = tasks.filter(task => 
+            keywords.some(keyword => task.title.includes(keyword))
+          );
+        }
+      }
+    }
+    
+    // Apply priority sub-filter (only when not already filtering by priority)
+    if (selectedPriority !== 'all' && !['high', 'medium', 'low'].includes(selectedFilter)) {
+      filteredTasks = filteredTasks.filter(task => task.priority === selectedPriority);
+    }
+    
+    return filteredTasks;
+  };
+
+  // Convert database task to admin task format
+  const convertDbTaskToAdminTask = (dbTask: any): Task => {
+    const statusMap: { [key: string]: Task['status'] } = {
+      'pending': 'not-started',
+      'in_progress': 'in-progress',
+      'completed': 'done'
+    };
+
+    const categoryMap: { [key: string]: Task['category'] } = {
+      'siso_app_dev': 'development',
+      'onboarding_app': 'development',
+      'main': 'admin',
+      'instagram': 'marketing',
+      'weekly': 'admin',
+      'daily': 'admin'
+    };
+
+    return {
+      id: dbTask.id,
+      title: dbTask.title,
+      completed: dbTask.status === 'completed',
+      status: statusMap[dbTask.status || 'pending'] || 'not-started',
+      priority: dbTask.priority || 'medium',
+      assignee: 'SISO Team',
+      dueDate: dbTask.due_date,
+      category: categoryMap[dbTask.category] || 'admin',
+      tags: [],
+      estimatedHours: Math.round((dbTask.duration || 60) / 60),
+      description: dbTask.description || 'No description provided',
+      subtasks: [],
+      progress: 0
+    };
+  };
+
+  // Handle loading and error states
+  if (error) {
+    console.error('Error fetching tasks:', error);
+    toast({
+      variant: 'destructive',
+      title: 'Error loading tasks',
+      description: 'Could not load tasks from database.'
+    });
+  }
+
+  // Sample tasks as fallback
+  const sampleTasks: Task[] = [
     {
       id: '1',
       title: 'Design landing page with portfolio showcase',
@@ -132,48 +260,83 @@ const AdminTasks: React.FC = () => {
         { id: '3.5', title: 'Write API documentation', completed: false }
       ]
     }
-  ]);
+  ];
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [showCompletedTasks, setShowCompletedTasks] = useState(false);
-  const activeTasks = tasks.filter(task => !task.completed);
-  const completedTasks = tasks.filter(task => task.completed);
+  
+  // Convert database tasks to admin task format - no fallback to sample tasks
+  const tasks = dbTasks.length > 0 
+    ? dbTasks.map(convertDbTaskToAdminTask)
+    : [];
+  
+  // Get filtered tasks
+  const filteredTasks = getFilteredTasks();
+  const activeTasks = filteredTasks.filter(task => !task.completed);
+  const completedTasks = filteredTasks.filter(task => task.completed);
   
   // AI Integration
   const [isAIEnabled, setIsAIEnabled] = useState(true);
 
-  const toggleTask = (taskId: string) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    ));
+  // Get current filter option for display
+  const getCurrentFilterOption = () => {
+    // Check all categories for the selected filter
+    const allOptions = [
+      ...filterCategories.general,
+      ...filterCategories.priority,
+      ...filterCategories.projects
+    ];
+    return allOptions.find(option => option.value === selectedFilter) || filterCategories.general[0];
+  };
+
+  const currentFilterOption = getCurrentFilterOption();
+
+
+  const toggleTask = async (taskId: string) => {
+    // Find task from the converted tasks list
+    const task = getFilteredTasks().find(t => t.id === taskId);
+    if (!task) {
+      console.error('Task not found:', taskId);
+      return;
+    }
+
+    // Determine new status based on current completed state
+    const newStatus = task.completed ? 'pending' : 'completed';
+    
+    console.log('Toggling task:', taskId, 'from completed:', task.completed, 'to status:', newStatus);
+    
+    try {
+      // Convert to database format for mutation
+      const updateData = {
+        id: taskId,
+        status: newStatus as any, // Cast to satisfy TypeScript
+        completed_at: newStatus === 'completed' ? new Date().toISOString() : null
+      };
+      
+      await updateTaskMutation.mutateAsync(updateData);
+
+      toast({
+        title: 'Task updated',
+        description: `Task marked as ${newStatus === 'completed' ? 'completed' : 'pending'}.`
+      });
+    } catch (error) {
+      console.error('Error updating task:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Update failed',
+        description: error instanceof Error ? error.message : 'Could not update task status.'
+      });
+    }
   };
 
   const toggleSubtask = (taskId: string, subtaskId: string) => {
-    setTasks(tasks.map(task => {
-      if (task.id === taskId) {
-        const updatedSubtasks = task.subtasks?.map(subtask => 
-          subtask.id === subtaskId ? { ...subtask, completed: !subtask.completed } : subtask
-        ) || [];
-        
-        // Calculate progress based on completed subtasks
-        const completedCount = updatedSubtasks.filter(st => st.completed).length;
-        const progress = updatedSubtasks.length > 0 
-          ? (completedCount / updatedSubtasks.length) * 100 
-          : 0;
-        
-        return { ...task, subtasks: updatedSubtasks, progress };
-      }
-      return task;
-    }));
+    // TODO: Implement with React Query mutation
+    console.log('Toggle subtask:', taskId, subtaskId);
   };
 
   const handleDateChange = (taskId: string, date: Date | undefined) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { 
-        ...task, 
-        dueDate: date ? date.toISOString().split('T')[0] : undefined 
-      } : task
-    ));
+    // TODO: Implement with React Query mutation
+    console.log('Handle date change:', taskId, date);
   };
 
   const handleToggleComplete = (taskId: string, e: React.MouseEvent) => {
@@ -181,10 +344,40 @@ const AdminTasks: React.FC = () => {
     toggleTask(taskId);
   };
 
-  const updateTaskStatus = (taskId: string, newStatus: Task['status']) => {
-    setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, status: newStatus } : task
-    ));
+  const updateTaskStatus = async (taskId: string, newStatus: Task['status']) => {
+    try {
+      // Map admin task status to database status
+      const statusMap: { [key: string]: string } = {
+        'not-started': 'pending',
+        'in-progress': 'in_progress',
+        'blocked': 'in_progress', // Keep as in_progress but could add blocked status to DB
+        'done': 'completed',
+        'started': 'in_progress',
+        'upcoming': 'pending'
+      };
+
+      const dbStatus = statusMap[newStatus] || 'pending';
+      
+      const updateData = {
+        id: taskId,
+        status: dbStatus as any,
+        completed_at: dbStatus === 'completed' ? new Date().toISOString() : null
+      };
+      
+      await updateTaskMutation.mutateAsync(updateData);
+
+      toast({
+        title: 'Task updated',
+        description: `Task status changed to ${newStatus.replace('-', ' ')}.`
+      });
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Update failed',
+        description: error instanceof Error ? error.message : 'Could not update task status.'
+      });
+    }
   };
 
   const sendMessage = (message: string) => {
@@ -217,9 +410,8 @@ const AdminTasks: React.FC = () => {
   };
 
   const handleTaskModalSave = (updatedTask: Task) => {
-    setTasks(tasks.map(task => 
-      task.id === updatedTask.id ? updatedTask : task
-    ));
+    // TODO: Implement with React Query mutation
+    console.log('Handle task modal save:', updatedTask);
     setIsTaskModalOpen(false);
     setSelectedTaskForModal(null);
   };
@@ -227,6 +419,56 @@ const AdminTasks: React.FC = () => {
   const handleTaskModalClose = () => {
     setIsTaskModalOpen(false);
     setSelectedTaskForModal(null);
+  };
+
+  // Calendar view handlers
+  const handleEditTask = (task: Task) => {
+    setSelectedTaskForModal(task);
+    setIsTaskModalOpen(true);
+  };
+
+  const handleCreateTask = async (taskData: Partial<Task>) => {
+    try {
+      const newTask = {
+        title: taskData.title || 'New Task',
+        description: taskData.description || '',
+        status: taskData.status || 'pending',
+        priority: taskData.priority || 'medium',
+        category: taskData.category || 'admin',
+        due_date: taskData.dueDate || null,
+        assigned_to: user?.id || null
+      };
+      
+      await createTaskMutation.mutateAsync(newTask);
+      toast({
+        title: "Task created",
+        description: "New task has been created successfully.",
+      });
+    } catch (error) {
+      console.error('Error creating task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create task. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await deleteTaskMutation.mutateAsync(taskId);
+      toast({
+        title: "Task deleted",
+        description: "Task has been deleted successfully.",
+      });
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete task. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Helper functions
@@ -263,17 +505,16 @@ const AdminTasks: React.FC = () => {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showDisplayDropdown) {
-        const target = event.target as HTMLElement;
-        if (!target.closest('.display-dropdown-container')) {
-          setShowDisplayDropdown(false);
-        }
+      const target = event.target as HTMLElement;
+      
+      if (showFilterDropdown && !target.closest('.filter-dropdown-container')) {
+        setShowFilterDropdown(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showDisplayDropdown]);
+  }, [showFilterDropdown]);
 
   return (
     <AdminLayout>
@@ -285,8 +526,9 @@ const AdminTasks: React.FC = () => {
               <AITaskChat
                 tasks={tasks}
                 chatMessages={chatMessages}
-                onTasksUpdate={setTasks}
+                onTasksUpdate={(updatedTasks) => console.log('Tasks updated:', updatedTasks)}
                 onChatUpdate={setChatMessages}
+                onTaskRefresh={refetchTasks}
               />
             ) : (
               <div className="h-full flex flex-col" style={{ backgroundColor: '#252525' }}>
@@ -404,85 +646,176 @@ const AdminTasks: React.FC = () => {
                 <Badge variant="secondary" className="bg-gray-100 text-gray-700 text-xs px-2 py-1">
                   {activeTasks.length}
                 </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsAIEnabled(!isAIEnabled)}
-                  className={`text-xs px-3 py-1 ${
-                    isAIEnabled 
-                      ? 'bg-orange-500 text-white border-orange-500 hover:bg-orange-600' 
-                      : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
-                  }`}
-                >
-                  {isAIEnabled ? '🤖 AI ON' : '💬 AI OFF'}
-                </Button>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="bg-[#252525] border-gray-600 text-white hover:bg-[#2a2a2a]"
-                    onClick={() => setShowDisplayDropdown(!showDisplayDropdown)}
+                <div className="filter-dropdown-container relative">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                    className={`text-xs px-3 py-1 ${currentFilterOption.color} text-white border-none hover:opacity-80 shadow-lg`}
                   >
-                    <Grid3X3 className="h-4 w-4 mr-2" />
-                    Display
-                    <ChevronDown className="h-4 w-4 ml-2" />
+                    <span className="mr-2">{currentFilterOption.icon}</span>
+                    {currentFilterOption.label}
+                    <ChevronDown className="h-3 w-3 ml-2" />
                   </Button>
 
-                  {showDisplayDropdown && (
-                    <div className="display-dropdown-container absolute top-full mt-2 right-0 bg-[#252525] border border-gray-600 rounded-lg shadow-lg z-50 min-w-[200px]">
-                      <div className="p-3">
-                        <div className="mb-3">
-                          <h4 className="text-sm font-medium text-white mb-2">View</h4>
-                          <div className="space-y-1">
-                            <button
-                              onClick={() => {
-                                setCurrentView('list');
-                                setShowDisplayDropdown(false);
-                              }}
-                              className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-                                currentView === 'list' 
-                                  ? 'bg-orange-600 text-white' 
-                                  : 'text-gray-300 hover:bg-[#2a2a2a] hover:text-white'
-                              }`}
-                            >
-                              <List className="h-4 w-4 inline mr-2" />
-                              List View
-                            </button>
-                            <button
-                              onClick={() => {
-                                setCurrentView('kanban');
-                                setShowDisplayDropdown(false);
-                              }}
-                              className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-                                currentView === 'kanban' 
-                                  ? 'bg-orange-600 text-white' 
-                                  : 'text-gray-300 hover:bg-[#2a2a2a] hover:text-white'
-                              }`}
-                            >
-                              <Columns3 className="h-4 w-4 inline mr-2" />
-                              Kanban View
-                            </button>
-                            <button
-                              onClick={() => {
-                                setCurrentView('calendar');
-                                setShowDisplayDropdown(false);
-                              }}
-                              className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
-                                currentView === 'calendar' 
-                                  ? 'bg-orange-600 text-white' 
-                                  : 'text-gray-300 hover:bg-[#2a2a2a] hover:text-white'
-                              }`}
-                            >
-                              <Calendar className="h-4 w-4 inline mr-2" />
-                              Calendar View
-                            </button>
+                  {showFilterDropdown && (
+                    <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 min-w-[280px] overflow-hidden">
+                      {/* Main Categories */}
+                      <div className="p-4">
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                            <Filter className="h-4 w-4" />
+                            Filter Tasks
+                          </h4>
+                          
+                          {/* General */}
+                          <div className="mb-4">
+                            <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">General</h5>
+                            <div className="space-y-1">
+                              {filterCategories.general.map((option) => (
+                                <button
+                                  key={option.value}
+                                  onClick={() => {
+                                    setSelectedFilter(option.value);
+                                    setSelectedPriority('all');
+                                    setShowFilterDropdown(false);
+                                  }}
+                                  className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-all flex items-center gap-3 ${
+                                    selectedFilter === option.value
+                                      ? `${option.color} text-white shadow-md`
+                                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                                  }`}
+                                >
+                                  <span className="text-base">{option.icon}</span>
+                                  <span className="font-medium">{option.label}</span>
+                                  {selectedFilter === option.value && <span className="ml-auto text-xs">●</span>}
+                                </button>
+                              ))}
+                            </div>
                           </div>
+
+                          {/* Priority */}
+                          <div className="mb-4">
+                            <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Priority</h5>
+                            <div className="space-y-1">
+                              {filterCategories.priority.map((option) => (
+                                <button
+                                  key={option.value}
+                                  onClick={() => {
+                                    setSelectedFilter(option.value);
+                                    setSelectedPriority('all');
+                                    setShowFilterDropdown(false);
+                                  }}
+                                  className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-all flex items-center gap-3 ${
+                                    selectedFilter === option.value
+                                      ? `${option.color} text-white shadow-md`
+                                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                                  }`}
+                                >
+                                  <span className="text-base">{option.icon}</span>
+                                  <span className="font-medium">{option.label}</span>
+                                  {selectedFilter === option.value && <span className="ml-auto text-xs">●</span>}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Projects */}
+                          <div className="mb-4">
+                            <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Projects</h5>
+                            <div className="space-y-1">
+                              {filterCategories.projects.map((option) => (
+                                <button
+                                  key={option.value}
+                                  onClick={() => {
+                                    setSelectedFilter(option.value);
+                                    setSelectedPriority('all');
+                                    setShowFilterDropdown(false);
+                                  }}
+                                  className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-all flex items-center gap-3 ${
+                                    selectedFilter === option.value
+                                      ? `${option.color} text-white shadow-md`
+                                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                                  }`}
+                                >
+                                  <span className="text-base">{option.icon}</span>
+                                  <span className="font-medium">{option.label}</span>
+                                  {selectedFilter === option.value && <span className="ml-auto text-xs">●</span>}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Priority Sub-filter (only show when in project mode) */}
+                          {!['all', 'high', 'medium', 'low'].includes(selectedFilter) && (
+                            <div className="border-t border-gray-100 pt-4">
+                              <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Sub-filter by Priority</h5>
+                              <div className="grid grid-cols-2 gap-1">
+                                {priorityOptions.map((option) => (
+                                  <button
+                                    key={option.value}
+                                    onClick={() => {
+                                      setSelectedPriority(option.value);
+                                      setShowFilterDropdown(false);
+                                    }}
+                                    className={`px-2 py-1 text-xs rounded-md transition-all flex items-center gap-2 ${
+                                      selectedPriority === option.value
+                                        ? 'bg-gray-800 text-white'
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                    }`}
+                                  >
+                                    <span>{option.icon}</span>
+                                    <span>{option.label}</span>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {/* View Icons */}
+                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentView('list')}
+                    className={`h-8 w-8 p-0 ${
+                      currentView === 'list'
+                        ? 'bg-orange-500 text-white hover:bg-orange-600'
+                        : 'text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentView('kanban')}
+                    className={`h-8 w-8 p-0 ${
+                      currentView === 'kanban'
+                        ? 'bg-orange-500 text-white hover:bg-orange-600'
+                        : 'text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Columns3 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentView('calendar')}
+                    className={`h-8 w-8 p-0 ${
+                      currentView === 'calendar'
+                        ? 'bg-orange-500 text-white hover:bg-orange-600'
+                        : 'text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Calendar className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -490,33 +823,137 @@ const AdminTasks: React.FC = () => {
             {/* Tasks List */}
             <div className="flex-1 overflow-y-auto min-h-0" style={{ backgroundColor: '#252525' }}>
               <div className="p-4">
-                {currentView === 'list' && activeTasks.map((task, index) => (
-                  <EnhancedTaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={toggleTask}
-                    onEdit={openEditTask}
-                    onSubtaskToggle={toggleSubtask}
-                    onDateChange={handleDateChange}
-                    showSubtasksOnHover={true}
-                    isLast={index === activeTasks.length - 1}
-                  />
-                ))}
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                    <span className="ml-3 text-white">Loading tasks...</span>
+                  </div>
+                ) : (
+                  <>
+                    {currentView === 'list' && activeTasks.map((task, index) => (
+                      <EnhancedTaskItem
+                        key={task.id}
+                        task={task}
+                        onToggle={toggleTask}
+                        onEdit={openEditTask}
+                        onSubtaskToggle={toggleSubtask}
+                        onDateChange={handleDateChange}
+                        showSubtasksOnHover={true}
+                        isLast={index === activeTasks.length - 1}
+                      />
+                    ))}
+                  </>
+                )}
                 
                 {currentView === 'kanban' && (
-                  <div className="text-center py-12">
-                    <Grid3X3 className="w-12 h-12 text-orange-400 mx-auto mb-4" />
-                    <h3 className="text-white text-lg font-semibold mb-2">Kanban View</h3>
-                    <p className="text-gray-400">Kanban functionality coming soon...</p>
-                  </div>
+                  <KanbanBoard
+                    tasks={activeTasks}
+                    onTaskToggle={toggleTask}
+                    onTaskEdit={openEditTask}
+                    onTaskStatusUpdate={updateTaskStatus}
+                    onTaskCreate={async (taskData) => {
+                      try {
+                        // Map admin task format to database format
+                        const dbTask = {
+                          title: taskData.title || 'New Task',
+                          description: taskData.description || '',
+                          status: taskData.status === 'not-started' ? 'pending' : 
+                                  taskData.status === 'in-progress' ? 'in_progress' : 
+                                  taskData.status === 'done' ? 'completed' : 'pending',
+                          priority: taskData.priority || 'medium',
+                          category: taskData.category === 'development' ? 'siso_app_dev' :
+                                   taskData.category === 'marketing' ? 'instagram' :
+                                   taskData.category === 'design' ? 'siso_app_dev' :
+                                   taskData.category === 'client' ? 'main' : 'main',
+                          assigned_to: user?.id,
+                          due_date: taskData.dueDate,
+                          duration: (taskData.estimatedHours || 1) * 60 // Convert hours to minutes
+                        };
+                        
+                        await createTaskMutation.mutateAsync(dbTask);
+                        
+                        toast({
+                          title: 'Task created',
+                          description: 'New task has been created successfully.'
+                        });
+                      } catch (error) {
+                        console.error('Error creating task:', error);
+                        toast({
+                          variant: 'destructive',
+                          title: 'Creation failed',
+                          description: error instanceof Error ? error.message : 'Could not create task.'
+                        });
+                      }
+                    }}
+                    onTaskDelete={async (taskId) => {
+                      try {
+                        await deleteTaskMutation.mutateAsync(taskId);
+                        
+                        toast({
+                          title: 'Task deleted',
+                          description: 'Task has been deleted successfully.'
+                        });
+                      } catch (error) {
+                        console.error('Error deleting task:', error);
+                        toast({
+                          variant: 'destructive',
+                          title: 'Deletion failed',
+                          description: error instanceof Error ? error.message : 'Could not delete task.'
+                        });
+                      }
+                    }}
+                    onTaskDuplicate={async (task) => {
+                      try {
+                        // Create a duplicate task
+                        const duplicateTask = {
+                          title: `${task.title} (Copy)`,
+                          description: task.description || '',
+                          status: 'pending',
+                          priority: task.priority,
+                          category: task.category === 'development' ? 'siso_app_dev' :
+                                   task.category === 'marketing' ? 'instagram' :
+                                   task.category === 'design' ? 'siso_app_dev' :
+                                   task.category === 'client' ? 'main' : 'main',
+                          assigned_to: user?.id,
+                          due_date: task.dueDate,
+                          duration: (task.estimatedHours || 1) * 60
+                        };
+                        
+                        await createTaskMutation.mutateAsync(duplicateTask);
+                        
+                        toast({
+                          title: 'Task duplicated',
+                          description: 'Task has been duplicated successfully.'
+                        });
+                      } catch (error) {
+                        console.error('Error duplicating task:', error);
+                        toast({
+                          variant: 'destructive',
+                          title: 'Duplication failed',
+                          description: error instanceof Error ? error.message : 'Could not duplicate task.'
+                        });
+                      }
+                    }}
+                    selectedFilter={selectedFilter}
+                    selectedPriority={selectedPriority}
+                    onFilterChange={setSelectedFilter}
+                    onPriorityChange={setSelectedPriority}
+                    filterCategories={filterCategories}
+                  />
                 )}
                 
                 {currentView === 'calendar' && (
-                  <div className="text-center py-12">
-                    <Calendar className="w-12 h-12 text-orange-400 mx-auto mb-4" />
-                    <h3 className="text-white text-lg font-semibold mb-2">Calendar View</h3>
-                    <p className="text-gray-400">Calendar functionality coming soon...</p>
-                  </div>
+                  <CalendarView
+                    tasks={filteredTasks}
+                    onTaskEdit={handleEditTask}
+                    onTaskCreate={handleCreateTask}
+                    onTaskDelete={handleDeleteTask}
+                    selectedFilter={selectedFilter}
+                    selectedPriority={selectedPriority}
+                    onFilterChange={setSelectedFilter}
+                    onPriorityChange={setSelectedPriority}
+                    filterCategories={filterCategories}
+                  />
                 )}
               </div>
             </div>

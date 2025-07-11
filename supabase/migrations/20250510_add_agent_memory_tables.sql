@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS agent_tool_calls (
   success BOOLEAN NOT NULL,
   error_message TEXT,
   execution_time_ms INTEGER,
-  created_at TIMESTAMTz NOT NULL DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Add indexes for common query patterns

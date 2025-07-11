@@ -27,11 +27,13 @@ export function safeCast<T = any>(data: any): T {
   return data as T;
 }
 
+// Cache admin status to prevent repeated calls
+let adminStatusCache: { [userId: string]: { result: boolean; timestamp: number } } = {};
+const CACHE_DURATION = 30000; // 30 seconds
+
 // Helper function to check if the current user is an admin
 export const checkIsAdmin = async (): Promise<boolean> => {
   try {
-    console.log('Checking admin status...');
-    
     // Get current user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError) {
@@ -44,6 +46,15 @@ export const checkIsAdmin = async (): Promise<boolean> => {
       return false;
     }
 
+    // Check cache first
+    const cached = adminStatusCache[user.id];
+    const now = Date.now();
+    
+    if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+      console.log('Using cached admin status:', cached.result);
+      return cached.result;
+    }
+
     console.log('Checking admin status for user:', user.id, user.email);
     
     // Use a direct query approach to avoid RLS recursion issues
@@ -54,11 +65,25 @@ export const checkIsAdmin = async (): Promise<boolean> => {
       return false;
     }
 
-    console.log('Admin check result from RPC:', data);
-    return !!data;
+    const result = !!data;
+    console.log('Admin check result from RPC:', result);
+    
+    // Cache the result
+    adminStatusCache[user.id] = { result, timestamp: now };
+    
+    return result;
   } catch (error) {
     console.error('Unexpected error checking admin status:', error);
     return false;
+  }
+};
+
+// Clear admin status cache (call on sign out)
+export const clearAdminCache = (userId?: string) => {
+  if (userId) {
+    delete adminStatusCache[userId];
+  } else {
+    adminStatusCache = {};
   }
 };
 

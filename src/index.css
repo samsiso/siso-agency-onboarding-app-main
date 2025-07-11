@@ -110,6 +110,7 @@
 
   * {
     @apply border-border;
+    cursor: auto;
   }
 
   html {
@@ -121,6 +122,17 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Cursor performance optimizations */
+  button, a, [role="button"], [tabindex], .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .hover-performance {
+    will-change: transform;
+    backface-visibility: hidden;
+    contain: layout style;
   }
 
   #root {

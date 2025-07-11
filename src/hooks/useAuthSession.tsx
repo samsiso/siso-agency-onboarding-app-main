@@ -47,6 +47,9 @@ export const useAuthSession = () => {
   useEffect(() => {
     const initializeSession = async () => {
       try {
+        // Prevent multiple initializations
+        if (isInitialized.current) return;
+        
         console.log('Initializing auth session...');
         const { data: { session } } = await supabase.auth.getSession();
         

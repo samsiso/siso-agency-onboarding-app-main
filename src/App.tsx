@@ -1,100 +1,111 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import Index from './pages/Index';
-import TestPage from './pages/TestPage';
-import Auth from './pages/Auth';
-import Profile from './pages/Profile';
-import OnboardingSocial from './pages/onboarding/social';
 import { Toaster } from '@/components/ui/toaster';
-import OnboardingChat from './pages/OnboardingChat';
-import ThankYou from './pages/ThankYou';
-import ThankYouPlan from './pages/ThankYou';
-import Plan from './pages/Plan';
-import DecoraPlan from './pages/DecoraPlan';
-import PublicPlanView from './pages/PublicPlanView';
-import Congratulations from './pages/onboarding/congratulations';
-import Home from './pages/Home';
-import CryptoExchange from './pages/CryptoExchange';
-import HowToEarn from './pages/HowToEarn';
-import LeaderboardPage from './pages/LeaderboardPage';
 import { AuthGuard } from './components/auth/AuthGuard';
-import MyProjects from './pages/MyProjects';
-import AdminPlans from './pages/AdminPlans';
-import AdminOutreach from './pages/AdminOutreach';
-import AdminTemplates from './pages/AdminTemplates';
-import AdminTeams from './pages/AdminTeams';
-import Portfolio from './pages/Portfolio';
-import PublicPortfolio from './pages/PublicPortfolio';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminClients from './pages/AdminClients';
-import AdminPayments from './pages/AdminPayments';
-import AdminDailyPlanner from './pages/AdminDailyPlanner';
-import AdminLifeLock from './pages/AdminLifeLock';
-import AdminLifeLockDay from './pages/AdminLifeLockDay';
-import ClientDetailPage from './pages/ClientDetailPage';
-import AdminTasks from './pages/AdminTasks';
-import AdminSettings from './pages/AdminSettings';
-import AdminPrompts from './pages/AdminPrompts';
-import { TeamMemberTasksView } from './components/admin/tasks/TeamMemberTasksView';
-import TeamMemberTasksPage from './pages/TeamMemberTasksPage';
-import ClientDashboard from "./pages/ClientDashboard";
-import ClientDocumentsPage from "./pages/client/ClientDocumentsPage";
-import ClientTasksPage from "./pages/client/ClientTasksPage";
-import ClientStatusPage from "./pages/client/ClientStatusPage";
-import ClientSupportPage from "./pages/client/ClientSupportPage";
-import ProjectsAndTasksPage from './pages/ProjectsAndTasksPage';
-import DocumentLibraryPage from './pages/resources/DocumentLibraryPage';
-import ProjectDetailsPage from './pages/ProjectDetailsPage';
-import ResourcesPage from './pages/resources/ResourcesPage';
-import TimelinePage from './pages/TimelinePage';
-import Communication from './pages/Communication';
-import AppPlan from './pages/AppPlan';
-import AppPlanTestingDashboard from '@/components/debug/AppPlanTestingDashboard';
-import DebugPage from './pages/debug';
+import { PageLoader } from './components/ui/PageLoader';
+
+// Critical pages loaded immediately (landing, auth, home)
+import Index from './pages/Index';
+import Auth from './pages/Auth';
+import Home from './pages/Home';
+
+// Lazy load all other pages for super-fast initial load
+const TestPage = lazy(() => import('./pages/TestPage'));
+const Profile = lazy(() => import('./pages/Profile'));
+const OnboardingSocial = lazy(() => import('./pages/onboarding/social'));
+const OnboardingChat = lazy(() => import('./pages/OnboardingChat'));
+const ThankYou = lazy(() => import('./pages/ThankYou'));
+const ThankYouPlan = lazy(() => import('./pages/ThankYouPlan'));
+const Plan = lazy(() => import('./pages/Plan'));
+const DecoraPlan = lazy(() => import('./pages/DecoraPlan'));
+const PublicPlanView = lazy(() => import('./pages/PublicPlanView'));
+const Congratulations = lazy(() => import('./pages/onboarding/congratulations'));
+const CryptoExchange = lazy(() => import('./pages/CryptoExchange'));
+const HowToEarn = lazy(() => import('./pages/HowToEarn'));
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
+const MyProjects = lazy(() => import('./pages/MyProjects'));
+const Portfolio = lazy(() => import('./pages/Portfolio'));
+const PublicPortfolio = lazy(() => import('./pages/PublicPortfolio'));
+const ProjectsAndTasksPage = lazy(() => import('./pages/ProjectsAndTasksPage'));
+const ProjectDetailsPage = lazy(() => import('./pages/ProjectDetailsPage'));
+const TimelinePage = lazy(() => import('./pages/TimelinePage'));
+const Communication = lazy(() => import('./pages/Communication'));
+
+// Admin pages - heavy bundle, lazy load all
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminClients = lazy(() => import('./pages/AdminClients'));
+const AdminTasks = lazy(() => import('./pages/AdminTasks'));
+const AdminPlans = lazy(() => import('./pages/AdminPlans'));
+const AdminOutreach = lazy(() => import('./pages/AdminOutreach'));
+const AdminTemplates = lazy(() => import('./pages/AdminTemplates'));
+const AdminTeams = lazy(() => import('./pages/AdminTeams'));
+const AdminPayments = lazy(() => import('./pages/AdminPayments'));
+const AdminDailyPlanner = lazy(() => import('./pages/AdminDailyPlanner'));
+const AdminLifeLock = lazy(() => import('./pages/AdminLifeLock'));
+const AdminLifeLockDay = lazy(() => import('./pages/AdminLifeLockDay'));
+const ClientDetailPage = lazy(() => import('./pages/ClientDetailPage'));
+const AdminSettings = lazy(() => import('./pages/AdminSettings'));
+const AdminPrompts = lazy(() => import('./pages/AdminPrompts'));
+const TeamMemberTasksPage = lazy(() => import('./pages/TeamMemberTasksPage'));
+
+// Client pages - separate bundle
+const ClientDashboard = lazy(() => import('./pages/ClientDashboard'));
+const ClientDocumentsPage = lazy(() => import('./pages/client/ClientDocumentsPage'));
+const ClientTasksPage = lazy(() => import('./pages/client/ClientTasksPage'));
+const ClientStatusPage = lazy(() => import('./pages/client/ClientStatusPage'));
+const ClientSupportPage = lazy(() => import('./pages/client/ClientSupportPage'));
+
+// Resources pages
+const DocumentLibraryPage = lazy(() => import('./pages/resources/DocumentLibraryPage'));
+const ResourcesPage = lazy(() => import('./pages/resources/ResourcesPage'));
+
+// App Plan & Debug pages
+const AppPlan = lazy(() => import('./pages/AppPlan'));
+const AppPlanTestingDashboard = lazy(() => import('@/components/debug/AppPlanTestingDashboard'));
+const DebugPage = lazy(() => import('./pages/debug'));
 
 // Financial & Account section
-import PaymentsPage from './pages/financial/PaymentsPage';
-import LeaderboardsPage from './pages/financial/LeaderboardsPage';
-import FinancialProfilePage from './pages/financial/FinancialProfilePage';
-import ClientAppDetailsPage from './pages/ClientAppDetailsPage';
-import AdminWireframes from './pages/AdminWireframes';
-import UserFlow from './pages/UserFlow';
-import AdminUserFlow from './pages/AdminUserFlow';
-import UserFlowFeedbackPage from './pages/projects/UserFlowFeedbackPage';
-import UserFlowNodesPage from './pages/projects/UserFlowNodesPage';
-import UserFlowCodePage from './pages/projects/UserFlowCodePage';
-import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
-import { BusinessOnboarding } from './components/onboarding/BusinessOnboarding';
-import PartnershipPage from './pages/PartnershipPage';
+const PaymentsPage = lazy(() => import('./pages/financial/PaymentsPage'));
+const LeaderboardsPage = lazy(() => import('./pages/financial/LeaderboardsPage'));
+const FinancialProfilePage = lazy(() => import('./pages/financial/FinancialProfilePage'));
+const ClientAppDetailsPage = lazy(() => import('./pages/ClientAppDetailsPage'));
+const AdminWireframes = lazy(() => import('./pages/AdminWireframes'));
+const UserFlow = lazy(() => import('./pages/UserFlow'));
+const AdminUserFlow = lazy(() => import('./pages/AdminUserFlow'));
+const UserFlowFeedbackPage = lazy(() => import('./pages/projects/UserFlowFeedbackPage'));
+const UserFlowNodesPage = lazy(() => import('./pages/projects/UserFlowNodesPage'));
+const UserFlowCodePage = lazy(() => import('./pages/projects/UserFlowCodePage'));
+const ProjectOnboardingPage = lazy(() => import('./pages/ProjectOnboardingPage'));
+const BusinessOnboarding = lazy(() => import('./components/onboarding/BusinessOnboarding').then(m => ({ default: m.BusinessOnboarding })));
+const PartnershipPage = lazy(() => import('./pages/PartnershipPage'));
 
-// Partner Dashboard & Auth imports
-import PartnerLogin from './pages/auth/PartnerLogin';
-import PartnerRegister from './pages/auth/PartnerRegister';
-import PartnerPasswordReset from './pages/auth/PartnerPasswordReset';
-import PartnerDashboard from './pages/dashboard/PartnerDashboard';
-import { PartnerAuthGuard } from './components/auth/PartnerAuthGuard';
-import { PartnerLeaderboard } from './components/dashboard/PartnerLeaderboard';
-import { ComingSoonSection } from './components/dashboard/ComingSoonSection';
-import EducationHub from './pages/dashboard/EducationHub';
-import TrainingHub from './pages/dashboard/TrainingHub';
-import ReferralsManagement from './pages/dashboard/ReferralsManagement';
-import Clients from './pages/dashboard/Clients';
-import AppPlanGeneratorPage from './pages/dashboard/AppPlanGenerator';
-import AffiliateLeaderboard from './pages/dashboard/AffiliateLeaderboard';
-import Support from './pages/dashboard/Support';
+// Partner Dashboard & Auth imports - separate bundle
+const PartnerLogin = lazy(() => import('./pages/auth/PartnerLogin'));
+const PartnerRegister = lazy(() => import('./pages/auth/PartnerRegister'));
+const PartnerPasswordReset = lazy(() => import('./pages/auth/PartnerPasswordReset'));
+const PartnerDashboard = lazy(() => import('./pages/dashboard/PartnerDashboard'));
+const PartnerAuthGuard = lazy(() => import('./components/auth/PartnerAuthGuard').then(m => ({ default: m.PartnerAuthGuard })));
+const PartnerLeaderboard = lazy(() => import('./components/dashboard/PartnerLeaderboard').then(m => ({ default: m.PartnerLeaderboard })));
+const ComingSoonSection = lazy(() => import('./components/dashboard/ComingSoonSection').then(m => ({ default: m.ComingSoonSection })));
+const EducationHub = lazy(() => import('./pages/dashboard/EducationHub'));
+const TrainingHub = lazy(() => import('./pages/dashboard/TrainingHub'));
+const ReferralsManagement = lazy(() => import('./pages/dashboard/ReferralsManagement'));
+const Clients = lazy(() => import('./pages/dashboard/Clients'));
+const AppPlanGeneratorPage = lazy(() => import('./pages/dashboard/AppPlanGenerator'));
+const AffiliateLeaderboard = lazy(() => import('./pages/dashboard/AffiliateLeaderboard'));
+const Support = lazy(() => import('./pages/dashboard/Support'));
 
 // Admin Partnership imports
-import AdminPartnershipDashboard from './pages/admin/AdminPartnershipDashboard';
-import AdminPartnershipLeaderboard from './pages/admin/AdminPartnershipLeaderboard';
-import AdminPartnershipReferrals from './pages/admin/AdminPartnershipReferrals';
-import AdminPartnershipStatistics from './pages/admin/AdminPartnershipStatistics';
-import AdminPartnershipTraining from './pages/admin/AdminPartnershipTraining';
+const AdminPartnershipDashboard = lazy(() => import('./pages/admin/AdminPartnershipDashboard'));
+const AdminPartnershipLeaderboard = lazy(() => import('./pages/admin/AdminPartnershipLeaderboard'));
+const AdminPartnershipReferrals = lazy(() => import('./pages/admin/AdminPartnershipReferrals'));
+const AdminPartnershipStatistics = lazy(() => import('./pages/admin/AdminPartnershipStatistics'));
+const AdminPartnershipTraining = lazy(() => import('./pages/admin/AdminPartnershipTraining'));
 
-// Automation System imports
-import { AutomationPage } from './pages/automation/AutomationPage';
-
-// Dev Tools imports
-import DevTools from './pages/DevTools';
+// Automation & Dev Tools
+const AutomationPage = lazy(() => import('./pages/automation/AutomationPage').then(m => ({ default: m.AutomationPage })));
+const DevTools = lazy(() => import('./pages/DevTools'));
 
 function ErrorFallback({error, resetErrorBoundary}: {error: Error, resetErrorBoundary: () => void}) {
   return (
@@ -129,7 +140,8 @@ function App() {
         FallbackComponent={ErrorFallback}
         onReset={() => window.location.reload()}
       >
-        <Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
           {/* Test route for diagnosis */}
           <Route path="/test" element={<TestPage />} />
           
@@ -302,7 +314,8 @@ function App() {
           
           {/* Debug Dashboard Route */}
           <Route path="/debug" element={<DebugPage />} />
-        </Routes>
+          </Routes>
+        </Suspense>
       </ErrorBoundary>
     </>
   );

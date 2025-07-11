@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   KanbanBoard,
   KanbanCard,
@@ -8,7 +8,11 @@ import {
 } from "@/components/ui/kanban";
 import { TaskCard } from './TaskCard';
 import { TaskDetailsSheet } from './TaskDetailsSheet';
+import { CompletedTasksCard, CompletedTask } from './CompletedTasksCard';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import { Loader2 } from 'lucide-react';
 
 const taskStatuses = [
   { id: "1", name: "Awaiting Your Action", color: "#FF0000" },
@@ -110,7 +114,8 @@ const clientTasks = [
       name: "Your Project Manager",
       image: "https://api.dicebear.com/7.x/initials/svg?seed=PM",
     },
-    status: { name: "Done", color: "#10B981" }
+    status: { name: "Done", color: "#10B981" },
+    completedAt: new Date("2025-04-30")
   },
   {
     id: "7",
@@ -172,7 +177,8 @@ const clientTasks = [
       name: "Your Project Manager",
       image: "https://api.dicebear.com/7.x/initials/svg?seed=PM",
     },
-    status: { name: "Done", color: "#10B981" }
+    status: { name: "Done", color: "#10B981" },
+    completedAt: new Date("2025-05-30")
   }
 ];
 
@@ -194,44 +200,161 @@ export interface UiTask {
   };
   actionButton?: string;
   actionLink?: string;
+  completedAt?: Date;
 }
 
 export function ActiveTasksView() {
-  const [tasks, setTasks] = useState<UiTask[]>(clientTasks);
+  const [tasks, setTasks] = useState<UiTask[]>([]);
   const [selectedTask, setSelectedTask] = useState<UiTask | null>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuthSession();
 
-  const handleDragEnd = (event: any) => {
+  // Function to convert database task to UI task format
+  const convertDbTaskToUiTask = (dbTask: any): UiTask => {
+    const statusMap: { [key: string]: { name: string; color: string } } = {
+      'pending': { name: 'Awaiting Your Action', color: '#FF0000' },
+      'in_progress': { name: 'In Development', color: '#F59E0B' },
+      'completed': { name: 'Done', color: '#10B981' }
+    };
+
+    const priorityColor = {
+      'urgent': '🔴',
+      'high': '🟠',
+      'medium': '🟡',
+      'low': '🟢'
+    };
+
+    return {
+      id: dbTask.id,
+      name: dbTask.title,
+      description: dbTask.description || 'No description provided',
+      startAt: new Date(dbTask.created_at || Date.now()),
+      endAt: new Date(dbTask.due_date || Date.now() + 7 * 24 * 60 * 60 * 1000),
+      category: `${priorityColor[dbTask.priority || 'medium']} ${dbTask.category?.toUpperCase() || 'GENERAL'}`,
+      priority: dbTask.priority || 'medium',
+      owner: {
+        name: 'SISO Team',
+        image: 'https://api.dicebear.com/7.x/initials/svg?seed=SISO'
+      },
+      status: statusMap[dbTask.status || 'pending'],
+      completedAt: dbTask.completed_at ? new Date(dbTask.completed_at) : undefined
+    };
+  };
+
+  // Fetch tasks from database
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      console.log('Fetching tasks for user:', user?.id);
+      
+      let query = supabase
+        .from('tasks')
+        .select('id, title, description, created_at, due_date, category, priority, status, completed_at, assigned_to, created_by');
+      
+      // Filter by user ID if available, otherwise get all tasks for admins
+      if (user?.id) {
+        query = query.or(`assigned_to.eq.${user.id},created_by.eq.${user.id}`);
+      }
+      
+      const { data, error } = await query.order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching tasks:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error loading tasks',
+          description: 'Could not load tasks from database. Using sample data.'
+        });
+        // Fallback to sample tasks
+        setTasks(clientTasks);
+      } else {
+        // Convert database tasks to UI format
+        const uiTasks = data.map(convertDbTaskToUiTask);
+        setTasks(uiTasks.length > 0 ? uiTasks : clientTasks);
+      }
+    } catch (error) {
+      console.error('Database connection error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Database connection error',
+        description: 'Using sample data while connection is restored.'
+      });
+      setTasks(clientTasks);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, [user]);
+
+  const handleDragEnd = async (event: any) => {
     const { active, over } = event;
     if (!over) return;
 
-    setTasks(currentTasks => {
-      return currentTasks.map(task => {
-        if (task.id === active.id) {
-          const statusColor = 
-            over.id === 'Awaiting Your Action' ? '#FF0000' :
-            over.id === 'In Development' ? '#F59E0B' :
-            '#10B981';
+    // Map UI status to database status
+    const dbStatusMap: { [key: string]: string } = {
+      'Awaiting Your Action': 'pending',
+      'In Development': 'in_progress',
+      'Done': 'completed'
+    };
+
+    const newDbStatus = dbStatusMap[over.id];
+    
+    try {
+      // Update in database
+      const { error } = await supabase
+        .from('tasks')
+        .update({ status: newDbStatus })
+        .eq('id', active.id);
+
+      if (error) {
+        toast({
+          variant: 'destructive',
+          title: "Error updating task",
+          description: "Could not update task status in database."
+        });
+        return;
+      }
+
+      // Update local state
+      setTasks(currentTasks => {
+        return currentTasks.map(task => {
+          if (task.id === active.id) {
+            const statusColor = 
+              over.id === 'Awaiting Your Action' ? '#FF0000' :
+              over.id === 'In Development' ? '#F59E0B' :
+              '#10B981';
+              
+            const updatedTask = {
+              ...task,
+              status: {
+                name: over.id,
+                color: statusColor
+              }
+            };
             
-          const updatedTask = {
-            ...task,
-            status: {
-              name: over.id,
-              color: statusColor
-            }
-          };
-          
-          // Show toast when status changes
-          toast({
-            title: "Task Status Updated",
-            description: `"${task.name}" moved to ${over.id}`,
-          });
-          
-          return updatedTask;
-        }
-        return task;
+            // Show success toast
+            toast({
+              title: "Task Status Updated",
+              description: `"${task.name}" moved to ${over.id}`,
+            });
+            
+            return updatedTask;
+          }
+          return task;
+        });
       });
-    });
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      toast({
+        variant: 'destructive',
+        title: "Update failed",
+        description: "Could not update task status."
+      });
+    }
   };
 
   const handleUpdateTask = (updatedTask: UiTask) => {
@@ -248,6 +371,28 @@ export function ActiveTasksView() {
     });
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <span className="ml-2 text-muted-foreground">Loading tasks...</span>
+      </div>
+    );
+  }
+
+  // Convert completed tasks to CompletedTask format
+  const completedTasks: CompletedTask[] = tasks
+    .filter(task => task.status.name === "Done")
+    .map(task => ({
+      id: task.id,
+      title: task.name,
+      description: task.description,
+      completedAt: task.completedAt || task.endAt,
+      category: task.category,
+      priority: task.priority,
+      owner: task.owner
+    }));
+
   return (
     <div className="p-4">
       <TaskDetailsSheet
@@ -257,48 +402,65 @@ export function ActiveTasksView() {
         onUpdateTask={handleUpdateTask}
       />
       
-      <KanbanProvider onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {taskStatuses.map((status) => (
-            <KanbanBoard 
-              key={status.name} 
-              id={status.name}
-              className="bg-[#1A1A1A]/80 border border-[#333] hover:border-[#444] rounded-xl"
-            >
-              <KanbanHeader 
-                name={status.name} 
-                color={status.name === "Awaiting Your Action" ? "#FF5555" : 
-                       status.name === "In Development" ? "#FFAA33" : 
-                       "#55AA55"} 
-              />
-              <KanbanCards>
-                {tasks
-                  .filter((task) => task.status.name === status.name)
-                  .map((task, index) => (
-                    <KanbanCard
-                      key={task.id}
-                      id={task.id}
-                      name={task.name}
-                      parent={status.name}
-                      index={index}
-                      className="bg-transparent shadow-none p-0 mb-4"
-                    >
-                      <div onClick={() => setSelectedTask(task)}>
-                        <TaskCard {...task} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Active Tasks Kanban Board */}
+        <div className="lg:col-span-2">
+          <KanbanProvider onDragEnd={handleDragEnd}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {taskStatuses.filter(status => status.name !== "Done").map((status) => (
+                <KanbanBoard 
+                  key={status.name} 
+                  id={status.name}
+                  className="bg-[#1A1A1A]/80 border border-[#333] hover:border-[#444] rounded-xl"
+                >
+                  <KanbanHeader 
+                    name={status.name} 
+                    color={status.name === "Awaiting Your Action" ? "#FF5555" : "#FFAA33"} 
+                  />
+                  <KanbanCards>
+                    {tasks
+                      .filter((task) => task.status.name === status.name)
+                      .map((task, index) => (
+                        <KanbanCard
+                          key={task.id}
+                          id={task.id}
+                          name={task.name}
+                          parent={status.name}
+                          index={index}
+                          className="bg-transparent shadow-none p-0 mb-4"
+                        >
+                          <div onClick={() => setSelectedTask(task)}>
+                            <TaskCard {...task} completedAt={task.completedAt} />
+                          </div>
+                        </KanbanCard>
+                      ))}
+                      
+                    {tasks.filter((task) => task.status.name === status.name).length === 0 && (
+                      <div className="flex items-center justify-center h-28 border border-dashed border-[#333] rounded-lg bg-[#1f2533]/30 text-sm text-muted-foreground">
+                        No tasks in this section
                       </div>
-                    </KanbanCard>
-                  ))}
-                  
-                {tasks.filter((task) => task.status.name === status.name).length === 0 && (
-                  <div className="flex items-center justify-center h-28 border border-dashed border-[#333] rounded-lg bg-[#1f2533]/30 text-sm text-muted-foreground">
-                    No tasks in this section
-                  </div>
-                )}
-              </KanbanCards>
-            </KanbanBoard>
-          ))}
+                    )}
+                  </KanbanCards>
+                </KanbanBoard>
+              ))}
+            </div>
+          </KanbanProvider>
         </div>
-      </KanbanProvider>
+
+        {/* Completed Tasks Card */}
+        <div className="lg:col-span-1">
+          <CompletedTasksCard
+            tasks={completedTasks}
+            onTaskClick={(task) => {
+              // Find the original task and show details
+              const originalTask = tasks.find(t => t.id === task.id);
+              if (originalTask) {
+                setSelectedTask(originalTask);
+              }
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

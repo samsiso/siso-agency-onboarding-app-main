@@ -1,3 +1,4 @@
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,7 +34,7 @@ const weeklyData = [
   { name: 'Sun', tasks: 5 },
 ];
 
-export const AdminStats = () => {
+export const AdminStats = React.memo(function AdminStats() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
@@ -188,4 +189,4 @@ export const AdminStats = () => {
       </CardContent>
     </Card>
   );
-};
+});

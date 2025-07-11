@@ -55,6 +55,29 @@ export class ClaudeCodeIntegration {
     const startTime = Date.now();
     const processId = crypto.randomUUID();
     
+    // In browser environment, we can't execute local Claude Code
+    if (typeof window !== 'undefined') {
+      return Promise.resolve({
+        success: false,
+        output: '',
+        errors: ['Claude Code execution not available in browser environment'],
+        executionTime: 0,
+        tokenUsage: 0,
+        processId
+      });
+    }
+
+    if (!spawn) {
+      return Promise.resolve({
+        success: false,
+        output: '',
+        errors: ['spawn not available - Node.js environment required'],
+        executionTime: 0,
+        tokenUsage: 0,
+        processId
+      });
+    }
+    
     return new Promise((resolve, reject) => {
       const args = this.buildClaudeArgs(request);
       const logs: string[] = [];
@@ -65,8 +88,8 @@ export class ClaudeCodeIntegration {
       const childProcess = spawn(this.claudePath, args, {
         stdio: ['pipe', 'pipe', 'pipe'],
         env: {
-          ...process.env,
-          ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY
+          ...(process?.env || {}),
+          ANTHROPIC_API_KEY: process?.env?.ANTHROPIC_API_KEY || ''
         }
       });
 
@@ -315,14 +338,22 @@ export class ClaudeCodeIntegration {
    * Detect Claude Code installation path
    */
   private detectClaudePath(): string {
-    // Common Claude installation paths
+    // In browser environment, we can't access file system paths
+    // This would need to be implemented differently for browser vs Node.js
+    if (typeof window !== 'undefined') {
+      // Browser environment - return default path
+      return 'claude';
+    }
+    
+    // Node.js environment
+    const homeDir = process?.env?.HOME || '/home/user';
     const possiblePaths = [
       '/usr/local/bin/claude',
       '/opt/homebrew/bin/claude',
       'claude', // System PATH
       '/usr/bin/claude',
-      `${process.env.HOME}/.local/bin/claude`,
-      `${process.env.HOME}/bin/claude`
+      `${homeDir}/.local/bin/claude`,
+      `${homeDir}/bin/claude`
     ];
     
     // For now, assume it's in PATH
@@ -334,6 +365,21 @@ export class ClaudeCodeIntegration {
    * Test Claude Code installation
    */
   async testInstallation(): Promise<{ installed: boolean; version?: string; error?: string }> {
+    // In browser environment, we can't test local installations
+    if (typeof window !== 'undefined') {
+      return {
+        installed: false,
+        error: 'Cannot test Claude Code installation in browser environment'
+      };
+    }
+
+    if (!spawn) {
+      return {
+        installed: false,
+        error: 'spawn not available - Node.js environment required'
+      };
+    }
+
     return new Promise((resolve) => {
       const process = spawn(this.claudePath, ['--version'], {
         stdio: ['pipe', 'pipe', 'pipe']
@@ -416,9 +462,12 @@ export class ClaudeCodeIntegration {
       issues.push(`Claude Code not installed: ${installation.error}`);
     }
     
-    // Check API key
-    const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
-    if (!hasApiKey) {
+    // Check API key (only in Node.js environment)
+    let hasApiKey = false;
+    if (typeof window === 'undefined' && process?.env) {
+      hasApiKey = !!process.env.ANTHROPIC_API_KEY;
+    }
+    if (!hasApiKey && typeof window === 'undefined') {
       issues.push('ANTHROPIC_API_KEY environment variable not set');
     }
     

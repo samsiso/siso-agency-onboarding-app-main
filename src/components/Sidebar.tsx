@@ -78,19 +78,17 @@ export const Sidebar = () => {
     expanded: {
       width: isMobile ? "16rem" : "16rem",
       transition: {
-        type: "spring",
-        stiffness: 200,
-        damping: 25,
-        mass: 0.8
+        type: "tween" as const,
+        duration: 0.1,
+        ease: "easeOut"
       }
     },
     collapsed: {
       width: isMobile ? "0" : "4rem",
       transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 35,
-        mass: 0.8
+        type: "tween" as const,
+        duration: 0.1,
+        ease: "easeIn"
       }
     }
   };
@@ -166,7 +164,7 @@ export const Sidebar = () => {
                 initial={{ opacity: 0, rotate: -90 }}
                 animate={{ opacity: 1, rotate: 0 }}
                 exit={{ opacity: 0, rotate: 90 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.1 }}
               >
                 {isMobileMenuOpen ? (
                   <X className="h-6 w-6 text-siso-text" />
@@ -218,7 +216,7 @@ export const Sidebar = () => {
                 <Button 
                   ref={projectMenuButtonRef}
                   variant="outline" 
-                  className="w-full h-16 justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-300"
+                  className="w-full h-16 justify-between bg-siso-bg-alt border-siso-border hover:bg-siso-bg-alt/80 hover:border-siso-border-hover group transition-all duration-150"
                   onClick={() => {
                     // When clicking project button, keep sidebar open
                     ignoreMouseLeaveUntil.current = Date.now() + 2000;

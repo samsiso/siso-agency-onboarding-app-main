@@ -14,9 +14,23 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { useWindowManager } from '@/services/windowManager';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+
+// Simplified version for now - will fix the full integration later
+const useWindowManager = () => {
+  return {
+    windows: [],
+    isChildWindow: false,
+    openDevTools: async () => 'dev-tools',
+    openAgentMonitor: async () => 'agent-monitor',
+    openTerminal: async () => 'terminal',
+    openCodeEditor: async () => 'code-editor',
+    openAgencyDashboard: async () => 'dashboard',
+    openAITeamAgents: async () => 'ai-agents',
+    focusWindow: () => {},
+    closeWindow: () => {}
+  };
+};
 
 interface WindowControlsProps {
   currentTab?: string;

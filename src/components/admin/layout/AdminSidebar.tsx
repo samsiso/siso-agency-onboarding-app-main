@@ -58,19 +58,17 @@ export const Sidebar = () => {
     expanded: {
       width: isMobile ? "16rem" : "16rem",
       transition: {
-        type: "spring" as const,
-        stiffness: 200,
-        damping: 25,
-        mass: 0.8
+        type: "tween" as const,
+        duration: 0.1,
+        ease: "easeOut"
       }
     },
     collapsed: {
       width: isMobile ? "0" : "4rem",
       transition: {
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 35,
-        mass: 0.8
+        type: "tween" as const,
+        duration: 0.1,
+        ease: "easeIn"
       }
     }
   };
@@ -107,7 +105,7 @@ export const Sidebar = () => {
                 initial={{ opacity: 0, rotate: -90 }}
                 animate={{ opacity: 1, rotate: 0 }}
                 exit={{ opacity: 0, rotate: 90 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.1 }}
               >
                 {isMobileMenuOpen ? (
                   <X className="h-6 w-6 text-siso-text" />
@@ -161,30 +159,18 @@ export const Sidebar = () => {
         />
       </motion.div>
 
-      <motion.div 
-        className="min-h-screen"
-        animate={{
-          marginLeft: !isMobile ? (isExpanded ? '16rem' : '4rem') : 0
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 200,
-          damping: 25
-        }}
-      >
-        <AnimatePresence>
-          {isMobile && isMobileMenuOpen && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
-          )}
-        </AnimatePresence>
-      </motion.div>
+      <AnimatePresence>
+        {isMobile && isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };

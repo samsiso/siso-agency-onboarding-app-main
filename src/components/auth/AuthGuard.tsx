@@ -111,7 +111,7 @@ export const AuthGuard = ({ children, adminOnly = false }: AuthGuardProps) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, adminOnly, toast, location.pathname]);
+  }, [navigate, adminOnly, toast]); // Removed location.pathname to prevent infinite loop
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">

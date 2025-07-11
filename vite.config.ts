@@ -7,14 +7,22 @@ import path from "path";
 export default defineConfig(({ mode }) => ({
   server: {
     host: true, // Allow network access
-    port: 2222,
-    strictPort: true, // Don't try other ports
+    port: 5173, // Use Vite default port to match Tauri config
+    strictPort: false, // Allow fallback to other ports if needed
     open: false, // Don't auto-open browser
     hmr: {
       overlay: false // Disable overlay for faster updates
     },
     fs: {
-      strict: false // Allow serving files from outside root
+      strict: false, // Allow serving files from outside root
+      // Exclude problematic directories from dependency scanning
+      deny: [
+        '**/storage/**',
+        '**/src-tauri/target/**',
+        '**/projects/**',
+        '**/dist-*/**',
+        '**/*.app/**'
+      ]
     }
   },
   plugins: [react()],
@@ -42,16 +50,86 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       external: ['child_process', 'fs', 'path', 'os'],
       output: {
-        manualChunks: {
-          // Safe code splitting - less aggressive
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-router': ['react-router-dom'],
-          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-select', '@radix-ui/react-tabs'],
-          'vendor-utils': ['clsx', 'tailwind-merge', 'lucide-react'],
-          'vendor-forms': ['react-hook-form', 'zod'],
-          'vendor-supabase': ['@supabase/supabase-js', '@supabase/auth-helpers-react'],
-          'vendor-charts': ['recharts', 'reaviz'],
-          'vendor-animation': ['framer-motion'],
+        manualChunks: (id) => {
+          // Aggressive code splitting for super-fast loading
+          if (id.includes('node_modules')) {
+            // Core React chunks
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('react-router')) {
+              return 'vendor-router';
+            }
+            
+            // UI library chunks
+            if (id.includes('@radix-ui') || id.includes('@headlessui')) {
+              return 'vendor-ui';
+            }
+            if (id.includes('lucide-react') || id.includes('clsx') || id.includes('tailwind-merge')) {
+              return 'vendor-utils';
+            }
+            
+            // Form handling
+            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) {
+              return 'vendor-forms';
+            }
+            
+            // Database & API
+            if (id.includes('supabase') || id.includes('@supabase')) {
+              return 'vendor-supabase';
+            }
+            
+            // Charts (heavy)
+            if (id.includes('recharts') || id.includes('reaviz') || id.includes('d3')) {
+              return 'vendor-charts';
+            }
+            
+            // Animation (heavy)
+            if (id.includes('framer-motion')) {
+              return 'vendor-animation';
+            }
+            
+            // AI & Heavy integrations
+            if (id.includes('openai') || id.includes('groq') || id.includes('@anthropic')) {
+              return 'vendor-ai';
+            }
+            
+            // Media & Rich content
+            if (id.includes('spline') || id.includes('@uiw/react-md-editor') || id.includes('canvas-confetti')) {
+              return 'vendor-media';
+            }
+            
+            // Crypto & Blockchain
+            if (id.includes('solana') || id.includes('moralis') || id.includes('web3')) {
+              return 'vendor-crypto';
+            }
+            
+            // Remaining node_modules
+            return 'vendor-misc';
+          }
+          
+          // App-specific chunks by route/feature
+          if (id.includes('/pages/admin') || id.includes('/components/admin')) {
+            return 'app-admin';
+          }
+          if (id.includes('/pages/client') || id.includes('/components/client')) {
+            return 'app-client';
+          }
+          if (id.includes('/pages/partnership') || id.includes('/components/partnership')) {
+            return 'app-partnership';
+          }
+          if (id.includes('/pages/projects') || id.includes('/components/projects')) {
+            return 'app-projects';
+          }
+          if (id.includes('/pages/dashboard') || id.includes('/components/dashboard')) {
+            return 'app-dashboard';
+          }
+          if (id.includes('/components/crypto') || id.includes('/pages/crypto')) {
+            return 'app-crypto';
+          }
+          if (id.includes('/services/') && (id.includes('claude') || id.includes('ai') || id.includes('grok'))) {
+            return 'app-ai-services';
+          }
         },
         
         assetFileNames: (assetInfo) => {

@@ -36,6 +36,80 @@ export type Database = {
         }
         Relationships: []
       }
+      automation_tasks: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          category: 'development' | 'testing' | 'deployment' | 'analysis' | 'maintenance'
+          priority: 'low' | 'medium' | 'high' | 'urgent'
+          status: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+          prompt: string
+          allowed_tools: Json
+          estimated_tokens: number
+          actual_tokens: number | null
+          execution_time_ms: number | null
+          result: string | null
+          error: string | null
+          created_by: string
+          metadata: Json
+          created_at: string
+          updated_at: string
+          started_at: string | null
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          category: 'development' | 'testing' | 'deployment' | 'analysis' | 'maintenance'
+          priority: 'low' | 'medium' | 'high' | 'urgent'
+          status?: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+          prompt: string
+          allowed_tools?: Json
+          estimated_tokens?: number
+          actual_tokens?: number | null
+          execution_time_ms?: number | null
+          result?: string | null
+          error?: string | null
+          created_by: string
+          metadata?: Json
+          created_at?: string
+          updated_at?: string
+          started_at?: string | null
+          completed_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          category?: 'development' | 'testing' | 'deployment' | 'analysis' | 'maintenance'
+          priority?: 'low' | 'medium' | 'high' | 'urgent'
+          status?: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+          prompt?: string
+          allowed_tools?: Json
+          estimated_tokens?: number
+          actual_tokens?: number | null
+          execution_time_ms?: number | null
+          result?: string | null
+          error?: string | null
+          created_by?: string
+          metadata?: Json
+          created_at?: string
+          updated_at?: string
+          started_at?: string | null
+          completed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agency_pain_points: {
         Row: {
           agency_type_id: string | null

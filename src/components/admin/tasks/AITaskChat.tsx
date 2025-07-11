@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+// Removed framer-motion for performance optimization
 import { PromptInputBox } from '@/components/ui/ai-prompt-box';
 import { grokTaskService } from '@/services/grokTaskService';
 import { voiceService } from '@/services/voiceService';
+import { aiTaskAgent } from '@/services/aiTaskAgent';
 import { Brain, Copy, Check, Play } from 'lucide-react';
 
 // Simple types to avoid import issues
@@ -31,13 +32,15 @@ interface AITaskChatProps {
   chatMessages: ChatMessage[];
   onTasksUpdate: (tasks: Task[]) => void;
   onChatUpdate: (messages: ChatMessage[]) => void;
+  onTaskRefresh?: () => void;
 }
 
 export const AITaskChat: React.FC<AITaskChatProps> = ({
   tasks,
   chatMessages,
   onTasksUpdate,
-  onChatUpdate
+  onChatUpdate,
+  onTaskRefresh
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
@@ -161,87 +164,98 @@ export const AITaskChat: React.FC<AITaskChatProps> = ({
         taskId: message.split(' ')[0]
       });
 
-      // Simulate AI thinking process
-      const aiThoughts = {
-        step1: 'Analyzing user intent and extracting key information',
-        step2: 'Checking if this is a task-related request',
-        step3: 'Determining appropriate response type',
-        step4: 'Generating contextual response',
-        step5: 'Preparing voice output if enabled'
-      };
-
-      console.log('💭 [AI TASK] AI Reasoning Process:');
-      Object.entries(aiThoughts).forEach(([step, thought]) => {
-        console.log(`   ${step}: ${thought}`);
-      });
-
-      // Enhanced AI response logic with detailed logging
-      let aiResponse = '';
+      // Use AI Task Agent for intelligent task processing
+      console.log('🤖 [AI TASK] Using AI Task Agent for processing...');
       
-      console.log('🧠 [AI TASK] Intent Classification:', {
-        isTaskCreation: message.toLowerCase().includes('create') || message.toLowerCase().includes('add'),
-        isTaskQuery: message.toLowerCase().includes('status') || message.toLowerCase().includes('progress'),
-        isTaskUpdate: message.toLowerCase().includes('update') || message.toLowerCase().includes('complete'),
-        isGeneralQuestion: message.includes('?'),
-        sentiment: message.toLowerCase().includes('help') ? 'seeking_help' : 'neutral'
-      });
-
-      if (message.toLowerCase().includes('create') || message.toLowerCase().includes('add')) {
-        console.log('🎯 [AI TASK] Detected: Task Creation Request');
-        console.log('📋 [AI TASK] Extracting task details from input...');
+      let aiResponse = '';
+      let taskActionPerformed = false;
+      
+      try {
+        // Check if this is a task-related command
+        const lowerMessage = message.toLowerCase().trim();
+        const isTaskCommand = lowerMessage.includes('delete') || 
+                             lowerMessage.includes('create') || 
+                             lowerMessage.includes('add') || 
+                             lowerMessage.includes('complete') || 
+                             lowerMessage.includes('status') ||
+                             lowerMessage.includes('clear') ||
+                             lowerMessage.includes('remove') ||
+                             lowerMessage.includes('finish') ||
+                             lowerMessage.includes('done') ||
+                             lowerMessage.startsWith('show') ||
+                             lowerMessage.includes('task') ||
+                             lowerMessage.includes('how many');
         
-        aiResponse = `I understand you want to create a new task. Let me help you with that!
+        if (isTaskCommand) {
+          console.log('🎯 [AI TASK] Task command detected, processing with AI Task Agent...');
+          console.log('🔍 [AI TASK] Original message:', message);
+          console.log('🔍 [AI TASK] Processed message:', lowerMessage);
+          console.log('🔍 [AI TASK] Available task context:', tasks.length, 'tasks');
+          
+          const agentResponse = await aiTaskAgent.processInput(message);
+          console.log('🤖 [AI TASK] Agent response received:', agentResponse);
+          
+          if (agentResponse.success) {
+            aiResponse = `✅ **Task Action Completed**\n\n${agentResponse.message}`;
+            taskActionPerformed = true;
+            
+            // If tasks were modified, trigger a refresh of the task list
+            if (agentResponse.affectedCount && agentResponse.affectedCount > 0) {
+              console.log('🔄 [AI TASK] Tasks modified, triggering refresh...');
+              
+              // Trigger task refresh to update the UI immediately
+              if (onTaskRefresh) {
+                setTimeout(() => {
+                  onTaskRefresh();
+                  console.log('✅ [AI TASK] Task refresh triggered');
+                }, 500); // Small delay to ensure database write completes
+              }
+            }
+          } else {
+            aiResponse = `❌ **Task Action Failed**\n\n${agentResponse.message}`;
+          }
+          
+          console.log('✅ [AI TASK] AI Task Agent response:', agentResponse);
+        } else {
+          // Fall back to conversational responses for non-task commands
+          console.log('💬 [AI TASK] Non-task command, using conversational response...');
+          
+          if (message.toLowerCase().includes('help')) {
+            aiResponse = `I'm here to help you manage your tasks efficiently! Here's what I can do:
 
-Based on your message, I'll create a task for you. Here's what I understand:
-- Task description: "${message}"
-- Priority: I'll set this as medium priority (you can adjust this)
-- Status: New/Pending
-
-Would you like me to add any specific details like deadlines, assignees, or additional notes?`;
-
-        console.log('✅ [AI TASK] Task creation response generated');
-        
-      } else if (message.toLowerCase().includes('status') || message.toLowerCase().includes('progress')) {
-        console.log('🎯 [AI TASK] Detected: Status/Progress Query');
-        
-        aiResponse = `Let me check the current task status for you.
-
-Based on the latest updates:
-- Active tasks: ${Math.floor(Math.random() * 10) + 1}
-- Completed today: ${Math.floor(Math.random() * 5) + 1}
-- Pending review: ${Math.floor(Math.random() * 3) + 1}
-
-Is there a specific task or project you'd like me to focus on?`;
-
-        console.log('✅ [AI TASK] Status query response generated');
-        
-      } else if (message.toLowerCase().includes('help')) {
-        console.log('🤖 [AI TASK] Detected: Help Request');
-        
-        aiResponse = `I'm here to help you manage your tasks efficiently! Here's what I can do:
-
-🔹 **Task Management**: Create, update, and track tasks
-🔹 **Progress Monitoring**: Check status and deadlines
-🔹 **Team Coordination**: Assign tasks and manage workloads
+🔹 **Task Creation**: "Create a new task for..." or "Add task..."
+🔹 **Task Deletion**: "Delete all tasks" or "Clear all main tasks"
+🔹 **Task Completion**: "Complete all tasks" or "Finish all daily tasks"
+🔹 **Status Checking**: "Show task status" or "How many tasks do I have?"
 🔹 **Voice Commands**: Use voice for hands-free operation
 
-What specific area would you like assistance with?`;
+**Examples:**
+• "Delete all high priority tasks"
+• "Create a new development task for API integration"
+• "Complete all daily tasks"
+• "Show me task status"
 
-        console.log('✅ [AI TASK] Help response generated');
-        
-      } else {
-        console.log('🎯 [AI TASK] Detected: General Query/Conversation');
-        console.log('🔍 [AI TASK] Generating contextual response...');
-        
-        const responses = [
-          `I understand your request about "${message}". Let me help you process this in the context of your current tasks and workflow.`,
-          `Thanks for that input! Based on what you've shared, I can help you optimize this aspect of your task management.`,
-          `That's an interesting point about "${message}". How would you like me to incorporate this into your current project workflow?`,
-          `I see you mentioned "${message}". This could be relevant to your ongoing tasks. Would you like me to create an action item for this?`
-        ];
-        
-        aiResponse = responses[Math.floor(Math.random() * responses.length)];
-        console.log('✅ [AI TASK] Contextual response generated');
+What would you like me to help you with?`;
+          } else if (message.toLowerCase().includes('status') || message.toLowerCase().includes('how many')) {
+            // Use AI Task Agent for status even if not detected as command
+            const agentResponse = await aiTaskAgent.processInput('status');
+            aiResponse = agentResponse.success ? agentResponse.message : 
+              `Let me check your current task status...\n\n- Active tasks: ${tasks.filter(t => !t.completed).length}\n- Completed tasks: ${tasks.filter(t => t.completed).length}`;
+          } else {
+            const responses = [
+              `I understand your request about "${message}". Let me help you with your task management needs.`,
+              `Thanks for that input! I can help you create, manage, or organize tasks related to "${message}".`,
+              `Interesting point about "${message}". Would you like me to create a task or help organize this into your workflow?`,
+              `I see you mentioned "${message}". I can help you turn this into actionable tasks or provide status updates.`
+            ];
+            
+            aiResponse = responses[Math.floor(Math.random() * responses.length)] + 
+              `\n\n💡 **Quick Actions:**\n• Say "create task..." to add new tasks\n• Say "delete all tasks" to clear your list\n• Say "status" to see your task overview`;
+          }
+        }
+      } catch (agentError) {
+        console.error('❌ [AI TASK] AI Task Agent error:', agentError);
+        aiResponse = `I encountered an issue processing your task request: ${agentError instanceof Error ? agentError.message : 'Unknown error'}. Please try again or rephrase your request.`;
       }
 
       console.log('📤 [AI TASK] Final AI Response:', aiResponse.substring(0, 100) + '...');
@@ -373,48 +387,23 @@ What specific area would you like assistance with?`;
         </div>
         {chatMessages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-6">
-            <motion.div 
-              className="text-center mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <motion.div 
-                className="w-20 h-20 mx-auto mb-8 flex items-center justify-center"
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 mx-auto mb-8 flex items-center justify-center">
                 <div className="w-16 h-16 border-2 border-orange-500/30 rounded-2xl flex items-center justify-center bg-gradient-to-br from-orange-500/20 to-orange-600/10 backdrop-blur-sm shadow-lg">
                   <Brain className="w-8 h-8 text-orange-400" />
                 </div>
-              </motion.div>
+              </div>
               
-              <motion.h2 
-                className="text-2xl text-white mb-4 font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
+              <h2 className="text-2xl text-white mb-4 font-semibold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 AI Task Assistant
-              </motion.h2>
+              </h2>
               
-              <motion.p 
-                className="text-gray-300 mb-6 max-w-md leading-relaxed"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-              >
+              <p className="text-gray-300 mb-6 max-w-md leading-relaxed">
                 I can help you create tasks, analyze your workload, suggest priorities, and optimize your productivity.
-              </motion.p>
+              </p>
               
               {/* AI Status Indicator */}
-              <motion.div 
-                className="mb-8"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 }}
-              >
+              <div className="mb-8">
                 {grokTaskService.isReady() ? (
                   <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-300 border border-green-500/30 rounded-full text-sm font-medium backdrop-blur-sm shadow-lg">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -426,15 +415,10 @@ What specific area would you like assistance with?`;
                     ⚠️ Demo Mode - Configure VITE_GROQ_API_KEY
                   </div>
                 )}
-              </motion.div>
+              </div>
               
               {/* Enhanced Task Stats */}
-              <motion.div 
-                className="flex items-center justify-center gap-4 mb-8"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.0 }}
-              >
+              <div className="flex items-center justify-center gap-4 mb-8">
                 <div className="px-4 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-300 border border-orange-500/30 rounded-xl text-sm font-semibold backdrop-blur-sm shadow-lg">
                   <span className="text-orange-200">{activeTasks.length}</span> Active
                 </div>
@@ -444,8 +428,8 @@ What specific area would you like assistance with?`;
                 <div className="px-4 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 text-red-300 border border-red-500/30 rounded-xl text-sm font-semibold backdrop-blur-sm shadow-lg">
                   <span className="text-red-200">{tasks.filter(t => t.status === 'overdue').length}</span> Overdue
                 </div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
         ) : (
           <div 
@@ -453,16 +437,8 @@ What specific area would you like assistance with?`;
             className="flex-1 p-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
           >
             <div className="space-y-6">
-              <AnimatePresence>
-                {groupedMessages.map((messageGroup, groupIndex) => (
-                  <motion.div
-                    key={`group-${groupIndex}`}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3, delay: groupIndex * 0.1 }}
-                    className={`flex ${messageGroup[0].sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
+              {groupedMessages.map((messageGroup, groupIndex) => (
+                  <div key={`group-${groupIndex}`} className={`flex ${messageGroup[0].sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`flex items-end gap-3 max-w-[85%] ${messageGroup[0].sender === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                       {/* Avatar */}
                       <div className="flex-shrink-0 mb-1">
@@ -484,11 +460,8 @@ What specific area would you like assistance with?`;
                       {/* Message Group */}
                       <div className="space-y-2">
                         {messageGroup.map((message, messageIndex) => (
-                          <motion.div
+                          <div
                             key={message.id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.2, delay: messageIndex * 0.05 }}
                             className="group relative"
                           >
                             <div className={`relative p-4 rounded-2xl backdrop-blur-sm shadow-lg transition-all duration-200 hover:shadow-xl ${
@@ -542,22 +515,16 @@ What specific area would you like assistance with?`;
                                 </div>
                               </div>
                             </div>
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
-              </AnimatePresence>
               
               {/* Enhanced Loading Indicator */}
               {isLoading && (
-                <motion.div 
-                  className="flex justify-start"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                >
+                <div className="flex justify-start">
                   <div className="flex items-end gap-3 max-w-[85%]">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/30 to-orange-600/20 border border-orange-500/30 flex items-center justify-center backdrop-blur-sm shadow-lg">
                       <Brain className="w-5 h-5 text-orange-400 animate-pulse" />
@@ -576,7 +543,7 @@ What specific area would you like assistance with?`;
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
               
               {/* Scroll anchor */}

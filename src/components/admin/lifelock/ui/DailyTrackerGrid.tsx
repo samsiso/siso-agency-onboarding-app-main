@@ -22,8 +22,8 @@ interface DailyTrackerGridProps {
 }
 
 const gapClasses = {
-  sm: 'gap-3',
-  md: 'gap-4 sm:gap-5',
+  sm: 'gap-2 sm:gap-3',
+  md: 'gap-3 sm:gap-4 lg:gap-5',
   lg: 'gap-4 sm:gap-6 lg:gap-8'
 };
 

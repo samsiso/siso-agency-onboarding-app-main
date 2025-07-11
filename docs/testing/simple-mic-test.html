@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎤 Simple Mic Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 600px; 
+            margin: 50px auto; 
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        button { 
+            background: #ff6b35; 
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            font-size: 18px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin: 10px;
+        }
+        button:hover { background: #e55a2e; }
+        .status { 
+            background: #333; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 15px 0; 
+        }
+        .success { background: #0a4d0a; }
+        .error { background: #4d0a0a; }
+    </style>
+</head>
+<body>
+    <h1>🎤 Simple Microphone Test</h1>
+    <p>This will help us bypass Chrome's permission issues.</p>
+    
+    <button onclick="testMicrophone()">🎤 Test Microphone</button>
+    <button onclick="testSpeech()">🗣️ Test Speech</button>
+    
+    <div id="status" class="status">Ready to test...</div>
+    <div id="transcript" class="status" style="display: none;"></div>
+
+    <script>
+        let recognition = null;
+
+        function log(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = message;
+            status.className = 'status ' + type;
+        }
+
+        async function testMicrophone() {
+            log('🔄 Testing microphone access...', 'info');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+                
+                log('✅ Microphone access GRANTED! Device: ' + 
+                    (stream.getAudioTracks()[0].label || 'Default'), 'success');
+                
+                // Clean up
+                stream.getTracks().forEach(track => track.stop());
+                
+            } catch (error) {
+                log('❌ Microphone BLOCKED: ' + error.message + 
+                    '<br><br>🔧 Fix: Click the microphone icon 🎤 in address bar and allow', 'error');
+            }
+        }
+
+        function testSpeech() {
+            if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+                log('❌ Speech recognition not supported in this browser', 'error');
+                return;
+            }
+
+            log('🎤 Starting speech recognition... SAY SOMETHING!', 'info');
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                document.getElementById('transcript').style.display = 'block';
+                document.getElementById('transcript').innerHTML = 'Listening... speak now!';
+            };
+
+            recognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                
+                document.getElementById('transcript').innerHTML = 'You said: "' + transcript + '"';
+                
+                if (event.results[event.results.length - 1].isFinal) {
+                    log('✅ Speech recognition SUCCESS! Final: "' + transcript + '"', 'success');
+                }
+            };
+
+            recognition.onerror = (event) => {
+                log('❌ Speech error: ' + event.error, 'error');
+            };
+
+            recognition.start();
+        }
+
+        // Auto-test on load
+        window.onload = function() {
+            log('🔍 Checking browser capabilities...', 'info');
+            
+            const capabilities = [
+                'SpeechRecognition: ' + !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+                'MediaDevices: ' + !!navigator.mediaDevices,
+                'getUserMedia: ' + !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+                'HTTPS/Localhost: ' + (location.protocol === 'https:' || location.hostname === 'localhost')
+            ];
+            
+            log('Browser check:<br>' + capabilities.join('<br>'), 'info');
+        };
+    </script>
+</body>
+</html>
