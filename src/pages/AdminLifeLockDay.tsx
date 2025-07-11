@@ -61,8 +61,17 @@ const AdminLifeLockDay: React.FC = () => {
   const [dailyHabitsData, setDailyHabitsData] = useState<DailyHabits | null>(null);
   const [dailyReflectionsData, setDailyReflectionsData] = useState<DailyReflections | null>(null);
 
-  // Derived state from LifeLock data
-  const morningRoutine = dailyRoutineData?.items || [];
+  // Derived state from LifeLock data with fallbacks
+  const morningRoutine = dailyRoutineData?.items || [
+    { id: '1', title: 'Wake Up', completed: false, description: 'Start the day before midday to maximize productivity.' },
+    { id: '2', title: 'Get Blood Flowing (5 min)', completed: false, description: 'Max rep push-ups (Target PB: 30).', logField: 'Log reps: ____' },
+    { id: '3', title: 'Hydrate (5 min)', completed: false, description: 'Drink 500 ml water to start the day.' },
+    { id: '4', title: 'Supplements & Pre-Workout (5 min)', completed: false, description: 'Take omega-3, multivitamin, ashwagandha, and pre-workout.' },
+    { id: '5', title: 'Shower & Brush Teeth (25 min)', completed: false, description: 'Cold shower to wake up.' },
+    { id: '6', title: 'Review & Plan Day (15 min)', completed: false, description: 'Go through tasks, prioritize, and allocate time slots.' },
+    { id: '7', title: 'Meditation (2 min)', completed: false, description: 'Meditate to set an innovative mindset for creating business value.' }
+  ];
+  
   const setMorningRoutine = (items: any[]) => {
     if (dailyRoutineData) {
       const updatedRoutine = { ...dailyRoutineData, items };
@@ -238,8 +247,14 @@ const AdminLifeLockDay: React.FC = () => {
     }
   };
 
-  // Workout Data from Supabase
-  const workoutItems = dailyWorkoutData?.exercises || [];
+  // Workout Data from Supabase with fallbacks
+  const workoutItems = dailyWorkoutData?.exercises || [
+    { id: '1', title: 'Push-ups', completed: false, target: '50 reps', logged: '' },
+    { id: '2', title: 'Squats', completed: false, target: '100 reps', logged: '' },
+    { id: '3', title: 'Plank', completed: false, target: '2 minutes', logged: '' },
+    { id: '4', title: 'Burpees', completed: false, target: '20 reps', logged: '' },
+    { id: '5', title: 'Mountain Climbers', completed: false, target: '50 reps', logged: '' }
+  ];
   const setWorkoutItems = (exercises: any[]) => {
     if (dailyWorkoutData) {
       const updatedWorkout = { ...dailyWorkoutData, exercises };
@@ -248,8 +263,14 @@ const AdminLifeLockDay: React.FC = () => {
     }
   };
 
-  // Health Non-Negotiables from Supabase
-  const healthItems = dailyHealthData?.health_checklist || [];
+  // Health Non-Negotiables from Supabase with fallbacks
+  const healthItems = dailyHealthData?.health_checklist || [
+    { id: '1', title: 'Take vitamins/supplements', completed: false },
+    { id: '2', title: 'Drink 2L+ water', completed: false },
+    { id: '3', title: 'No smoking THC', completed: false },
+    { id: '4', title: 'Eat balanced meals', completed: false },
+    { id: '5', title: 'Get 7+ hours sleep', completed: false }
+  ];
   const setHealthItems = (items: any[]) => {
     if (dailyHealthData) {
       const updatedHealth = { ...dailyHealthData, health_checklist: items };
@@ -345,33 +366,39 @@ const AdminLifeLockDay: React.FC = () => {
   // Load all LifeLock data from Supabase on mount and date change
   useEffect(() => {
     let isMounted = true; // Prevent state updates if component unmounted
+    let timeoutId: NodeJS.Timeout;
     
     const loadLifeLockData = async () => {
       if (!isMounted) return;
       
       setIsLoadingLifeLockData(true);
-      console.log('Loading LifeLock data for date:', format(currentDate, 'yyyy-MM-dd'));
+      console.log('AdminLifeLockDay: Loading LifeLock data for date:', format(currentDate, 'yyyy-MM-dd'));
       
-      try {
-        // Try to migrate localStorage data first (only if Supabase data doesn't exist)
-        const existingData = await LifeLockService.getAllDailyData(currentDate);
-        
-        if (!isMounted) return;
-        
-        // If no data exists in Supabase, try to migrate from localStorage
-        if (!existingData.routine && !existingData.workout && !existingData.health) {
-          console.log('No Supabase data found, attempting localStorage migration...');
-          await LifeLockService.migrateLocalStorageData(currentDate);
+      // Set a maximum timeout for the entire operation
+      timeoutId = setTimeout(() => {
+        if (isMounted) {
+          console.error('AdminLifeLockDay: Data loading timed out after 15 seconds');
+          setDailyRoutineData(null);
+          setDailyWorkoutData(null);
+          setDailyHealthData(null);
+          setDailyHabitsData(null);
+          setDailyReflectionsData(null);
+          setIsLoadingLifeLockData(false);
         }
-        
-        if (!isMounted) return;
-        
-        // Load fresh data from Supabase after potential migration
+      }, 15000); // 15 second timeout
+
+      try {
+        // Single call to getAllDailyData with improved error handling
         const data = await LifeLockService.getAllDailyData(currentDate);
         
         if (!isMounted) return;
         
-        console.log('Loaded LifeLock data successfully:', data);
+        // Clear timeout since we got data
+        clearTimeout(timeoutId);
+        
+        console.log('AdminLifeLockDay: Loaded LifeLock data successfully:', data);
+        
+        // Set data even if some parts are null - the component can handle it
         setDailyRoutineData(data.routine);
         setDailyWorkoutData(data.workout);
         setDailyHealthData(data.health);
@@ -379,9 +406,11 @@ const AdminLifeLockDay: React.FC = () => {
         setDailyReflectionsData(data.reflections);
         
       } catch (error) {
-        console.error('Failed to load LifeLock data:', error);
+        console.error('AdminLifeLockDay: Failed to load LifeLock data:', error);
+        clearTimeout(timeoutId);
+        
         if (isMounted) {
-          // Set default data to prevent infinite loading
+          // Set null data to allow component to render with default values
           setDailyRoutineData(null);
           setDailyWorkoutData(null);
           setDailyHealthData(null);
@@ -390,6 +419,7 @@ const AdminLifeLockDay: React.FC = () => {
         }
       } finally {
         if (isMounted) {
+          clearTimeout(timeoutId);
           setIsLoadingLifeLockData(false);
         }
       }
@@ -399,6 +429,9 @@ const AdminLifeLockDay: React.FC = () => {
     
     return () => {
       isMounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
   }, [currentDate]);
 

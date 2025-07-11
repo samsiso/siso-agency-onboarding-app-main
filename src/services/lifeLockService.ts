@@ -698,23 +698,116 @@ export class LifeLockService {
   }
 
   /**
-   * Get all daily data for a specific date
+   * Get all daily data for a specific date with improved error handling
    */
   static async getAllDailyData(date: Date = new Date()) {
-    const [routine, workout, health, habits, reflections] = await Promise.all([
-      this.getDailyRoutine(date),
-      this.getDailyWorkout(date),
-      this.getDailyHealth(date),
-      this.getDailyHabits(date),
-      this.getDailyReflections(date)
-    ]);
+    console.log('LifeLockService: Starting getAllDailyData for', format(date, 'yyyy-MM-dd'));
+    
+    // Check authentication first
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        console.error('LifeLockService: Authentication failed:', error);
+        return {
+          routine: null,
+          workout: null,
+          health: null,
+          habits: null,
+          reflections: null
+        };
+      }
+      console.log('LifeLockService: User authenticated:', user.id);
+    } catch (authError) {
+      console.error('LifeLockService: Authentication error:', authError);
+      return {
+        routine: null,
+        workout: null,
+        health: null,
+        habits: null,
+        reflections: null
+      };
+    }
 
-    return {
-      routine,
-      workout,
-      health,
-      habits,
-      reflections
+    // Load data sequentially with individual error handling to prevent total failure
+    const results = {
+      routine: null as DailyRoutine | null,
+      workout: null as DailyWorkout | null,
+      health: null as DailyHealth | null,
+      habits: null as DailyHabits | null,
+      reflections: null as DailyReflections | null
     };
+
+    // Load routine data with timeout
+    try {
+      console.log('LifeLockService: Loading routine data...');
+      const routinePromise = this.getDailyRoutine(date);
+      const routineTimeout = new Promise<null>((_, reject) => 
+        setTimeout(() => reject(new Error('Routine timeout')), 5000)
+      );
+      results.routine = await Promise.race([routinePromise, routineTimeout]);
+      console.log('LifeLockService: Routine data loaded successfully');
+    } catch (error) {
+      console.error('LifeLockService: Failed to load routine data:', error);
+      results.routine = null;
+    }
+
+    // Load workout data with timeout
+    try {
+      console.log('LifeLockService: Loading workout data...');
+      const workoutPromise = this.getDailyWorkout(date);
+      const workoutTimeout = new Promise<null>((_, reject) => 
+        setTimeout(() => reject(new Error('Workout timeout')), 5000)
+      );
+      results.workout = await Promise.race([workoutPromise, workoutTimeout]);
+      console.log('LifeLockService: Workout data loaded successfully');
+    } catch (error) {
+      console.error('LifeLockService: Failed to load workout data:', error);
+      results.workout = null;
+    }
+
+    // Load health data with timeout
+    try {
+      console.log('LifeLockService: Loading health data...');
+      const healthPromise = this.getDailyHealth(date);
+      const healthTimeout = new Promise<null>((_, reject) => 
+        setTimeout(() => reject(new Error('Health timeout')), 5000)
+      );
+      results.health = await Promise.race([healthPromise, healthTimeout]);
+      console.log('LifeLockService: Health data loaded successfully');
+    } catch (error) {
+      console.error('LifeLockService: Failed to load health data:', error);
+      results.health = null;
+    }
+
+    // Load habits data with timeout
+    try {
+      console.log('LifeLockService: Loading habits data...');
+      const habitsPromise = this.getDailyHabits(date);
+      const habitsTimeout = new Promise<null>((_, reject) => 
+        setTimeout(() => reject(new Error('Habits timeout')), 5000)
+      );
+      results.habits = await Promise.race([habitsPromise, habitsTimeout]);
+      console.log('LifeLockService: Habits data loaded successfully');
+    } catch (error) {
+      console.error('LifeLockService: Failed to load habits data:', error);
+      results.habits = null;
+    }
+
+    // Load reflections data with timeout
+    try {
+      console.log('LifeLockService: Loading reflections data...');
+      const reflectionsPromise = this.getDailyReflections(date);
+      const reflectionsTimeout = new Promise<null>((_, reject) => 
+        setTimeout(() => reject(new Error('Reflections timeout')), 5000)
+      );
+      results.reflections = await Promise.race([reflectionsPromise, reflectionsTimeout]);
+      console.log('LifeLockService: Reflections data loaded successfully');
+    } catch (error) {
+      console.error('LifeLockService: Failed to load reflections data:', error);
+      results.reflections = null;
+    }
+
+    console.log('LifeLockService: Completed getAllDailyData with results:', results);
+    return results;
   }
 }
