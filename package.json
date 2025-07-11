@@ -34,7 +34,10 @@
     "kb:extract": "tsx src/knowledge-base/insight-extractor.ts",
     "kb:stats": "tsx src/knowledge-base/knowledge-base-manager.ts stats",
     "kb:export": "tsx src/knowledge-base/knowledge-base-manager.ts export",
-    "kb:search": "tsx src/knowledge-base/knowledge-base-manager.ts search"
+    "kb:search": "tsx src/knowledge-base/knowledge-base-manager.ts search",
+    "migrate:lifelock": "node scripts/migrate-lifelock-hardcoded-data.js",
+    "migrate:lifelock:default": "node scripts/migrate-lifelock-default-data.js",
+    "setup:admin": "node scripts/setup-admin-user.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
